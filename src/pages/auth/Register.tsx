@@ -12,7 +12,7 @@ const HeartIcon = () => (
     viewBox="0 0 24 24"
     strokeWidth={1.8}
     stroke="currentColor"
-    className="w-5 h-5"
+    className="w-7 h-7"
   >
     <path
       strokeLinecap="round"
@@ -242,7 +242,7 @@ const Register: React.FC = () => {
     handleTogglePassword,
     handleToggleConfirmPassword,
     handleRegister,
-    handleGoogleRegister,
+    loginWithGoogle,
   } = useRegisterHooks();
 
   const toggleBtn = (show: boolean, onToggle: () => void) => (
@@ -259,7 +259,7 @@ const Register: React.FC = () => {
   return (
     <div className="min-h-screen flex">
       {/* ── Left decorative panel ── */}
-      <div className="hidden lg:flex lg:w-[45%] relative bg-gradient-to-br from-primary via-primary-hover to-secondary overflow-hidden flex-col items-center justify-center px-12">
+      <div className="hidden lg:flex lg:w-[50%] relative bg-gradient-to-br from-primary via-primary-hover to-secondary overflow-hidden flex-col items-center justify-center px-12">
         {/* Blobs */}
 
         <div className="absolute top-1/4 right-8 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
@@ -268,7 +268,7 @@ const Register: React.FC = () => {
         <div className="relative z-10 text-center text-white space-y-8 max-w-sm">
           {/* Logo */}
           <div className="flex items-center justify-center gap-3">
-            <div className="bg-white/20 backdrop-blur-sm p-2.5 rounded-2xl">
+            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
               <HeartIcon />
             </div>
             <span className="text-3xl font-extrabold tracking-tight">BookingHealth</span>
@@ -317,7 +317,7 @@ const Register: React.FC = () => {
       </div>
 
       {/* ── Right form panel ── */}
-      <div className="w-full lg:w-[55%] flex items-center justify-center px-6 py-10 bg-background overflow-y-auto">
+      <div className="w-full lg:w-[50%] flex items-center justify-center px-6 py-10 bg-background overflow-y-auto">
         <div className="w-full max-w-lg">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center justify-center gap-2 mb-8">
@@ -340,7 +340,7 @@ const Register: React.FC = () => {
             <button
               id="google-register-btn"
               type="button"
-              onClick={handleGoogleRegister}
+              onClick={() => loginWithGoogle()}
               className="w-full flex items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground shadow-sm transition-all duration-200 hover:bg-accent hover:border-primary/30 hover:shadow-md active:scale-[0.98] cursor-pointer"
             >
               <GoogleIcon />

@@ -139,8 +139,8 @@ const Login: React.FC = () => {
     handleChange,
     handleTogglePassword,
     handleLogin,
-    handleGoogleLogin,
     handleForgotPassword,
+    loginWithGoogle,
   } = useLoginHooks();
 
   return (
@@ -148,8 +148,6 @@ const Login: React.FC = () => {
       {/* ── Left panel (decorative) ── */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary via-primary-hover to-secondary overflow-hidden flex-col items-center justify-center px-12">
         {/* Decorative circles */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/5 rounded-full" />
-        <div className="absolute -bottom-32 -right-16 w-80 h-80 bg-white/5 rounded-full" />
         <div className="absolute top-1/3 right-8 w-40 h-40 bg-secondary/20 rounded-full blur-2xl" />
 
         <div className="relative z-10 text-center text-white space-y-8 max-w-sm">
@@ -219,7 +217,7 @@ const Login: React.FC = () => {
               <button
                 id="google-login-btn"
                 type="button"
-                onClick={handleGoogleLogin}
+                onClick={() => loginWithGoogle()}
                 className="w-full flex items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground shadow-sm transition-all duration-200 hover:bg-accent hover:border-primary/30 hover:shadow-md active:scale-[0.98] cursor-pointer"
               >
                 <GoogleIcon />

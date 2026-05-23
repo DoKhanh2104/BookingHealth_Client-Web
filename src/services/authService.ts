@@ -33,6 +33,14 @@ export interface SignupResponse {
   message?: string;
 }
 
+export interface GoogleLoginResponse {
+  code: number;
+  result?: {
+    token: string;
+  };
+  message?: string;
+}
+
 export const authService = {
   login: async (data: LoginPayload): Promise<LoginResponse> => {
     const response = await apiClient.post('/auth/login', {
@@ -59,6 +67,14 @@ export const authService = {
 
   forgotPassword: async (data: ForgotPasswordPayload) => {
     const response = await apiClient.post('/auth/forgot-password', data);
+    return response.data;
+  },
+
+  /**
+   * Đăng nhập bằng Google OAuth access token
+   */
+  loginWithGoogle: async (accessToken: string): Promise<GoogleLoginResponse> => {
+    const response = await apiClient.post('/auth/google', { token: accessToken });
     return response.data;
   },
 
