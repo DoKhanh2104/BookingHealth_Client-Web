@@ -15,11 +15,7 @@ export const chatService = {
    * GET /chat-rooms/:roomId/messages
    * Lấy danh sách tin nhắn trong phòng (TIN_NHAN)
    */
-  getMessages: async (
-    roomId: number,
-    page = 0,
-    size = 50
-  ): Promise<ApiResponse<ChatMessage[]>> => {
+  getMessages: async (roomId: number, page = 0, size = 50): Promise<ApiResponse<ChatMessage[]>> => {
     const res = await apiClient.get(`/chat-rooms/${roomId}/messages`, {
       params: { page, size },
     });

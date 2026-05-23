@@ -75,8 +75,8 @@ export interface Clinic {
 export interface DoctorQualification {
   id: number;
   doctorId: number;
-  degree: string;        // tenTrinhDo
-  issueDate: string;     // ngayCap (ISO date)
+  degree: string; // tenTrinhDo
+  issueDate: string; // ngayCap (ISO date)
 }
 
 export interface Doctor {
@@ -85,7 +85,7 @@ export interface Doctor {
   practiceStartDate?: string;
   practiceLicenseNumber?: string;
   practiceLicenseImage?: string;
-  status?: number;       // trangThaiXacNhan: 0=pending,1=approved,2=rejected
+  status?: number; // trangThaiXacNhan: 0=pending,1=approved,2=rejected
   specialties: Specialty[];
   clinic?: Clinic;
   qualifications?: DoctorQualification[];
@@ -111,8 +111,8 @@ export interface PriceHistory {
   id: number;
   doctorId: number;
   examinationFee: number; // chiPhiKham
-  appliedDate: string;    // ngayApDung
-  status: number;         // 0:inactive, 1:active
+  appliedDate: string; // ngayApDung
+  status: number; // 0:inactive, 1:active
 }
 
 // ─────────────────────────────────────────────
@@ -122,7 +122,7 @@ export interface PriceHistory {
 export interface WorkSchedule {
   id: number;
   doctorId: number;
-  workDate: string;           // ngayLamViec
+  workDate: string; // ngayLamViec
   appointmentSlots: AppointmentSlot[];
 }
 
@@ -132,9 +132,9 @@ export interface WorkSchedule {
 
 export interface AppointmentSlot {
   id: number;
-  startTime: string;   // thoiGianBatDau (HH:mm)
-  endTime: string;     // thoiGianKetThuc (HH:mm)
-  status: number;      // 0: booked, 1: available
+  startTime: string; // thoiGianBatDau (HH:mm)
+  endTime: string; // thoiGianKetThuc (HH:mm)
+  status: number; // 0: booked, 1: available
   workScheduleId: number;
 }
 
@@ -202,7 +202,7 @@ export interface BookAppointmentRequest {
 
 export interface DoctorReview {
   id: number;
-  rating: number;      // 1-5
+  rating: number; // 1-5
   comment?: string;
   doctorId: number;
   userId: number;
@@ -234,9 +234,9 @@ export interface Notification {
   userId: number;
   title: string;
   content: string;
-  type: number;        // loai
-  isRead: boolean;     // trangThai (derived)
-  createdAt: string;   // den
+  type: number; // loai
+  isRead: boolean; // trangThai (derived)
+  createdAt: string; // den
 }
 
 // ─────────────────────────────────────────────
@@ -246,7 +246,7 @@ export interface Notification {
 export interface ChatRoom {
   id: number;
   appointmentId: number;
-  status: number;      // 0: closed, 1: open
+  status: number; // 0: closed, 1: open
 }
 
 export interface ChatMessage {
@@ -256,7 +256,7 @@ export interface ChatMessage {
   senderName?: string;
   senderAvatar?: string;
   content: string;
-  sentAt: string;      // thoiGian (ISO datetime)
+  sentAt: string; // thoiGian (ISO datetime)
 }
 
 export interface SendMessageRequest {
@@ -273,7 +273,7 @@ export interface ScreeningLog {
   userId: number;
   specialtyId: number;
   recommendedSpecialtyId?: number;
-  symptoms: string;    // trieuChung
+  symptoms: string; // trieuChung
   createdAt?: string;
 }
 
@@ -296,7 +296,7 @@ export interface VerificationRequest {
   id: number;
   doctorId: number;
   adminId?: number;
-  status: number;      // 0:pending, 1:approved, 2:rejected
+  status: number; // 0:pending, 1:approved, 2:rejected
   rejectionReason?: string;
 }
 

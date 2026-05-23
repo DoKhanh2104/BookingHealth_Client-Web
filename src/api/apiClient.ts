@@ -1,11 +1,11 @@
-import axios from "axios";
+import axios from 'axios';
 
-export const TOKEN_KEY = "bookinghealth_admin_token";
+export const TOKEN_KEY = 'bookinghealth_admin_token';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
-    Accept: "application/json",
+    Accept: 'application/json',
   },
   withCredentials: true, // Nếu BE có xài Cookie thì cứ giữ
   timeout: 10000,
@@ -33,9 +33,9 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       // KHÔNG redirect nếu lỗi 401 phát ra từ API Đăng nhập (vì đây là lỗi sai mật khẩu, không phải lỗi hết hạn Token)
-      if (error.config && !error.config.url?.includes("/auth/login")) {
+      if (error.config && !error.config.url?.includes('/auth/login')) {
         localStorage.removeItem(TOKEN_KEY);
-        window.location.href = "/login";
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);

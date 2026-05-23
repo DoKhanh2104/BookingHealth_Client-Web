@@ -17,11 +17,37 @@ export interface ForgotPasswordPayload {
   phone: string;
 }
 
+export interface SignupPayload {
+  phone: string;
+  email: string;
+  password: string;
+  name: string;
+}
+
+export interface SignupResponse {
+  code: number;
+  result?: {
+    token: string;
+    authenticated: boolean;
+  };
+  message?: string;
+}
+
 export const authService = {
   login: async (data: LoginPayload): Promise<LoginResponse> => {
     const response = await apiClient.post('/auth/login', {
       username: data.phone,
       password: data.password,
+    });
+    return response.data;
+  },
+
+  signup: async (data: SignupPayload): Promise<SignupResponse> => {
+    const response = await apiClient.post('/auth/signup', {
+      phone: data.phone,
+      email: data.email,
+      password: data.password,
+      name: data.name,
     });
     return response.data;
   },

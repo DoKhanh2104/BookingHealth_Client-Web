@@ -1,10 +1,11 @@
-import { createBrowserRouter } from "react-router-dom";
-import ClientLayout from "../../layouts/ClientLayout";
-import RootLayout from "../../layouts/RootLayout";
-import Home from "../../pages/home/Home";
-import Login from "../../pages/auth/Login";
-import PageNotFound from "../../pages/error/PageNotFound";
-import ComingSoon from "../../components/ComingSoon";
+import { createBrowserRouter } from 'react-router-dom';
+import ClientLayout from '../../layouts/ClientLayout';
+import RootLayout from '../../layouts/RootLayout';
+import Home from '../../pages/home/Home';
+import Login from '../../pages/auth/Login';
+import Register from '../../pages/auth/Register';
+import PageNotFound from '../../pages/error/PageNotFound';
+import ComingSoon from '../../components/ComingSoon';
 
 /**
  * Routes cho trang client BookingHealth
@@ -33,59 +34,59 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       {
-        path: "/",
+        path: '/',
         element: <ClientLayout />,
         children: [
           // Trang chủ
           { index: true, element: <Home /> },
 
           // Bác sĩ - BAC_SI
-          { path: "doctors", element: <ComingSoon title="Danh sách Bác sĩ" /> },
-          { path: "doctors/:id", element: <ComingSoon title="Chi tiết Bác sĩ" /> },
+          { path: 'doctors', element: <ComingSoon title="Danh sách Bác sĩ" /> },
+          { path: 'doctors/:id', element: <ComingSoon title="Chi tiết Bác sĩ" /> },
 
           // Chuyên khoa - CHUYEN_KHOA
-          { path: "specialties", element: <ComingSoon title="Chuyên khoa" /> },
-          { path: "specialties/:id", element: <ComingSoon title="Chi tiết Chuyên khoa" /> },
+          { path: 'specialties', element: <ComingSoon title="Chuyên khoa" /> },
+          { path: 'specialties/:id', element: <ComingSoon title="Chi tiết Chuyên khoa" /> },
 
           // Phòng khám - PHONG_KHAM
-          { path: "clinics", element: <ComingSoon title="Phòng khám" /> },
-          { path: "clinics/:id", element: <ComingSoon title="Chi tiết Phòng khám" /> },
+          { path: 'clinics', element: <ComingSoon title="Phòng khám" /> },
+          { path: 'clinics/:id', element: <ComingSoon title="Chi tiết Phòng khám" /> },
 
           // AI Sàng lọc - NHAT_KY_SANG_LOC
-          { path: "screening", element: <ComingSoon title="AI Sàng lọc Sức khoẻ" /> },
+          { path: 'screening', element: <ComingSoon title="AI Sàng lọc Sức khoẻ" /> },
 
           // Lịch hẹn - LICH_HEN
-          { path: "appointments", element: <ComingSoon title="Lịch hẹn của tôi" /> },
-          { path: "appointments/:id", element: <ComingSoon title="Chi tiết Lịch hẹn" /> },
+          { path: 'appointments', element: <ComingSoon title="Lịch hẹn của tôi" /> },
+          { path: 'appointments/:id', element: <ComingSoon title="Chi tiết Lịch hẹn" /> },
 
           // Chat sau khám - PHONG_HOI_THOAI / TIN_NHAN
-          { path: "appointments/:id/chat", element: <ComingSoon title="Chat với Bác sĩ" /> },
+          { path: 'appointments/:id/chat', element: <ComingSoon title="Chat với Bác sĩ" /> },
 
           // Đặt lịch - booking flow
-          { path: "booking", element: <ComingSoon title="Đặt lịch khám" /> },
+          { path: 'booking', element: <ComingSoon title="Đặt lịch khám" /> },
 
           // Hồ sơ cá nhân - NGUOI_DUNG
-          { path: "profile", element: <ComingSoon title="Hồ sơ cá nhân" /> },
+          { path: 'profile', element: <ComingSoon title="Hồ sơ cá nhân" /> },
 
           // Thông báo - THONG_BAO
-          { path: "notifications", element: <ComingSoon title="Thông báo" /> },
+          { path: 'notifications', element: <ComingSoon title="Thông báo" /> },
 
           // Thông tin tĩnh
-          { path: "about", element: <ComingSoon title="Về chúng tôi" /> },
-          { path: "faq", element: <ComingSoon title="Câu hỏi thường gặp" /> },
-          { path: "privacy", element: <ComingSoon title="Chính sách bảo mật" /> },
-          { path: "terms", element: <ComingSoon title="Điều khoản dịch vụ" /> },
-          { path: "guide", element: <ComingSoon title="Hướng dẫn sử dụng" /> },
-          { path: "news", element: <ComingSoon title="Tin tức" /> },
+          { path: 'about', element: <ComingSoon title="Về chúng tôi" /> },
+          { path: 'faq', element: <ComingSoon title="Câu hỏi thường gặp" /> },
+          { path: 'privacy', element: <ComingSoon title="Chính sách bảo mật" /> },
+          { path: 'terms', element: <ComingSoon title="Điều khoản dịch vụ" /> },
+          { path: 'guide', element: <ComingSoon title="Hướng dẫn sử dụng" /> },
+          { path: 'news', element: <ComingSoon title="Tin tức" /> },
         ],
       },
 
       // Auth routes (không có Header/Footer)
-      { path: "login", element: <Login /> },
-      { path: "register", element: <ComingSoon title="Đăng ký tài khoản" /> },
+      { path: 'login', element: <Login /> },
+      { path: 'register', element: <Register /> },
 
       // 404
-      { path: "*", element: <PageNotFound /> },
+      { path: '*', element: <PageNotFound /> },
     ],
   },
 ]);

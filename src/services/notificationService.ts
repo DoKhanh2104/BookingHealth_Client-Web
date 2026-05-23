@@ -5,7 +5,7 @@ export const notificationService = {
   /** GET /notifications/me - Danh sách thông báo của tôi */
   getMyNotifications: async (
     page = 0,
-    size = 20
+    size = 20,
   ): Promise<ApiResponse<PageResponse<Notification>>> => {
     const res = await apiClient.get('/notifications/me', { params: { page, size } });
     return res.data;

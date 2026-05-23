@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HomeIcon = ({ className }: { className?: string }) => (
   <svg
@@ -27,7 +27,7 @@ const PageNotFound: React.FC = () => {
         <div className="relative flex items-center justify-center mb-2">
           {/* Subtle glowing effect in the background */}
           <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-primary to-secondary opacity-20 blur-2xl select-none pointer-events-none" />
-          
+
           <h1 className="relative text-[120px] md:text-[200px] font-black leading-none bg-gradient-to-br from-primary to-primary-hover bg-clip-text text-transparent opacity-15 select-none tracking-tighter">
             404
           </h1>
@@ -38,11 +38,12 @@ const PageNotFound: React.FC = () => {
         </h2>
 
         <p className="text-muted-foreground max-w-[480px] text-base md:text-lg leading-relaxed">
-          Có vẻ như bạn đã đi lạc hoặc đường dẫn này đã bị thay đổi. Đừng lo lắng, hãy quay lại trang chủ để tiếp tục công việc nhé.
+          Có vẻ như bạn đã đi lạc hoặc đường dẫn này đã bị thay đổi. Đừng lo lắng, hãy quay lại
+          trang chủ để tiếp tục công việc nhé.
         </p>
 
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate('/')}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-10 py-3.5 text-base font-bold text-primary-foreground shadow-[0_8px_25px_rgba(26,113,180,0.4)] transition-all duration-300 ease-in-out hover:-translate-y-[3px] hover:shadow-[0_12px_30px_rgba(26,113,180,0.6)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] cursor-pointer"
         >
           <HomeIcon className="w-5 h-5" />

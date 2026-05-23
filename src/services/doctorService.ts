@@ -1,5 +1,12 @@
 import apiClient from '../api/apiClient';
-import type { ApiResponse, PageResponse, Doctor, DoctorReview, CreateReviewRequest, WorkSchedule } from '../types';
+import type {
+  ApiResponse,
+  PageResponse,
+  Doctor,
+  DoctorReview,
+  CreateReviewRequest,
+  WorkSchedule,
+} from '../types';
 
 export interface DoctorFilterParams {
   page?: number;
@@ -23,7 +30,10 @@ export const doctorService = {
   },
 
   /** GET /doctors/:id/work-schedules - Lịch làm việc của bác sĩ (theo ngày) */
-  getWorkSchedules: async (doctorId: number, date: string): Promise<ApiResponse<WorkSchedule[]>> => {
+  getWorkSchedules: async (
+    doctorId: number,
+    date: string,
+  ): Promise<ApiResponse<WorkSchedule[]>> => {
     const res = await apiClient.get(`/doctors/${doctorId}/work-schedules`, { params: { date } });
     return res.data;
   },
@@ -32,7 +42,7 @@ export const doctorService = {
   getReviews: async (
     doctorId: number,
     page = 0,
-    size = 10
+    size = 10,
   ): Promise<ApiResponse<PageResponse<DoctorReview>>> => {
     const res = await apiClient.get(`/doctors/${doctorId}/reviews`, { params: { page, size } });
     return res.data;
