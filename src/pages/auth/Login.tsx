@@ -93,6 +93,40 @@ const GoogleIcon = () => (
   </svg>
 );
 
+const EmailIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.8}
+    stroke="currentColor"
+    className="w-5 h-5"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+    />
+  </svg>
+);
+
+const KeyIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.8}
+    stroke="currentColor"
+    className="w-5 h-5"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 0 1 21.75 8.25Z"
+    />
+  </svg>
+);
+
 const ArrowLeftIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -130,16 +164,29 @@ const Login: React.FC = () => {
     view,
     setView,
     formData,
-    forgotPhone,
-    setForgotPhone,
+    forgotEmail,
+    setForgotEmail,
+    resetToken,
+    setResetToken,
+    newPassword,
+    setNewPassword,
+    confirmPassword,
+    setConfirmPassword,
+    showNewPassword,
+    setShowNewPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
     loading,
     forgotLoading,
+    resetLoading,
     errors,
     showPassword,
     handleChange,
     handleTogglePassword,
     handleLogin,
     handleForgotPassword,
+    handleTokenSubmit,
+    handleResetPassword,
     loginWithGoogle,
   } = useLoginHooks();
 
@@ -326,7 +373,7 @@ const Login: React.FC = () => {
                   id="login-submit-btn"
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_8px_20px_rgba(26,113,180,0.35)] cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_8px_20px_rgba(26,113,180,0.35)] cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -383,7 +430,7 @@ const Login: React.FC = () => {
               <div>
                 <h1 className="text-3xl font-extrabold text-foreground">Quên mật khẩu</h1>
                 <p className="mt-1.5 text-muted-foreground text-sm">
-                  Nhập số điện thoại đã đăng ký, chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu cho
+                  Nhập địa chỉ email đã đăng ký, chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu cho
                   bạn.
                 </p>
               </div>
@@ -391,23 +438,24 @@ const Login: React.FC = () => {
               <form onSubmit={handleForgotPassword} noValidate className="space-y-5">
                 <div className="space-y-1.5">
                   <label
-                    htmlFor="forgot-phone"
+                    htmlFor="forgot-email"
                     className="block text-sm font-semibold text-foreground"
                   >
-                    Số điện thoại
+                    Địa chỉ email
                   </label>
                   <div className="relative">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
-                      <PhoneIcon />
+                      <EmailIcon />
                     </span>
                     <input
-                      id="forgot-phone"
-                      name="forgot-phone"
-                      type="tel"
+                      id="forgot-email"
+                      name="forgot-email"
+                      type="email"
+                      autoComplete="email"
                       autoFocus
-                      placeholder="0912 345 678"
-                      value={forgotPhone}
-                      onChange={(e) => setForgotPhone(e.target.value)}
+                      placeholder="example@email.com"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
                       className="w-full rounded-xl border border-border pl-11 pr-4 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/15"
                     />
                   </div>
@@ -417,7 +465,7 @@ const Login: React.FC = () => {
                   id="forgot-password-submit-btn"
                   type="submit"
                   disabled={forgotLoading}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {forgotLoading ? (
                     <>
@@ -440,6 +488,207 @@ const Login: React.FC = () => {
                     </>
                   ) : (
                     'Gửi hướng dẫn'
+                  )}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* ════════ TOKEN INPUT VIEW ════════ */}
+          {view === 'tokenInput' && (
+            <div className="space-y-7 animate-in fade-in duration-300">
+              {/* Back */}
+              <button
+                type="button"
+                id="back-to-forgot-btn"
+                onClick={() => setView('forgotPassword')}
+                className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                <ArrowLeftIcon />
+                Quay lại
+              </button>
+
+              <div>
+                <h1 className="text-3xl font-extrabold text-foreground">Nhập mã xác nhận</h1>
+                <p className="mt-1.5 text-muted-foreground text-sm">
+                  Mã token đã được tạo. Vui lòng kiểm tra email{' '}
+                  <span className="font-semibold text-primary">{forgotEmail}</span> hoặc hỏi quản
+                  trị viên để lấy token.
+                </p>
+              </div>
+
+              {/* Info box */}
+              <div className="flex items-start gap-3 bg-primary/8 border border-primary/20 rounded-xl p-4">
+                <span className="text-xl mt-0.5">🔑</span>
+                <div className="text-sm">
+                  <p className="font-semibold text-foreground">Token có hiệu lực trong 10 phút</p>
+                  <p className="text-muted-foreground mt-0.5">
+                    Dán token từ email vào ô bên dưới để tiếp tục đặt lại mật khẩu.
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleTokenSubmit} noValidate className="space-y-5">
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="reset-token"
+                    className="block text-sm font-semibold text-foreground"
+                  >
+                    Token xác nhận
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      <KeyIcon />
+                    </span>
+                    <input
+                      id="reset-token"
+                      name="reset-token"
+                      type="text"
+                      autoFocus
+                      placeholder="Dán token vào đây..."
+                      value={resetToken}
+                      onChange={(e) => setResetToken(e.target.value)}
+                      className="w-full rounded-xl border border-border pl-11 pr-4 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/15 font-mono"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  id="token-submit-btn"
+                  type="submit"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] cursor-pointer"
+                >
+                  Tiếp tục
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* ════════ RESET PASSWORD VIEW ════════ */}
+          {view === 'resetPassword' && (
+            <div className="space-y-7 animate-in fade-in duration-300">
+              {/* Back */}
+              <button
+                type="button"
+                id="back-to-token-btn"
+                onClick={() => setView('tokenInput')}
+                className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                <ArrowLeftIcon />
+                Quay lại
+              </button>
+
+              <div>
+                <h1 className="text-3xl font-extrabold text-foreground">Đặt mật khẩu mới</h1>
+                <p className="mt-1.5 text-muted-foreground text-sm">
+                  Tạo mật khẩu mới an toàn cho tài khoản của bạn.
+                </p>
+              </div>
+
+              <form onSubmit={handleResetPassword} noValidate className="space-y-5">
+                {/* New password */}
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="new-password"
+                    className="block text-sm font-semibold text-foreground"
+                  >
+                    Mật khẩu mới
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      <LockIcon />
+                    </span>
+                    <input
+                      id="new-password"
+                      name="new-password"
+                      type={showNewPassword ? 'text' : 'password'}
+                      autoFocus
+                      placeholder="••••••••"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full rounded-xl border border-border pl-11 pr-12 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/15"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword((p) => !p)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      aria-label="Hiển thị/ẩn mật khẩu mới"
+                    >
+                      {showNewPassword ? <EyeOffIcon /> : <EyeIcon />}
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Ít nhất 6 ký tự</p>
+                </div>
+
+                {/* Confirm password */}
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="confirm-password"
+                    className="block text-sm font-semibold text-foreground"
+                  >
+                    Xác nhận mật khẩu
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      <LockIcon />
+                    </span>
+                    <input
+                      id="confirm-password"
+                      name="confirm-password"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className={`w-full rounded-xl border pl-11 pr-12 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60
+                        ${
+                          confirmPassword && newPassword !== confirmPassword
+                            ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
+                            : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/15'
+                        }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((p) => !p)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      aria-label="Hiển thị/ẩn xác nhận mật khẩu"
+                    >
+                      {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                    </button>
+                  </div>
+                  {confirmPassword && newPassword !== confirmPassword && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <span>⚠</span> Mật khẩu xác nhận không khớp
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  id="reset-password-submit-btn"
+                  type="submit"
+                  disabled={resetLoading}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {resetLoading ? (
+                    <>
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
+                      </svg>
+                      Đang lưu...
+                    </>
+                  ) : (
+                    'Đặt lại mật khẩu'
                   )}
                 </button>
               </form>

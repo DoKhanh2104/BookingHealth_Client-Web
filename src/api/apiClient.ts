@@ -32,8 +32,10 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      // KHÔNG redirect nếu lỗi 401 phát ra từ API Đăng nhập (vì đây là lỗi sai mật khẩu, không phải lỗi hết hạn Token)
-      if (error.config && !error.config.url?.includes('/auth/login')) {
+      // Không redirect nếu lỗi 401 từ các endpoint auth (login, signup, forgot-password, v.v.)
+      const url: string = error.config?.url ?? '';
+      const isAuthEndpoint = url.includes('/auth');
+      if (!isAuthEndpoint) {
         localStorage.removeItem(TOKEN_KEY);
         window.location.href = '/login';
       }
