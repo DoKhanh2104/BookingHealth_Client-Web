@@ -6,7 +6,7 @@ import { TOKEN_KEY } from '../../api/apiClient';
 import { parseJwt } from '../../utils/jwt';
 import { useGoogleLogin } from '@react-oauth/google';
 
-export type LoginView = 'login' | 'forgotPassword';
+export type LoginView = 'login' | 'forgotPassword' | 'tokenInput' | 'resetPassword';
 
 export const useLoginHooks = () => {
   const navigate = useNavigate();
@@ -16,9 +16,18 @@ export const useLoginHooks = () => {
     phone: '',
     password: '',
   });
-  const [forgotPhone, setForgotPhone] = useState('');
+
+  // Forgot password flow state
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [resetToken, setResetToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
 
@@ -92,26 +101,69 @@ export const useLoginHooks = () => {
     window.location.href = authService.getGoogleOAuthUrl();
   };
 
+  // Bước 1: Gửi email → backend tạo reset token (POST /auth)
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!forgotPhone.trim()) {
-      toast.error('Vui lòng nhập số điện thoại');
+    if (!forgotEmail.trim()) {
+      toast.error('Vui lòng nhập địa chỉ email');
       return;
     }
-    if (!/^(0[3|5|7|8|9])[0-9]{8}$/.test(forgotPhone.trim())) {
-      toast.error('Số điện thoại không hợp lệ');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail.trim())) {
+      toast.error('Địa chỉ email không hợp lệ');
       return;
     }
     try {
       setForgotLoading(true);
-      await authService.forgotPassword({ phone: forgotPhone });
-      toast.success('Hướng dẫn đặt lại mật khẩu đã được gửi!');
-      setView('login');
-      setForgotPhone('');
+      await authService.forgotPassword({ email: forgotEmail });
+      toast.success('Token đặt lại mật khẩu đã được tạo! Vui lòng nhập token để tiếp tục.');
+      setView('tokenInput');
     } catch {
-      toast.error('Không tìm thấy tài khoản với số điện thoại này.');
+      toast.error('Không tìm thấy tài khoản với email này.');
     } finally {
       setForgotLoading(false);
+    }
+  };
+
+  // Bước 2: Xác nhận token
+  const handleTokenSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetToken.trim()) {
+      toast.error('Vui lòng nhập token xác nhận');
+      return;
+    }
+    setView('resetPassword');
+  };
+
+  // Bước 3: Đặt lại mật khẩu mới (POST /auth/forgot-password)
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword.trim()) {
+      toast.error('Vui lòng nhập mật khẩu mới');
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast.error('Mật khẩu phải có ít nhất 6 ký tự');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Mật khẩu xác nhận không khớp');
+      return;
+    }
+    try {
+      setResetLoading(true);
+      await authService.resetPassword({ token: resetToken, newPassword });
+      toast.success('Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.');
+      // Reset toàn bộ state
+      setForgotEmail('');
+      setResetToken('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setView('login');
+    } catch {
+      toast.error('Token không hợp lệ hoặc đã hết hạn (10 phút). Vui lòng thử lại.');
+      setView('tokenInput');
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -148,10 +200,21 @@ export const useLoginHooks = () => {
     view,
     setView,
     formData,
-    forgotPhone,
-    setForgotPhone,
+    forgotEmail,
+    setForgotEmail,
+    resetToken,
+    setResetToken,
+    newPassword,
+    setNewPassword,
+    confirmPassword,
+    setConfirmPassword,
+    showNewPassword,
+    setShowNewPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
     loading,
     forgotLoading,
+    resetLoading,
     errors,
     showPassword,
     handleChange,
@@ -159,6 +222,8 @@ export const useLoginHooks = () => {
     handleLogin,
     handleGoogleLogin,
     handleForgotPassword,
+    handleTokenSubmit,
+    handleResetPassword,
     loginWithGoogle,
   };
 };

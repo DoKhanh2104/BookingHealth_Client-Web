@@ -14,7 +14,12 @@ export interface LoginResponse {
 }
 
 export interface ForgotPasswordPayload {
-  phone: string;
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
 }
 
 export interface SignupPayload {
@@ -66,7 +71,14 @@ export const authService = {
   },
 
   forgotPassword: async (data: ForgotPasswordPayload) => {
+    // Backend: POST /auth/forgot-password → gửi email đặt lại mật khẩu
     const response = await apiClient.post('/auth/forgot-password', data);
+    return response.data;
+  },
+
+  resetPassword: async (data: ResetPasswordPayload) => {
+    // Backend: POST /auth/reset-password → đặt lại mật khẩu bằng token
+    const response = await apiClient.post('/auth/reset-password', data);
     return response.data;
   },
 
