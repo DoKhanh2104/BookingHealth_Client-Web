@@ -1,7 +1,7 @@
-import { Toaster } from "sonner";
-import { AuthProvider } from "./contexts/AuthProvider";
-import { RouterProvider } from "react-router-dom";
-import { router } from "./app/router/router";
+import { Toaster } from 'sonner';
+import { AuthProvider } from './contexts/AuthProvider';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './app/router/router';
 
 function App() {
   return (

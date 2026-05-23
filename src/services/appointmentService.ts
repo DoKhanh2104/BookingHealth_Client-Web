@@ -1,10 +1,5 @@
 import apiClient from '../api/apiClient';
-import type {
-  ApiResponse,
-  PageResponse,
-  Appointment,
-  BookAppointmentRequest,
-} from '../types';
+import type { ApiResponse, PageResponse, Appointment, BookAppointmentRequest } from '../types';
 
 export const appointmentService = {
   /** POST /appointments - Đặt lịch hẹn mới */
@@ -17,7 +12,7 @@ export const appointmentService = {
   getMyAppointments: async (
     page = 0,
     size = 10,
-    status?: number
+    status?: number,
   ): Promise<ApiResponse<PageResponse<Appointment>>> => {
     const res = await apiClient.get('/appointments/me', {
       params: { page, size, ...(status !== undefined ? { status } : {}) },
