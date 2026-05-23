@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { authService, type SignupPayload } from '../../services/authService';
 import { TOKEN_KEY } from '../../api/apiClient';
+import { useGoogleLogin } from '@react-oauth/google';
+import { parseJwt } from '../../utils/jwt';
 
 export const useRegisterHooks = () => {
   const navigate = useNavigate();
@@ -157,6 +159,35 @@ export const useRegisterHooks = () => {
     window.location.href = authService.getGoogleOAuthUrl();
   };
 
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const data = await authService.loginWithGoogle(tokenResponse.access_token);
+
+        if (data?.code !== 1000 || !data?.result?.token) {
+          toast.error('Đăng ký bằng Google thất bại. Vui lòng thử lại!');
+          return;
+        }
+
+        const token = data.result.token;
+        const decoded = parseJwt(token);
+
+        if (!decoded) {
+          toast.error('Không thể xác thực tài khoản!');
+          return;
+        }
+
+        localStorage.setItem(TOKEN_KEY, token);
+        window.dispatchEvent(new Event('storage'));
+        toast.success('Đăng ký bằng Google thành công! Chào mừng bạn đến với BookingHealth');
+        navigate('/');
+      } catch {
+        toast.error('Đăng ký bằng Google thất bại. Vui lòng thử lại!');
+      }
+    },
+    onError: () => toast.error('Đăng ký bằng Google thất bại. Vui lòng thử lại!'),
+  });
+
   return {
     formData,
     confirmPassword,
@@ -171,5 +202,6 @@ export const useRegisterHooks = () => {
     handleToggleConfirmPassword,
     handleRegister,
     handleGoogleRegister,
+    loginWithGoogle,
   };
 };

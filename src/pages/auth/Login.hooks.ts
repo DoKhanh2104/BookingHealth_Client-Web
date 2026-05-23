@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { authService, type LoginPayload } from '../../services/authService';
 import { TOKEN_KEY } from '../../api/apiClient';
 import { parseJwt } from '../../utils/jwt';
+import { useGoogleLogin } from '@react-oauth/google';
 
 export type LoginView = 'login' | 'forgotPassword';
 
@@ -114,6 +115,35 @@ export const useLoginHooks = () => {
     }
   };
 
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const data = await authService.loginWithGoogle(tokenResponse.access_token);
+
+        if (data?.code !== 1000 || !data?.result?.token) {
+          toast.error('Đăng nhập Google thất bại. Vui lòng thử lại!');
+          return;
+        }
+
+        const token = data.result.token;
+        const decoded = parseJwt(token);
+
+        if (!decoded) {
+          toast.error('Không thể xác thực tài khoản!');
+          return;
+        }
+
+        localStorage.setItem(TOKEN_KEY, token);
+        window.dispatchEvent(new Event('storage'));
+        toast.success('Đăng nhập Google thành công! Chào mừng bạn trở lại');
+        navigate('/');
+      } catch {
+        toast.error('Đăng nhập Google thất bại. Vui lòng thử lại!');
+      }
+    },
+    onError: () => toast.error('Đăng nhập Google thất bại. Vui lòng thử lại!'),
+  });
+
   return {
     view,
     setView,
@@ -129,5 +159,6 @@ export const useLoginHooks = () => {
     handleLogin,
     handleGoogleLogin,
     handleForgotPassword,
+    loginWithGoogle,
   };
 };
