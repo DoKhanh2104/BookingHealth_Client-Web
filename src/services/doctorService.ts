@@ -6,6 +6,7 @@ import type {
   DoctorReview,
   CreateReviewRequest,
   WorkSchedule,
+  AppointmentSlot,
 } from '../types';
 
 export interface DoctorFilterParams {
@@ -51,6 +52,12 @@ export const doctorService = {
   /** POST /reviews - Tạo đánh giá sau khi khám xong */
   createReview: async (data: CreateReviewRequest): Promise<ApiResponse<DoctorReview>> => {
     const res = await apiClient.post('/reviews', data);
+    return res.data;
+  },
+
+  /** PATCH /doctors/me/schedule-slots/:id - Bác sĩ bật/tắt ca khám */
+  toggleSlotStatus: async (slotId: number): Promise<ApiResponse<AppointmentSlot>> => {
+    const res = await apiClient.patch(`/doctors/me/schedule-slots/${slotId}`);
     return res.data;
   },
 };

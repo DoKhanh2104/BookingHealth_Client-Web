@@ -30,6 +30,7 @@ export interface User {
   status: number; // 0: inactive, 1: active, 2: blocked
   avatar?: string;
   roles?: Role[];
+  doctorId?: number;
 }
 
 // ─────────────────────────────────────────────
@@ -89,6 +90,7 @@ export interface Doctor {
   specialties: Specialty[];
   clinic?: Clinic;
   qualifications?: DoctorQualification[];
+  reviews?: DoctorReview[];
   // from User join
   name: string;
   phone?: string;
@@ -123,19 +125,25 @@ export interface WorkSchedule {
   id: number;
   doctorId: number;
   workDate: string; // ngayLamViec
-  appointmentSlots: AppointmentSlot[];
+  slots: AppointmentSlot[];
 }
 
 // ─────────────────────────────────────────────
-// APPOINTMENT SLOT - KHUNG_GIO
+// APPOINTMENT SLOT - KHUNG_GIO (ca khám theo ngày)
 // ─────────────────────────────────────────────
 
 export interface AppointmentSlot {
   id: number;
-  startTime: string; // thoiGianBatDau (HH:mm)
-  endTime: string; // thoiGianKetThuc (HH:mm)
-  status: number; // 0: booked, 1: available
-  workScheduleId: number;
+  templateId?: number;
+  startTime: string; // HH:mm
+  endTime: string; // HH:mm
+  workScheduleId?: number;
+  /** Bác sĩ đang mở ca */
+  doctorOpen: boolean;
+  /** Đã có lịch hẹn */
+  booked: boolean;
+  /** Có thể đặt lịch (bệnh nhân) */
+  available: boolean;
 }
 
 // ─────────────────────────────────────────────
@@ -210,6 +218,8 @@ export interface DoctorReview {
   userAvatar?: string;
   appointmentId: number;
   createdAt?: string;
+  patientName?: string;
+  date?: string;
 }
 
 export interface CreateReviewRequest {

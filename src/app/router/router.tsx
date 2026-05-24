@@ -9,6 +9,18 @@ import Profile from '../../pages/profile/Profile';
 import Specialties from '../../pages/specialties/Specialties';
 import PageNotFound from '../../pages/error/PageNotFound';
 import ComingSoon from '../../components/ComingSoon';
+import DoctorDetail from '../../pages/doctors/DoctorDetail';
+import BookingPage from '../../pages/booking/BookingPage';
+
+// Doctor Portal Components
+import DoctorGuard from '../../components/DoctorGuard';
+import DoctorLayout from '../../layouts/DoctorLayout';
+import DoctorDashboard from '../../pages/doctor/DoctorDashboard';
+import DoctorAppointments from '../../pages/doctor/DoctorAppointments';
+import DoctorSchedules from '../../pages/doctor/DoctorSchedules';
+import DoctorChat from '../../pages/doctor/DoctorChat';
+import DoctorReviews from '../../pages/doctor/DoctorReviews';
+import DoctorProfile from '../../pages/doctor/DoctorProfile';
 
 /**
  * Routes cho trang client BookingHealth
@@ -45,7 +57,7 @@ export const router = createBrowserRouter([
 
           // Bác sĩ - BAC_SI
           { path: 'doctors', element: <ComingSoon title="Danh sách Bác sĩ" /> },
-          { path: 'doctors/:id', element: <ComingSoon title="Chi tiết Bác sĩ" /> },
+          { path: 'doctors/:id', element: <DoctorDetail /> },
 
           // Chuyên khoa - CHUYEN_KHOA
           { path: 'specialties', element: <Specialties /> },
@@ -66,7 +78,7 @@ export const router = createBrowserRouter([
           { path: 'appointments/:id/chat', element: <ComingSoon title="Chat với Bác sĩ" /> },
 
           // Đặt lịch - booking flow
-          { path: 'booking', element: <ComingSoon title="Đặt lịch khám" /> },
+          { path: 'booking', element: <BookingPage /> },
 
           // Hồ sơ cá nhân - NGUOI_DUNG
           { path: 'profile', element: <Profile /> },
@@ -88,6 +100,25 @@ export const router = createBrowserRouter([
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> },
       { path: 'register-doctor', element: <RegisterDoctor /> },
+
+      // Doctor Portal Protected Routes
+      {
+        path: 'doctor',
+        element: <DoctorGuard />,
+        children: [
+          {
+            element: <DoctorLayout />,
+            children: [
+              { path: 'dashboard', element: <DoctorDashboard /> },
+              { path: 'appointments', element: <DoctorAppointments /> },
+              { path: 'schedules', element: <DoctorSchedules /> },
+              { path: 'chat', element: <DoctorChat /> },
+              { path: 'reviews', element: <DoctorReviews /> },
+              { path: 'profile', element: <DoctorProfile /> },
+            ],
+          },
+        ],
+      },
 
       // 404
       { path: '*', element: <PageNotFound /> },

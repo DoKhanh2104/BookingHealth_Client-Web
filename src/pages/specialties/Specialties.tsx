@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSpecialtiesHooks } from './Specialties.hooks';
-import { useAuth } from '../../contexts/AuthContext';
 
 /* ─── SVG Icons ─── */
 const SearchIcon = () => (
@@ -38,10 +37,27 @@ const StarIcon = ({ filled = true }: { filled?: boolean }) => (
   </svg>
 );
 
+const UserIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.8}
+    stroke="currentColor"
+    className={className}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+    />
+  </svg>
+);
+
 // Trả về icon và gradient theo chuyên khoa
 const getSpecialtyMeta = (name: string) => {
   const n = name.toLowerCase();
-  
+
   // 1. Răng - Hàm - Mặt
   if (n.includes('răng') || n.includes('rang') || n.includes('hàm') || n.includes('ham')) {
     return {
@@ -49,7 +65,7 @@ const getSpecialtyMeta = (name: string) => {
       color: 'from-cyan-500/10 to-blue-500/10 text-cyan-600 border-cyan-500/20 bg-cyan-500/5',
     };
   }
-  
+
   // 2. Tim mạch
   if (n.includes('tim') || n.includes('mạch') || n.includes('mach')) {
     return {
@@ -57,15 +73,21 @@ const getSpecialtyMeta = (name: string) => {
       color: 'from-red-500/10 to-pink-500/10 text-red-500 border-red-500/20 bg-red-500/5',
     };
   }
-  
+
   // 3. Thần kinh
-  if (n.includes('thần kinh') || n.includes('than kinh') || n.includes('não') || n.includes('nao')) {
+  if (
+    n.includes('thần kinh') ||
+    n.includes('than kinh') ||
+    n.includes('não') ||
+    n.includes('nao')
+  ) {
     return {
       icon: '🧠',
-      color: 'from-purple-500/10 to-indigo-500/10 text-purple-500 border-purple-500/20 bg-purple-500/5',
+      color:
+        'from-purple-500/10 to-indigo-500/10 text-purple-500 border-purple-500/20 bg-purple-500/5',
     };
   }
-  
+
   // 4. Nhi khoa
   if (n.includes('nhi')) {
     return {
@@ -73,7 +95,7 @@ const getSpecialtyMeta = (name: string) => {
       color: 'from-amber-500/10 to-yellow-500/10 text-amber-500 border-amber-500/20 bg-amber-500/5',
     };
   }
-  
+
   // 5. Sản phụ khoa
   if (n.includes('sản') || n.includes('san') || n.includes('phụ') || n.includes('phu')) {
     return {
@@ -81,15 +103,21 @@ const getSpecialtyMeta = (name: string) => {
       color: 'from-pink-500/10 to-rose-500/10 text-pink-500 border-pink-500/20 bg-pink-500/5',
     };
   }
-  
+
   // 6. Tai Mũi Họng
-  if (n.includes('tai') || n.includes('mũi') || n.includes('mui') || n.includes('họng') || n.includes('hong')) {
+  if (
+    n.includes('tai') ||
+    n.includes('mũi') ||
+    n.includes('mui') ||
+    n.includes('họng') ||
+    n.includes('hong')
+  ) {
     return {
       icon: '👂',
       color: 'from-rose-500/10 to-pink-500/10 text-rose-500 border-rose-500/20 bg-rose-500/5',
     };
   }
-  
+
   // 7. Mắt (Nhãn khoa)
   if (n.includes('mắt') || n.includes('mat')) {
     return {
@@ -97,71 +125,106 @@ const getSpecialtyMeta = (name: string) => {
       color: 'from-blue-500/10 to-cyan-500/10 text-blue-500 border-blue-500/20 bg-blue-500/5',
     };
   }
-  
+
   // 8. Da liễu
   if (n.includes('da liễu') || n.includes('da lieu')) {
     return {
       icon: '✨',
-      color: 'from-emerald-500/10 to-green-500/10 text-emerald-500 border-emerald-500/20 bg-emerald-500/5',
+      color:
+        'from-emerald-500/10 to-green-500/10 text-emerald-500 border-emerald-500/20 bg-emerald-500/5',
     };
   }
-  
+
   // 9. Cơ xương khớp
   if (n.includes('xương') || n.includes('xuong') || n.includes('khớp') || n.includes('khop')) {
     return {
       icon: '🦴',
-      color: 'from-orange-500/10 to-amber-500/10 text-orange-500 border-orange-500/20 bg-orange-500/5',
+      color:
+        'from-orange-500/10 to-amber-500/10 text-orange-500 border-orange-500/20 bg-orange-500/5',
     };
   }
-  
+
   // 10. Tiêu hóa
-  if (n.includes('tiêu hóa') || n.includes('tieu hoa') || n.includes('dạ dày') || n.includes('da day')) {
+  if (
+    n.includes('tiêu hóa') ||
+    n.includes('tieu hoa') ||
+    n.includes('dạ dày') ||
+    n.includes('da day')
+  ) {
     return {
       icon: '🥗',
-      color: 'from-green-500/10 to-emerald-500/10 text-green-600 border-green-500/20 bg-green-500/5',
+      color:
+        'from-green-500/10 to-emerald-500/10 text-green-600 border-green-500/20 bg-green-500/5',
     };
   }
-  
+
   // 11. Tâm thần
-  if (n.includes('tâm thần') || n.includes('tam than') || n.includes('tâm lý') || n.includes('tam ly')) {
+  if (
+    n.includes('tâm thần') ||
+    n.includes('tam than') ||
+    n.includes('tâm lý') ||
+    n.includes('tam ly')
+  ) {
     return {
       icon: '💭',
-      color: 'from-indigo-500/10 to-purple-500/10 text-indigo-500 border-indigo-500/20 bg-indigo-500/5',
+      color:
+        'from-indigo-500/10 to-purple-500/10 text-indigo-500 border-indigo-500/20 bg-indigo-500/5',
     };
   }
-  
+
   // 12. Chấn thương chỉnh hình
-  if (n.includes('chấn thương') || n.includes('chan thuong') || n.includes('chỉnh hình') || n.includes('chinh hinh')) {
+  if (
+    n.includes('chấn thương') ||
+    n.includes('chan thuong') ||
+    n.includes('chỉnh hình') ||
+    n.includes('chinh hinh')
+  ) {
     return {
       icon: '🩹',
       color: 'from-amber-600/10 to-red-500/10 text-amber-600 border-amber-500/20 bg-amber-500/5',
     };
   }
-  
+
   // 13. Y học cổ truyền
-  if (n.includes('cổ truyền') || n.includes('co truyen') || n.includes('đông y') || n.includes('dong y')) {
+  if (
+    n.includes('cổ truyền') ||
+    n.includes('co truyen') ||
+    n.includes('đông y') ||
+    n.includes('dong y')
+  ) {
     return {
       icon: '🌿',
-      color: 'from-emerald-600/10 to-teal-600/10 text-emerald-700 border-emerald-600/20 bg-emerald-600/5',
+      color:
+        'from-emerald-600/10 to-teal-600/10 text-emerald-700 border-emerald-600/20 bg-emerald-600/5',
     };
   }
-  
+
   // 14. Phục hồi chức năng
-  if (n.includes('phục hồi') || n.includes('phuc hoi') || n.includes('chức năng') || n.includes('chuc nang')) {
+  if (
+    n.includes('phục hồi') ||
+    n.includes('phuc hoi') ||
+    n.includes('chức năng') ||
+    n.includes('chuc nang')
+  ) {
     return {
       icon: '🚶',
       color: 'from-lime-500/10 to-emerald-500/10 text-lime-600 border-lime-500/20 bg-lime-500/5',
     };
   }
-  
+
   // 15. Nội tổng quát
-  if (n.includes('nội') || n.includes('noi') || n.includes('tổng quát') || n.includes('tong quat')) {
+  if (
+    n.includes('nội') ||
+    n.includes('noi') ||
+    n.includes('tổng quát') ||
+    n.includes('tong quat')
+  ) {
     return {
       icon: '🩺',
       color: 'from-teal-500/10 to-emerald-500/10 text-teal-500 border-teal-500/20 bg-teal-500/5',
     };
   }
-  
+
   return {
     icon: '🏥',
     color: 'from-primary/10 to-secondary/10 text-primary border-primary/20 bg-primary/5',
@@ -170,7 +233,6 @@ const getSpecialtyMeta = (name: string) => {
 
 const Specialties: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const {
     specialties,
     allSpecialtiesCount,
@@ -184,11 +246,7 @@ const Specialties: React.FC = () => {
   } = useSpecialtiesHooks();
 
   const handleBook = (doctorId: number) => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    } else {
-      navigate(`/booking?doctorId=${doctorId}`);
-    }
+    navigate(`/doctors/${doctorId}`);
   };
 
   return (
@@ -406,7 +464,7 @@ const Specialties: React.FC = () => {
                             {/* Doctor Header Profile */}
                             <div className="flex items-start gap-3.5">
                               {/* Avatar wrapper */}
-                              <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner border border-border">
+                              <div className="w-14 h-14 rounded-2xl overflow-hidden bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 shadow-inner border border-border">
                                 {doc.avatar ? (
                                   <img
                                     src={doc.avatar}
@@ -414,14 +472,12 @@ const Specialties: React.FC = () => {
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
-                                  '👨‍⚕️'
+                                  <UserIcon className="w-7 h-7 text-primary" />
                                 )}
                               </div>
                               <div className="min-w-0">
                                 <h3 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors leading-snug truncate">
-                                  {doc.qualifications && doc.qualifications.length > 0
-                                    ? `${doc.qualifications[0].degree}. ${doc.name}`
-                                    : `BS. ${doc.name}`}
+                                  Bác sĩ {doc.name}
                                 </h3>
                                 <p className="text-[11px] text-muted-foreground leading-normal mt-0.5">
                                   ⏳ {exp}
