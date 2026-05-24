@@ -4,6 +4,7 @@ import RootLayout from '../../layouts/RootLayout';
 import Home from '../../pages/home/Home';
 import Login from '../../pages/auth/Login';
 import Register from '../../pages/auth/Register';
+import RegisterDoctor from '../../pages/auth/RegisterDoctor';
 import Profile from '../../pages/profile/Profile';
 import PageNotFound from '../../pages/error/PageNotFound';
 import ComingSoon from '../../components/ComingSoon';
@@ -85,6 +86,7 @@ export const router = createBrowserRouter([
       // Auth routes (không có Header/Footer)
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> },
+      { path: 'register-doctor', element: <RegisterDoctor /> },
 
       // 404
       { path: '*', element: <PageNotFound /> },
