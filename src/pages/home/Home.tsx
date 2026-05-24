@@ -255,7 +255,7 @@ const Home = () => {
   return (
     <div className="overflow-hidden">
       {/* ═══════════════ HERO ═══════════════ */}
-      <section className="relative bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-16 md:py-24 lg:py-32">
+      <section className="relative bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-4 md:py-8 lg:py-16">
         {/* Decorative blobs */}
         <div className="absolute top-0 left-0 w-72 h-72 bg-primary/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/10 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl pointer-events-none" />
@@ -269,7 +269,7 @@ const Home = () => {
                 Nền tảng y tế số #1 Đà Nẵng
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-foreground leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground leading-tight">
                 Đặt lịch khám
                 <span className="block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   nhanh chóng
