@@ -4,6 +4,7 @@ import RootLayout from '../../layouts/RootLayout';
 import Home from '../../pages/home/Home';
 import Login from '../../pages/auth/Login';
 import Register from '../../pages/auth/Register';
+import Profile from '../../pages/profile/Profile';
 import PageNotFound from '../../pages/error/PageNotFound';
 import ComingSoon from '../../components/ComingSoon';
 
@@ -66,7 +67,7 @@ export const router = createBrowserRouter([
           { path: 'booking', element: <ComingSoon title="Đặt lịch khám" /> },
 
           // Hồ sơ cá nhân - NGUOI_DUNG
-          { path: 'profile', element: <ComingSoon title="Hồ sơ cá nhân" /> },
+          { path: 'profile', element: <Profile /> },
 
           // Thông báo - THONG_BAO
           { path: 'notifications', element: <ComingSoon title="Thông báo" /> },
