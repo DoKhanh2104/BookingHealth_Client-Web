@@ -5,6 +5,7 @@ import Home from '../../pages/home/Home';
 import Login from '../../pages/auth/Login';
 import Register from '../../pages/auth/Register';
 import Profile from '../../pages/profile/Profile';
+import Specialties from '../../pages/specialties/Specialties';
 import PageNotFound from '../../pages/error/PageNotFound';
 import ComingSoon from '../../components/ComingSoon';
 
@@ -46,7 +47,7 @@ export const router = createBrowserRouter([
           { path: 'doctors/:id', element: <ComingSoon title="Chi tiết Bác sĩ" /> },
 
           // Chuyên khoa - CHUYEN_KHOA
-          { path: 'specialties', element: <ComingSoon title="Chuyên khoa" /> },
+          { path: 'specialties', element: <Specialties /> },
           { path: 'specialties/:id', element: <ComingSoon title="Chi tiết Chuyên khoa" /> },
 
           // Phòng khám - PHONG_KHAM
