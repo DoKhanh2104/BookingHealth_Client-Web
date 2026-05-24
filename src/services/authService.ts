@@ -29,6 +29,20 @@ export interface SignupPayload {
   name: string;
 }
 
+export interface DoctorSignupPayload {
+  phone: string;
+  email: string;
+  password: string;
+  name: string;
+  practiceLicenseNumber: string;
+  practiceStartDate: string;
+  biography?: string;
+  avatar?: File;
+  practiceLicenseImage?: File;
+  clinicId?: number;
+  specialtyIds?: number[];
+}
+
 export interface SignupResponse {
   code: number;
   result?: {
@@ -87,6 +101,15 @@ export const authService = {
    */
   loginWithGoogle: async (accessToken: string): Promise<GoogleLoginResponse> => {
     const response = await apiClient.post('/auth/google', { token: accessToken });
+    return response.data;
+  },
+
+  signupDoctor: async (data: FormData): Promise<SignupResponse> => {
+    const response = await apiClient.post('/auth/signup-doctor', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   },
 
