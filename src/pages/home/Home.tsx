@@ -163,7 +163,7 @@ const specialties = [
   { name: 'Thần kinh', icon: '🧠', desc: 'Chuyên khoa thần kinh học lâm sàng' },
   { name: 'Nội tổng quát', icon: '🩺', desc: 'Khám & điều trị bệnh nội khoa chung' },
   { name: 'Nhi khoa', icon: '👶', desc: 'Chăm sóc sức khoẻ toàn diện cho trẻ em' },
-  { name: 'Da liễu', icon: '🌿', desc: 'Điều trị các bệnh lý về da' },
+  { name: 'Da liễu', icon: '✨', desc: 'Điều trị các bệnh lý về da' },
   { name: 'Cơ xương khớp', icon: '🦴', desc: 'Chuyên về xương khớp và cơ bắp' },
   { name: 'Mắt', icon: '👁️', desc: 'Chăm sóc và điều trị bệnh về mắt' },
   { name: 'Tai - Mũi - Họng', icon: '👂', desc: 'Điều trị bệnh lý TMH chuyên sâu' },
@@ -396,7 +396,7 @@ const Home = () => {
             {specialties.map((sp) => (
               <button
                 key={sp.name}
-                onClick={() => navigate('/specialties')}
+                onClick={() => navigate(`/specialties?name=${encodeURIComponent(sp.name)}`)}
                 className="group bg-background border border-border rounded-2xl p-5 text-left hover:border-primary/40 hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer"
               >
                 <div className="text-3xl mb-3">{sp.icon}</div>
