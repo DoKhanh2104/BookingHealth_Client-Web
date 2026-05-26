@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { appointmentService } from '../../services/appointmentService';
+import type { Appointment as ApiAppointment } from '../../types';
 
 interface Appointment {
   id: number;
@@ -18,7 +20,7 @@ interface Appointment {
 const DoctorAppointments: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
     'ALL' | 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
-  >('CONFIRMED');
+  >('ALL');
   const [selectedApp, setSelectedApp] = useState<Appointment | null>(null);
 
   // Clinical Form States
@@ -26,73 +28,61 @@ const DoctorAppointments: React.FC = () => {
   const [prescription, setPrescription] = useState('');
   const [attachment, setAttachment] = useState('');
 
-  // Initial Mock Appointments Data
-  const [appointments, setAppointments] = useState<Appointment[]>([
-    {
-      id: 101,
-      patientName: 'Nguyễn Văn Minh',
-      phone: '0905111222',
-      timeSlot: '08:30 - 09:00',
-      date: '2026-05-24',
-      symptoms: 'Sốt cao 38.5 độ, đau họng kéo dài, ho khan liên tục',
-      status: 'CONFIRMED',
-      fee: 150000,
-    },
-    {
-      id: 102,
-      patientName: 'Trần Thị Hà',
-      phone: '0905333444',
-      timeSlot: '09:30 - 10:00',
-      date: '2026-05-24',
-      symptoms: 'Đau đầu dữ dội vùng thái dương, chóng mặt khi đứng lên',
-      status: 'CONFIRMED',
-      fee: 200000,
-    },
-    {
-      id: 103,
-      patientName: 'Lê Hoàng Nam',
-      phone: '0905555666',
-      timeSlot: '10:30 - 11:00',
-      date: '2026-05-24',
-      symptoms: 'Đau âm ỉ vùng thượng vị sau khi ăn, đầy hơi khó tiêu',
-      status: 'PENDING',
-      fee: 150000,
-    },
-    {
-      id: 104,
-      patientName: 'Phạm Minh Tú',
-      phone: '0905777888',
-      timeSlot: '14:00 - 14:30',
-      date: '2026-05-24',
-      symptoms: 'Ho có đờm xanh, đau tức nhẹ ngực khi thở sâu',
-      status: 'PENDING',
-      fee: 150000,
-    },
-    {
-      id: 105,
-      patientName: 'Võ Hoàng Yến',
-      phone: '0905999000',
-      timeSlot: '08:00 - 08:30',
-      date: '2026-05-24',
-      symptoms: 'Tái khám định kỳ tăng huyết áp và đái tháo đường tuýp 2',
-      status: 'COMPLETED',
-      diagnosis: 'Huyết áp ổn định ở mức 125/80 mmHg. Đường huyết đói ổn định.',
-      prescription:
-        'Amlodipine 5mg x 30 viên (Uống 1 viên vào buổi sáng). Metformin 850mg x 60 viên (Uống 2 viên chia 2 lần sau ăn).',
-      attachment: 'https://res.cloudinary.com/demo/image/upload/sample.jpg',
-      fee: 150000,
-    },
-    {
-      id: 106,
-      patientName: 'Bùi Anh Tuấn',
-      phone: '0905123456',
-      timeSlot: '15:00 - 15:30',
-      date: '2026-05-23',
-      symptoms: 'Khám sức khỏe tổng quát định kỳ',
-      status: 'CANCELLED',
-      fee: 200000,
-    },
-  ]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAppointments = () => {
+    setLoading(true);
+    let statusNum: number | undefined = undefined;
+    if (activeTab === 'PENDING') statusNum = 0;
+    else if (activeTab === 'CONFIRMED') statusNum = 1;
+    else if (activeTab === 'COMPLETED') statusNum = 2;
+    else if (activeTab === 'CANCELLED') statusNum = 3;
+
+    appointmentService
+      .getMyAppointments(0, 100, statusNum)
+      .then((res) => {
+        if (res.result?.content) {
+          const mapped = res.result.content.map((apiApp: ApiAppointment) => {
+            const startTime = apiApp.appointmentSlot?.startTime || '00:00';
+            const endTime = apiApp.appointmentSlot?.endTime || '00:00';
+            const timeSlot = `${startTime.slice(0, 5)} - ${endTime.slice(0, 5)}`;
+
+            let statusStr: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' = 'PENDING';
+            if (apiApp.status === 1) statusStr = 'CONFIRMED';
+            else if (apiApp.status === 2) statusStr = 'COMPLETED';
+            else if (apiApp.status === 3) statusStr = 'CANCELLED';
+
+            return {
+              id: apiApp.id,
+              patientName: apiApp.user?.name || 'Bệnh nhân ẩn danh',
+              phone: apiApp.user?.phone || 'Chưa cập nhật',
+              timeSlot,
+              date: apiApp.expectedExaminationDate || '',
+              symptoms: apiApp.description || 'Không có triệu chứng',
+              status: statusStr,
+              diagnosis: apiApp.diagnosis,
+              prescription: apiApp.medicine,
+              attachment: apiApp.attachment,
+              fee: apiApp.totalAmount || 0,
+            };
+          });
+          setAppointments(mapped);
+        } else {
+          setAppointments([]);
+        }
+      })
+      .catch(() => {
+        toast.error('Không thể tải danh sách ca khám từ hệ thống!');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    Promise.resolve().then(() => fetchAppointments());
+  }, [activeTab]);
 
   const filteredAppointments = appointments.filter((app) => {
     if (activeTab === 'ALL') return true;
@@ -100,17 +90,29 @@ const DoctorAppointments: React.FC = () => {
   });
 
   const handleApprove = (id: number) => {
-    setAppointments((prev) =>
-      prev.map((app) => (app.id === id ? { ...app, status: 'CONFIRMED' } : app)),
-    );
-    toast.success('Đã xác nhận ca khám thành công');
+    appointmentService
+      .confirm(id)
+      .then(() => {
+        toast.success('Đã xác nhận ca khám thành công');
+        fetchAppointments();
+      })
+      .catch((err) => {
+        const msg = err.response?.data?.message || 'Không thể duyệt ca khám.';
+        toast.error(msg);
+      });
   };
 
   const handleCancel = (id: number) => {
-    setAppointments((prev) =>
-      prev.map((app) => (app.id === id ? { ...app, status: 'CANCELLED' } : app)),
-    );
-    toast.success('Đã hủy lịch hẹn');
+    appointmentService
+      .cancel(id)
+      .then(() => {
+        toast.success('Đã hủy lịch hẹn');
+        fetchAppointments();
+      })
+      .catch((err) => {
+        const msg = err.response?.data?.message || 'Không thể hủy lịch hẹn.';
+        toast.error(msg);
+      });
   };
 
   const handleOpenExam = (app: Appointment) => {
@@ -126,24 +128,23 @@ const DoctorAppointments: React.FC = () => {
       toast.error('Vui lòng nhập chẩn đoán bệnh');
       return;
     }
+    if (!selectedApp) return;
 
-    setAppointments((prev) =>
-      prev.map((app) => {
-        if (app.id === selectedApp?.id) {
-          return {
-            ...app,
-            status: 'COMPLETED',
-            diagnosis,
-            prescription,
-            attachment: attachment || undefined,
-          };
-        }
-        return app;
-      }),
-    );
-
-    toast.success('Lưu bệnh án & hoàn tất ca khám thành công!');
-    setSelectedApp(null);
+    appointmentService
+      .complete(selectedApp.id, {
+        diagnosis,
+        medicine: prescription,
+        attachment,
+      })
+      .then(() => {
+        toast.success('Lưu bệnh án & hoàn tất ca khám thành công!');
+        setSelectedApp(null);
+        fetchAppointments();
+      })
+      .catch((err) => {
+        const msg = err.response?.data?.message || 'Không thể lưu bệnh án.';
+        toast.error(msg);
+      });
   };
 
   return (
@@ -187,7 +188,16 @@ const DoctorAppointments: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs">
-              {filteredAppointments.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-primary"></div>
+                      Đang tải danh sách ca khám...
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredAppointments.length > 0 ? (
                 filteredAppointments.map((app) => (
                   <tr key={app.id} className="hover:bg-muted/10 transition-colors">
                     <td className="px-6 py-4">

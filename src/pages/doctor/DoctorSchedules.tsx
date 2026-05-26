@@ -198,7 +198,7 @@ const DoctorSchedules: React.FC = () => {
                       p-4 rounded-xl border text-center transition-all relative flex flex-col items-center justify-center gap-1.5
                       ${
                         slot.booked
-                          ? 'bg-muted/20 border-border text-muted-foreground cursor-not-allowed opacity-70'
+                          ? 'bg-rose-500/10 border-rose-500/20 text-rose-600 cursor-not-allowed opacity-95'
                           : isOpen
                             ? 'bg-primary/5 border-primary/20 text-primary hover:bg-primary/10 cursor-pointer'
                             : 'bg-muted/10 border-border text-muted-foreground hover:bg-accent/40 cursor-pointer'

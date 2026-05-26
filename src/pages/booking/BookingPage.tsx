@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { doctorService } from '../../services/doctorService';
+import { userService } from '../../services/userService';
+import { appointmentService } from '../../services/appointmentService';
 import type { Doctor } from '../../types';
 
 // User Profile Fallback Icon
@@ -42,6 +44,25 @@ const BookingPage: React.FC = () => {
   const [bookingReason, setBookingReason] = useState('');
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+
+  // Load current user profile to pre-fill info
+  useEffect(() => {
+    let active = true;
+    userService.getProfile()
+      .then((res) => {
+        if (!active) return;
+        if (res.result) {
+          setBookingName(res.result.name || '');
+          setBookingPhone(res.result.phone || '');
+        }
+      })
+      .catch(() => {
+        // User not logged in or error, ignore
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -111,14 +132,31 @@ const BookingPage: React.FC = () => {
       return;
     }
 
+    if (!doctorId || !selectedDate || !slotId) {
+      toast.error('Thông tin đặt lịch không hợp lệ.');
+      return;
+    }
+
     setBookingSubmitting(true);
 
-    // Simulate API request to book
-    setTimeout(() => {
-      setBookingSubmitting(false);
-      setBookingSuccess(true);
-      toast.success('Đặt lịch khám thành công!');
-    }, 1500);
+    appointmentService
+      .book({
+        doctorId: Number(doctorId),
+        appointmentSlotId: Number(slotId),
+        expectedExaminationDate: selectedDate,
+        description: bookingReason,
+      })
+      .then(() => {
+        setBookingSuccess(true);
+        toast.success('Đặt lịch khám thành công!');
+      })
+      .catch((error) => {
+        const msg = error.response?.data?.message || 'Có lỗi xảy ra khi đặt lịch khám. Vui lòng thử lại.';
+        toast.error(msg);
+      })
+      .finally(() => {
+        setBookingSubmitting(false);
+      });
   };
 
   // Format date helper: "Thứ Hai - 25/5"
@@ -161,12 +199,12 @@ const BookingPage: React.FC = () => {
   const titlePrefix = 'Bác sĩ';
 
   return (
-    <div className="bg-muted/10 min-h-screen py-12 text-xs">
+    <div className="bg-muted/10 min-h-screen py-12 text-sm">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-foreground/80 hover:text-primary font-bold text-xs bg-background border border-border px-4 py-2.5 rounded-xl transition-all shadow-sm hover:border-primary/20 active:scale-[0.98] w-fit cursor-pointer"
+          className="flex items-center gap-2 text-foreground/80 hover:text-primary font-bold text-sm bg-background border border-border px-4.5 py-3 rounded-xl transition-all shadow-sm hover:border-primary/20 active:scale-[0.98] w-fit cursor-pointer"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -186,15 +224,15 @@ const BookingPage: React.FC = () => {
         </button>
 
         {bookingSuccess ? (
-          <div className="bg-background border border-border rounded-3xl p-12 text-center space-y-6 shadow-md max-w-xl mx-auto animate-fadeIn">
-            <div className="w-16 h-16 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 rounded-full flex items-center justify-center text-3xl mx-auto shadow-sm">
+          <div className="bg-background border border-border rounded-3xl p-12 text-center space-y-6 shadow-md max-w-2xl mx-auto animate-fadeIn">
+            <div className="w-20 h-20 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 rounded-full flex items-center justify-center text-4xl mx-auto shadow-sm">
               ✓
             </div>
-            <div className="space-y-3">
-              <h2 className="font-black text-foreground text-xl tracking-tight">
+            <div className="space-y-4">
+              <h2 className="font-black text-foreground text-2xl tracking-tight">
                 ĐẶT LỊCH HẸN THÀNH CÔNG!
               </h2>
-              <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mx-auto">
+              <p className="text-muted-foreground text-base leading-relaxed max-w-md mx-auto">
                 Lịch hẹn của bạn vào lúc{' '}
                 <strong className="text-foreground">
                   {startTime} - {endTime}
@@ -202,7 +240,7 @@ const BookingPage: React.FC = () => {
                 ngày <strong className="text-foreground">{formatDateLabel(selectedDate)}</strong> đã
                 được ghi nhận thành công.
               </p>
-              <div className="border border-border rounded-2xl p-4 bg-muted/20 text-left max-w-sm mx-auto space-y-1.5 leading-relaxed text-muted-foreground text-[11px] mt-4">
+              <div className="border border-border rounded-2xl p-6 bg-muted/20 text-left max-w-md mx-auto space-y-2 leading-relaxed text-muted-foreground text-sm mt-4">
                 <p>
                   <span className="font-bold text-foreground">Họ tên người khám:</span>{' '}
                   {bookingName}
@@ -223,26 +261,26 @@ const BookingPage: React.FC = () => {
                 </p>
                 <p>
                   <span className="font-bold text-foreground">Phí tư vấn:</span>{' '}
-                  <span className="text-primary font-bold">
+                  <span className="text-primary font-bold text-base">
                     {doctor.examinationFee?.toLocaleString('vi-VN')}đ
                   </span>
                 </p>
               </div>
-              <p className="text-muted-foreground text-[10px] leading-relaxed pt-2 max-w-xs mx-auto">
+              <p className="text-muted-foreground text-xs leading-relaxed pt-2 max-w-sm mx-auto">
                 Nhân viên tư vấn của phòng khám sẽ liên hệ lại qua số điện thoại để xác nhận thông
                 tin cuộc hẹn trong vòng 15-30 phút.
               </p>
             </div>
-            <div className="pt-4 flex gap-3 justify-center">
+            <div className="pt-4 flex gap-4 justify-center">
               <button
                 onClick={() => navigate('/specialties')}
-                className="px-6 py-3 border border-border hover:bg-accent text-muted-foreground font-bold rounded-2xl cursor-pointer transition-colors text-xs"
+                className="px-6 py-3.5 border border-border hover:bg-accent text-muted-foreground font-bold rounded-2xl cursor-pointer transition-colors text-sm"
               >
                 Tiếp tục khám chuyên khoa
               </button>
               <button
                 onClick={() => navigate('/')}
-                className="px-6 py-3 bg-primary hover:bg-primary-hover text-primary-foreground font-black rounded-2xl cursor-pointer shadow-lg shadow-primary/20 transition-all text-xs"
+                className="px-6 py-3.5 bg-primary hover:bg-primary-hover text-primary-foreground font-black rounded-2xl cursor-pointer shadow-lg shadow-primary/20 transition-all text-sm"
               >
                 Quay lại Trang chủ
               </button>
@@ -253,19 +291,19 @@ const BookingPage: React.FC = () => {
             {/* LEFT COLUMN (3 cols): Spacious Booking Form */}
             <div className="md:col-span-3 bg-background border border-border rounded-3xl p-8 space-y-6 shadow-sm">
               <div>
-                <h2 className="text-lg font-black text-foreground tracking-tight uppercase">
+                <h2 className="text-xl font-black text-foreground tracking-tight uppercase">
                   Thông Tin Đăng Ký Khám
                 </h2>
-                <p className="text-muted-foreground text-[10px] mt-1">
+                <p className="text-muted-foreground text-xs sm:text-sm mt-1.5">
                   Vui lòng điền chính xác thông tin cá nhân dưới đây để được hỗ trợ làm hồ sơ khám
                   nhanh nhất.
                 </p>
               </div>
 
-              <form onSubmit={handleBookingSubmit} className="space-y-5">
+              <form onSubmit={handleBookingSubmit} className="space-y-6">
                 {/* Patient Full Name */}
                 <div className="space-y-2">
-                  <label className="block font-bold text-foreground text-xs uppercase tracking-wider">
+                  <label className="block font-bold text-foreground text-base tracking-wide">
                     Họ tên người bệnh <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -274,13 +312,13 @@ const BookingPage: React.FC = () => {
                     value={bookingName}
                     onChange={(e) => setBookingName(e.target.value)}
                     placeholder="Nhập đầy đủ họ và tên giống trong CCCD..."
-                    className="w-full px-4 py-3 border border-border rounded-2xl bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium"
+                    className="w-full px-4 py-3 border border-border rounded-2xl bg-background text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium placeholder:text-muted-foreground/60"
                   />
                 </div>
 
                 {/* Phone Number */}
                 <div className="space-y-2">
-                  <label className="block font-bold text-foreground text-xs uppercase tracking-wider">
+                  <label className="block font-bold text-foreground text-base tracking-wide">
                     Số điện thoại liên hệ <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -289,13 +327,13 @@ const BookingPage: React.FC = () => {
                     value={bookingPhone}
                     onChange={(e) => setBookingPhone(e.target.value)}
                     placeholder="Nhập số điện thoại di động chính chủ..."
-                    className="w-full px-4 py-3 border border-border rounded-2xl bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium"
+                    className="w-full px-4 py-3 border border-border rounded-2xl bg-background text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium placeholder:text-muted-foreground/60"
                   />
                 </div>
 
                 {/* Symptoms / Reason */}
                 <div className="space-y-2">
-                  <label className="block font-bold text-foreground text-xs uppercase tracking-wider">
+                  <label className="block font-bold text-foreground text-base tracking-wide">
                     Lý do khám / Triệu chứng bệnh (Tùy chọn)
                   </label>
                   <textarea
@@ -303,7 +341,7 @@ const BookingPage: React.FC = () => {
                     onChange={(e) => setBookingReason(e.target.value)}
                     rows={6}
                     placeholder="Mô tả cụ thể các triệu chứng bệnh của bạn để bác sĩ nắm bắt thông tin nhanh nhất (ví dụ: đau ê buốt răng khi ăn nóng lạnh, đau vùng thắt lưng lan xuống chân...)"
-                    className="w-full px-4 py-3 border border-border rounded-2xl bg-background text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium leading-relaxed"
+                    className="w-full px-4 py-3 border border-border rounded-2xl bg-background text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium leading-relaxed placeholder:text-muted-foreground/60"
                   />
                 </div>
 
@@ -311,14 +349,14 @@ const BookingPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate(-1)}
-                    className="px-6 py-3 border border-border hover:bg-accent text-muted-foreground font-extrabold rounded-2xl cursor-pointer transition-all"
+                    className="px-6 py-3 border border-border hover:bg-accent text-muted-foreground font-extrabold rounded-2xl cursor-pointer transition-all text-sm"
                   >
                     Hủy lịch đặt
                   </button>
                   <button
                     type="submit"
                     disabled={bookingSubmitting}
-                    className="px-8 py-3 bg-primary hover:bg-primary-hover text-primary-foreground font-black rounded-2xl cursor-pointer shadow-lg shadow-primary/25 disabled:bg-primary/50 transition-all active:scale-[0.98]"
+                    className="px-8 py-3 bg-primary hover:bg-primary-hover text-primary-foreground font-black rounded-2xl cursor-pointer shadow-lg shadow-primary/25 disabled:bg-primary/50 transition-all active:scale-[0.98] text-sm"
                   >
                     {bookingSubmitting ? 'Đang gửi hồ sơ...' : 'Xác nhận đặt lịch khám'}
                   </button>
@@ -330,13 +368,13 @@ const BookingPage: React.FC = () => {
             <div className="md:col-span-2 space-y-6">
               {/* Summary Card */}
               <div className="bg-background border border-border rounded-3xl p-6 space-y-5 shadow-sm">
-                <h3 className="text-xs font-black text-foreground uppercase tracking-wider border-b border-border pb-3">
+                <h3 className="text-sm font-black text-foreground uppercase tracking-wider border-b border-border pb-3">
                   Tóm tắt lịch hẹn
                 </h3>
 
                 {/* Doctor Bio Card */}
                 <div className="flex gap-4">
-                  <div className="w-14 h-14 rounded-full overflow-hidden border border-border bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border border-border bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
                     {doctor.avatar ? (
                       <img
                         src={doctor.avatar}
@@ -344,14 +382,14 @@ const BookingPage: React.FC = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <UserIcon className="w-7 h-7 text-primary" />
+                      <UserIcon className="w-8 h-8 text-primary" />
                     )}
                   </div>
                   <div className="space-y-1 min-w-0">
-                    <h4 className="font-bold text-foreground text-xs truncate">
+                    <h4 className="font-bold text-foreground text-sm sm:text-base truncate">
                       {titlePrefix} {doctor.name}
                     </h4>
-                    <p className="text-muted-foreground text-[10px] leading-relaxed">
+                    <p className="text-muted-foreground text-xs leading-relaxed">
                       {doctor.specialties && doctor.specialties.length > 0
                         ? doctor.specialties[0].specialtyName
                         : 'Chuyên khoa tổng quát'}
@@ -364,44 +402,44 @@ const BookingPage: React.FC = () => {
                 {/* Details Grid */}
                 <div className="grid grid-cols-2 gap-4 leading-normal">
                   <div className="space-y-1">
-                    <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
                       📅 NGÀY ĐẶT KHÁM
                     </span>
-                    <span className="font-bold text-foreground text-xs">
+                    <span className="font-bold text-foreground text-sm">
                       {formatDateLabel(selectedDate)}
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
                       ⏳ KHUNG GIỜ
                     </span>
-                    <span className="font-bold text-primary text-xs">
+                    <span className="font-bold text-primary text-sm">
                       {startTime} - {endTime}
                     </span>
                   </div>
                   <div className="col-span-2 border-t border-border/50 my-1"></div>
                   <div className="space-y-1 col-span-2">
-                    <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
                       🏥 ĐỊA ĐIỂM KHÁM
                     </span>
-                    <span className="font-bold text-foreground text-xs">
+                    <span className="font-bold text-foreground text-sm">
                       {doctor.clinic?.clinicName}
                     </span>
-                    <p className="text-[10px] text-muted-foreground leading-normal mt-0.5">
+                    <p className="text-xs text-muted-foreground leading-normal mt-0.5">
                       {doctor.clinic?.address}
                     </p>
                   </div>
                   <div className="col-span-2 border-t border-border/50 my-1"></div>
                   <div className="space-y-1 col-span-2 flex items-center justify-between">
                     <div>
-                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
                         💵 GIÁ KHÁM NIÊM YẾT
                       </span>
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         (Thanh toán trực tiếp tại phòng khám)
                       </span>
                     </div>
-                    <span className="font-black text-primary text-sm">
+                    <span className="font-black text-primary text-base sm:text-lg">
                       {doctor.examinationFee?.toLocaleString('vi-VN')}đ
                     </span>
                   </div>
@@ -410,10 +448,10 @@ const BookingPage: React.FC = () => {
 
               {/* Guide Card */}
               <div className="bg-background border border-border rounded-3xl p-6 space-y-3 shadow-sm">
-                <h3 className="text-xs font-black text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <h3 className="text-sm font-black text-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <span>💡</span> Hướng dẫn đặt khám
                 </h3>
-                <ul className="list-disc pl-4 text-[10px] text-muted-foreground space-y-2 leading-relaxed">
+                <ul className="list-disc pl-4 text-xs sm:text-sm text-muted-foreground space-y-2 leading-relaxed">
                   <li>
                     Lịch hẹn sau khi đặt sẽ được xác nhận bởi nhân viên tư vấn trong 15-30 phút qua
                     điện thoại.

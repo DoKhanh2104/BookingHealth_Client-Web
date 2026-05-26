@@ -271,7 +271,7 @@ const Specialties: React.FC = () => {
           <div className="lg:col-span-4 space-y-4">
             {/* Search Specialties Box */}
             <div className="bg-background/80 backdrop-blur border border-border/80 rounded-2xl p-4 shadow-sm space-y-3">
-              <span className="text-xs font-bold text-foreground">Tìm kiếm chuyên khoa</span>
+              <span className="text-sm font-bold text-foreground">Tìm kiếm chuyên khoa</span>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60">
                   <SearchIcon />
@@ -289,7 +289,7 @@ const Specialties: React.FC = () => {
             {/* Specialties Listing */}
             <div className="bg-background/80 backdrop-blur border border-border/80 rounded-3xl p-5 shadow-sm space-y-4">
               <div className="flex justify-between items-center pb-2 border-b border-border/50">
-                <span className="text-xs font-black text-foreground tracking-wider uppercase">
+                <span className="text-sm font-black text-foreground tracking-wider uppercase">
                   Danh sách chuyên khoa
                 </span>
                 <span className="text-[10px] bg-primary/10 text-primary font-bold px-2 py-0.5 rounded-full">
@@ -345,7 +345,7 @@ const Specialties: React.FC = () => {
                         </div>
                         <div className="min-w-0 flex-1">
                           <p
-                            className={`text-xs font-bold leading-snug transition-colors group-hover:text-primary ${isSelected ? 'text-primary' : 'text-foreground'}`}
+                            className={`text-sm font-bold leading-snug transition-colors group-hover:text-primary ${isSelected ? 'text-primary' : 'text-foreground'}`}
                           >
                             {spec.specialtyName}
                           </p>
@@ -458,7 +458,7 @@ const Specialties: React.FC = () => {
                       return (
                         <div
                           key={doc.id}
-                          className="bg-background/80 backdrop-blur border border-border/80 rounded-3xl p-5 shadow-sm hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between group"
+                          className="bg-background/80 backdrop-blur border border-border/80 rounded-3xl p-5 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 flex flex-col justify-between group"
                         >
                           <div className="space-y-4">
                             {/* Doctor Header Profile */}

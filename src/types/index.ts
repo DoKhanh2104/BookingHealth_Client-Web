@@ -195,6 +195,7 @@ export interface Appointment {
   doctor?: Doctor;
   user?: User;
   appointmentSlot?: AppointmentSlot;
+  reviews?: DoctorReview[];
 }
 
 export interface BookAppointmentRequest {
@@ -257,6 +258,14 @@ export interface ChatRoom {
   id: number;
   appointmentId: number;
   status: number; // 0: closed, 1: open
+  doctorId?: number;
+  doctorName?: string;
+  doctorAvatar?: string;
+  userId?: number;
+  userName?: string;
+  userAvatar?: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
 }
 
 export interface ChatMessage {
@@ -266,7 +275,8 @@ export interface ChatMessage {
   senderName?: string;
   senderAvatar?: string;
   content: string;
-  sentAt: string; // thoiGian (ISO datetime)
+  sendTime?: string;
+  sentAt?: string; // thoiGian (ISO datetime)
 }
 
 export interface SendMessageRequest {
@@ -332,4 +342,19 @@ export interface HealthDepartment {
   id: number;
   departmentName: string;
   address?: string;
+}
+
+// ─────────────────────────────────────────────
+// DOCTOR DASHBOARD - STATS
+// ─────────────────────────────────────────────
+
+export interface DoctorDashboardResponse {
+  todayAppointmentsCount: number;
+  todayPendingCount: number;
+  todayCompletedCount: number;
+  totalPatientsCount: number;
+  averageRating: number;
+  reviewCount: number;
+  monthlyRevenue: number;
+  todayFeaturedAppointments: Appointment[];
 }

@@ -10,7 +10,10 @@ import Specialties from '../../pages/specialties/Specialties';
 import PageNotFound from '../../pages/error/PageNotFound';
 import ComingSoon from '../../components/ComingSoon';
 import DoctorDetail from '../../pages/doctors/DoctorDetail';
+import Doctors from '../../pages/doctors/Doctors';
 import BookingPage from '../../pages/booking/BookingPage';
+import MyAppointments from '../../pages/appointments/MyAppointments';
+import PatientChat from '../../pages/chat/PatientChat';
 
 // Doctor Portal Components
 import DoctorGuard from '../../components/DoctorGuard';
@@ -56,7 +59,7 @@ export const router = createBrowserRouter([
           { index: true, element: <Home /> },
 
           // Bác sĩ - BAC_SI
-          { path: 'doctors', element: <ComingSoon title="Danh sách Bác sĩ" /> },
+          { path: 'doctors', element: <Doctors /> },
           { path: 'doctors/:id', element: <DoctorDetail /> },
 
           // Chuyên khoa - CHUYEN_KHOA
@@ -71,11 +74,11 @@ export const router = createBrowserRouter([
           { path: 'screening', element: <ComingSoon title="AI Sàng lọc Sức khoẻ" /> },
 
           // Lịch hẹn - LICH_HEN
-          { path: 'appointments', element: <ComingSoon title="Lịch hẹn của tôi" /> },
+          { path: 'appointments', element: <MyAppointments /> },
           { path: 'appointments/:id', element: <ComingSoon title="Chi tiết Lịch hẹn" /> },
 
           // Chat sau khám - PHONG_HOI_THOAI / TIN_NHAN
-          { path: 'appointments/:id/chat', element: <ComingSoon title="Chat với Bác sĩ" /> },
+          { path: 'appointments/:id/chat', element: <PatientChat /> },
 
           // Đặt lịch - booking flow
           { path: 'booking', element: <BookingPage /> },

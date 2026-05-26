@@ -260,7 +260,27 @@ const Header = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setNotificationMenuOpen((prev) => !prev);
+                      setNotificationMenuOpen((prev) => {
+                        const next = !prev;
+                        if (next) {
+                          notificationService.getMyNotifications(0, 5)
+                            .then((res) => {
+                              if (res?.result?.content) {
+                                setNotifications(res.result.content);
+                              }
+                            })
+                            .catch((err) => console.error(err));
+
+                          notificationService.getUnreadCount()
+                            .then((res) => {
+                              if (res?.result !== undefined) {
+                                setUnreadCount(Number(res.result));
+                              }
+                            })
+                            .catch((err) => console.error(err));
+                        }
+                        return next;
+                      });
                     }}
                     className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-xl transition-all cursor-pointer relative border border-border flex items-center justify-center w-9 h-9"
                     aria-label="Xem thông báo"

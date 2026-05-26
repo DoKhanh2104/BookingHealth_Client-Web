@@ -3,6 +3,15 @@ import type { ApiResponse, ChatRoom, ChatMessage, SendMessageRequest } from '../
 
 export const chatService = {
   /**
+   * GET /chat-rooms
+   * Lấy danh sách phòng hội thoại của người dùng/bác sĩ đang đăng nhập (PHONG_HOI_THOAI)
+   */
+  getMyChatRooms: async (): Promise<ApiResponse<ChatRoom[]>> => {
+    const res = await apiClient.get('/chat-rooms');
+    return res.data;
+  },
+
+  /**
    * GET /chat-rooms/:appointmentId
    * Lấy/tạo phòng hội thoại của một lịch hẹn (PHONG_HOI_THOAI)
    */
