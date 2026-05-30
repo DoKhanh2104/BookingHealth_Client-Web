@@ -14,6 +14,7 @@ import Doctors from '../../pages/doctors/Doctors';
 import BookingPage from '../../pages/booking/BookingPage';
 import MyAppointments from '../../pages/appointments/MyAppointments';
 import PatientChat from '../../pages/chat/PatientChat';
+import Screening from '../../pages/screening/Screening';
 
 // Doctor Portal Components
 import DoctorGuard from '../../components/DoctorGuard';
@@ -71,7 +72,7 @@ export const router = createBrowserRouter([
           { path: 'clinics/:id', element: <ComingSoon title="Chi tiết Phòng khám" /> },
 
           // AI Sàng lọc - NHAT_KY_SANG_LOC
-          { path: 'screening', element: <ComingSoon title="AI Sàng lọc Sức khoẻ" /> },
+          { path: 'screening', element: <Screening /> },
 
           // Lịch hẹn - LICH_HEN
           { path: 'appointments', element: <MyAppointments /> },

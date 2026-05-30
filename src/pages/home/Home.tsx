@@ -724,14 +724,14 @@ const Home = () => {
                   </div>
                 ))}
               </div>
-              <button
+              {/* <button
                 id="chat-feature-btn"
                 onClick={() => navigate('/login')}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground text-sm font-bold rounded-xl shadow-[0_8px_20px_rgba(26,113,180,0.35)] hover:-translate-y-[2px] hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] transition-all duration-300 cursor-pointer"
               >
                 <ChatBubbleIcon />
                 Bắt đầu ngay
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -747,13 +747,13 @@ const Home = () => {
             Đăng ký ngay hôm nay để đặt lịch khám với các bác sĩ hàng đầu. Hoàn toàn miễn phí!
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button
+            {/* <button
               id="cta-book-btn"
               onClick={() => navigate('/login')}
               className="px-8 py-4 bg-white text-primary font-bold text-sm rounded-2xl hover:bg-white/90 transition-all duration-200 shadow-lg cursor-pointer"
             >
               Đặt lịch ngay
-            </button>
+            </button> */}
             <button
               onClick={() => navigate('/doctors')}
               className="px-8 py-4 bg-white/15 text-white font-bold text-sm rounded-2xl border border-white/30 hover:bg-white/25 transition-all duration-200 cursor-pointer"

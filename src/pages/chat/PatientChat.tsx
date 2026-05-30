@@ -8,7 +8,8 @@ import { toast } from 'sonner';
 const PatientChat: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [room, setRoom] = useState<ChatRoom | null>(null);
@@ -19,7 +20,12 @@ const PatientChat: React.FC = () => {
 
   // Scroll to bottom
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
   };
 
   // Get user profile on mount
@@ -107,6 +113,9 @@ const PatientChat: React.FC = () => {
       })
       .finally(() => {
         setSending(false);
+        setTimeout(() => {
+          inputRef.current?.focus({ preventScroll: true });
+        }, 0);
       });
   };
 
@@ -139,35 +148,39 @@ const PatientChat: React.FC = () => {
   if (!room) return null;
 
   return (
-    <div className="bg-muted/10 min-h-screen py-6 text-xs sm:text-sm">
-      <div className="max-w-3xl mx-auto px-4">
+    <div className="bg-muted/10 min-h-screen py-8 text-sm font-sans">
+      <div className="max-w-4xl mx-auto px-4">
         {/* Chat Widget */}
-        <div className="bg-background border border-border rounded-3xl overflow-hidden shadow-sm flex flex-col h-[calc(100vh-8rem)]">
+        <div className="bg-background/95 backdrop-blur-xl border border-border rounded-[2rem] overflow-hidden shadow-2xl shadow-primary/5 flex flex-col h-[calc(100vh-6rem)]">
           {/* Header */}
-          <div className="h-16 border-b border-border flex items-center justify-between px-6 bg-muted/5 flex-shrink-0">
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold border border-primary/20 flex-shrink-0">
+          <div className="h-20 border-b border-border/50 flex items-center justify-between px-8 bg-background/50 flex-shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/10 flex-shrink-0 border border-primary/20">
                 {room.doctorName ? room.doctorName.charAt(0) : 'B'}
               </div>
-              <div className="space-y-0.5">
-                <h4 className="font-extrabold text-foreground text-sm sm:text-base leading-snug">
+              <div className="space-y-1">
+                <h4 className="font-extrabold text-foreground text-lg leading-snug">
                   {room.doctorName ? `BS. ${room.doctorName}` : 'Bác sĩ phụ trách'}
                 </h4>
-                <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
-                  ● Kênh tư vấn sau khám (Lịch hẹn #{room.appointmentId})
+                <p className="text-xs text-emerald-600 font-medium flex items-center gap-1.5">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  Kênh tư vấn sau khám (Lịch hẹn #{room.appointmentId})
                 </p>
               </div>
             </div>
             <button
               onClick={() => navigate('/appointments')}
-              className="px-4 py-2 border border-border text-muted-foreground hover:text-foreground font-bold text-xs rounded-xl hover:bg-accent cursor-pointer transition-colors"
+              className="px-5 py-2.5 border border-border text-muted-foreground hover:text-foreground hover:border-border/80 font-semibold text-sm rounded-2xl hover:bg-accent/50 cursor-pointer transition-all shadow-sm"
             >
               ← Quay lại
             </button>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-muted/5">
+          <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-8 space-y-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5">
             {messages.length === 0 ? (
               <div className="text-center py-20 text-muted-foreground space-y-2">
                 <div className="text-2xl">💬</div>
@@ -180,28 +193,28 @@ const PatientChat: React.FC = () => {
               messages.map((msg) => {
                 const isMe = currentUser && msg.senderId === currentUser.id;
                 return (
-                  <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                    <div className="flex items-end gap-2 max-w-[80%]">
+                  <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+                    <div className="flex items-end gap-3 max-w-[75%]">
                       {!isMe && (
-                        <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[9px] border border-primary/20 flex-shrink-0 mb-1">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shadow-md shadow-primary/10 flex-shrink-0 mb-1 border border-primary/20">
                           {msg.senderName ? msg.senderName.charAt(0) : 'B'}
                         </div>
                       )}
                       <div
                         className={`
-                          px-4 py-2.5 rounded-2xl leading-relaxed shadow-sm text-xs
+                          px-5 py-3.5 rounded-[1.5rem] leading-relaxed text-sm shadow-sm
                           ${
                             isMe
-                              ? 'bg-primary text-primary-foreground rounded-tr-none'
-                              : 'bg-background border border-border text-foreground rounded-tl-none'
+                              ? 'bg-primary text-primary-foreground rounded-br-sm shadow-primary/20'
+                              : 'bg-background border border-border text-foreground rounded-bl-sm shadow-foreground/5'
                           }
                         `}
                       >
                         <p className="break-words">{msg.content}</p>
                         <span
                           className={`
-                            block text-[8px] mt-1 text-right
-                            ${isMe ? 'text-primary-foreground/75' : 'text-muted-foreground/75'}
+                            block text-[10px] mt-1.5 font-medium
+                            ${isMe ? 'text-primary-foreground/80 text-right' : 'text-muted-foreground text-left'}
                           `}
                         >
                           {formatMessageTime(msg.sendTime)}
@@ -212,27 +225,33 @@ const PatientChat: React.FC = () => {
                 );
               })
             )}
-            <div ref={messagesEndRef} />
           </div>
 
           {/* Footer Input */}
           <form
             onSubmit={handleSendMessage}
-            className="p-4 border-t border-border flex gap-2.5 flex-shrink-0 bg-background"
+            className="p-5 border-t border-border flex gap-3 flex-shrink-0 bg-background/95 backdrop-blur-md rounded-b-[2rem]"
           >
             <input
+              ref={inputRef}
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Nhập câu hỏi tư vấn bác sĩ..."
-              className="flex-1 px-4 py-2.5 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary text-xs"
+              className="flex-1 px-5 py-3.5 border border-border rounded-2xl bg-muted/30 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm transition-all"
             />
             <button
               type="submit"
               disabled={!inputText.trim() || sending}
-              className="px-5 py-2.5 bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-primary-foreground font-black rounded-xl shadow-md shadow-primary/20 transition-all text-xs cursor-pointer"
+              className="px-8 py-3.5 bg-primary hover:bg-primary-hover disabled:opacity-50 text-primary-foreground font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all text-sm cursor-pointer flex items-center justify-center min-w-[100px]"
             >
-              {sending ? 'Đang gửi...' : 'Gửi'}
+              {sending ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                </div>
+              ) : (
+                'Gửi'
+              )}
             </button>
           </form>
         </div>

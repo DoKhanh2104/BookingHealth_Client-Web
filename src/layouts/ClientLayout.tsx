@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import AIChatWidget from '../components/AIChatWidget';
 
 const ClientLayout = () => {
   return (
@@ -10,6 +11,8 @@ const ClientLayout = () => {
         <Outlet />
       </main>
       <Footer />
+      {/* AI Chatbot Widget — floating, dùng RAG query live DB */}
+      <AIChatWidget />
     </div>
   );
 };

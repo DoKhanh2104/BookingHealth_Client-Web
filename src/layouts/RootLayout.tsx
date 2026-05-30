@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
 import { useEffect } from 'react';
 
 const getPageTitle = (pathname: string): string => {
@@ -38,7 +38,12 @@ const RootLayout = () => {
     document.title = `${title} | BookingHealth`;
   }, [location.pathname]);
 
-  return <Outlet />;
+  return (
+    <>
+      <ScrollRestoration />
+      <Outlet />
+    </>
+  );
 };
 
 export default RootLayout;

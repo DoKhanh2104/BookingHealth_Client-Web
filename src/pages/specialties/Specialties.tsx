@@ -400,12 +400,12 @@ const Specialties: React.FC = () => {
                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
                   <div className="flex flex-col sm:flex-row items-start gap-4">
                     <div
-                      className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl bg-background border shadow-inner ${getSpecialtyMeta(selectedSpecialty.specialtyName).color}`}
+                      className={`w-14 h-14 rounded-xl flex items-center justify-center text-xl bg-background border shadow-inner ${getSpecialtyMeta(selectedSpecialty.specialtyName).color}`}
                     >
                       {getSpecialtyMeta(selectedSpecialty.specialtyName).icon}
                     </div>
                     <div className="space-y-2 flex-1 min-w-0">
-                      <h2 className="text-2xl font-black text-foreground leading-tight">
+                      <h2 className="text-xl font-black text-foreground leading-tight">
                         Chuyên khoa {selectedSpecialty.specialtyName}
                       </h2>
                       <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">

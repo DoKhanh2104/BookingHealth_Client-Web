@@ -45,7 +45,9 @@ const MyAppointments: React.FC = () => {
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'>('ALL');
+  const [activeTab, setActiveTab] = useState<
+    'ALL' | 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
+  >('ALL');
 
   // Cancel state
   const [cancellingAppId, setCancellingAppId] = useState<number | null>(null);
@@ -73,7 +75,8 @@ const MyAppointments: React.FC = () => {
     else if (activeTab === 'COMPLETED') statusNum = 2;
     else if (activeTab === 'CANCELLED') statusNum = 3;
 
-    appointmentService.getMyAppointments(0, 100, statusNum)
+    appointmentService
+      .getMyAppointments(0, 100, statusNum)
       .then((res) => {
         if (res.result?.content) {
           setAppointments(res.result.content);
@@ -91,16 +94,17 @@ const MyAppointments: React.FC = () => {
 
   // Fetch stats based on a request fetching everything
   const fetchStats = () => {
-    appointmentService.getMyAppointments(0, 500)
+    appointmentService
+      .getMyAppointments(0, 500)
       .then((res) => {
         if (res.result?.content) {
           const list = res.result.content;
           setStats({
             all: list.length,
-            pending: list.filter(a => a.status === 0).length,
-            confirmed: list.filter(a => a.status === 1).length,
-            completed: list.filter(a => a.status === 2).length,
-            cancelled: list.filter(a => a.status === 3).length,
+            pending: list.filter((a) => a.status === 0).length,
+            confirmed: list.filter((a) => a.status === 1).length,
+            completed: list.filter((a) => a.status === 2).length,
+            cancelled: list.filter((a) => a.status === 3).length,
           });
         }
       })
@@ -108,8 +112,7 @@ const MyAppointments: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchAppointments();
-    fetchStats();
+    Promise.resolve().then(fetchAppointments);
   }, [activeTab]);
 
   const handleCancelClick = (id: number) => {
@@ -118,7 +121,8 @@ const MyAppointments: React.FC = () => {
 
   const handleConfirmCancel = () => {
     if (cancellingAppId === null) return;
-    appointmentService.cancel(cancellingAppId)
+    appointmentService
+      .cancel(cancellingAppId)
       .then(() => {
         toast.success('Hủy lịch hẹn thành công');
         setCancellingAppId(null);
@@ -142,12 +146,13 @@ const MyAppointments: React.FC = () => {
     if (!reviewApp || !reviewApp.doctor?.id) return;
 
     setSubmittingReview(true);
-    doctorService.createReview({
-      doctorId: reviewApp.doctor.id,
-      appointmentId: reviewApp.id,
-      rating,
-      comment: comment.trim() || undefined
-    })
+    doctorService
+      .createReview({
+        doctorId: reviewApp.doctor.id,
+        appointmentId: reviewApp.id,
+        rating,
+        comment: comment.trim() || undefined,
+      })
       .then(() => {
         toast.success('Gửi đánh giá bác sĩ thành công!');
         setReviewApp(null);
@@ -185,35 +190,53 @@ const MyAppointments: React.FC = () => {
               Xem chi tiết, trạng thái ca khám, nhận đơn thuốc và đánh giá bác sĩ của bạn.
             </p>
           </div>
-          <button
+          {/* <button
             onClick={() => navigate('/doctors')}
             className="px-4.5 py-2.5 bg-primary hover:bg-primary-hover text-primary-foreground font-extrabold rounded-xl transition-all cursor-pointer shadow-md shadow-primary/20 text-xs"
           >
             🔍 Tìm chuyên khoa & bác sĩ
-          </button>
+          </button> */}
         </div>
 
         {/* Stats Summary Panel */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 bg-background border border-border p-4 rounded-2xl shadow-sm">
           <div className="p-3 text-center border-r border-border last:border-0">
-            <div className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">Tất cả</div>
+            <div className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">
+              Tất cả
+            </div>
             <div className="text-xl sm:text-2xl font-black text-foreground mt-1">{stats.all}</div>
           </div>
           <div className="p-3 text-center border-r border-border last:border-0">
-            <div className="text-amber-600 text-[10px] uppercase font-bold tracking-wider">Chờ xác nhận</div>
-            <div className="text-xl sm:text-2xl font-black text-amber-500 mt-1">{stats.pending}</div>
+            <div className="text-amber-600 text-[10px] uppercase font-bold tracking-wider">
+              Chờ xác nhận
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-amber-500 mt-1">
+              {stats.pending}
+            </div>
           </div>
           <div className="p-3 text-center border-r border-border last:border-0">
-            <div className="text-blue-600 text-[10px] uppercase font-bold tracking-wider">Đã xác nhận</div>
-            <div className="text-xl sm:text-2xl font-black text-blue-500 mt-1">{stats.confirmed}</div>
+            <div className="text-blue-600 text-[10px] uppercase font-bold tracking-wider">
+              Đã xác nhận
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-blue-500 mt-1">
+              {stats.confirmed}
+            </div>
           </div>
           <div className="p-3 text-center border-r border-border last:border-0">
-            <div className="text-emerald-600 text-[10px] uppercase font-bold tracking-wider">Đã khám xong</div>
-            <div className="text-xl sm:text-2xl font-black text-emerald-500 mt-1">{stats.completed}</div>
+            <div className="text-emerald-600 text-[10px] uppercase font-bold tracking-wider">
+              Đã khám xong
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-emerald-500 mt-1">
+              {stats.completed}
+            </div>
           </div>
           <div className="p-3 text-center last:border-0 col-span-2 sm:col-span-1">
-            <div className="text-red-600 text-[10px] uppercase font-bold tracking-wider">Đã hủy</div>
-            <div className="text-xl sm:text-2xl font-black text-red-500 mt-1">{stats.cancelled}</div>
+            <div className="text-red-600 text-[10px] uppercase font-bold tracking-wider">
+              Đã hủy
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-red-500 mt-1">
+              {stats.cancelled}
+            </div>
           </div>
         </div>
 
@@ -250,25 +273,33 @@ const MyAppointments: React.FC = () => {
           <div className="space-y-4">
             {appointments.map((app) => {
               const doctorName = app.doctor?.name ? `BS. ${app.doctor.name}` : 'Bác sĩ y tế';
-              const specialty = app.doctor?.specialties && app.doctor.specialties.length > 0 
-                ? app.doctor.specialties[0].specialtyName 
-                : 'Chuyên khoa tổng quát';
-              
+              const specialty =
+                app.doctor?.specialties && app.doctor.specialties.length > 0
+                  ? app.doctor.specialties[0].specialtyName
+                  : 'Chuyên khoa tổng quát';
+
               const startTime = app.appointmentSlot?.startTime || '00:00';
               const endTime = app.appointmentSlot?.endTime || '00:00';
               const timeSlot = `${startTime.slice(0, 5)} - ${endTime.slice(0, 5)}`;
-              
+
               const isReviewed = app.reviews && app.reviews.length > 0;
               const hasAttachment = !!app.attachment;
 
               return (
-                <div key={app.id} className="bg-background border border-border rounded-3xl p-5 sm:p-6 shadow-sm hover:border-border/80 transition-all space-y-4">
+                <div
+                  key={app.id}
+                  className="bg-background border border-border rounded-3xl p-5 sm:p-6 shadow-sm hover:border-border/80 transition-all space-y-4"
+                >
                   {/* Top: Doctor Info & Badges */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
                     <div className="flex items-start gap-3.5">
                       <div className="w-12 h-12 rounded-full overflow-hidden border border-border bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 shadow-inner">
                         {app.doctor?.avatar ? (
-                          <img src={app.doctor.avatar} alt={doctorName} className="w-full h-full object-cover" />
+                          <img
+                            src={app.doctor.avatar}
+                            alt={doctorName}
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
                           <UserIcon className="w-6 h-6 text-primary" />
                         )}
@@ -286,20 +317,25 @@ const MyAppointments: React.FC = () => {
 
                     <div className="flex flex-wrap sm:flex-col sm:items-end gap-2 text-right">
                       {/* Status badge */}
-                      <span className={`
+                      <span
+                        className={`
                         px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border tracking-wider
                         ${app.status === 0 && 'bg-amber-500/10 text-amber-600 border-amber-500/20'}
                         ${app.status === 1 && 'bg-blue-500/10 text-blue-600 border-blue-500/20'}
                         ${app.status === 2 && 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'}
                         ${app.status === 3 && 'bg-red-500/10 text-red-600 border-red-500/20'}
-                      `}>
+                      `}
+                      >
                         {app.status === 0 && 'Chờ duyệt'}
                         {app.status === 1 && 'Đã xác nhận'}
                         {app.status === 2 && 'Đã khám xong'}
                         {app.status === 3 && 'Đã hủy'}
                       </span>
                       <div className="text-xs text-muted-foreground font-semibold mt-0.5">
-                        💵 Phí khám: <strong className="text-primary">{(app.totalAmount || 0).toLocaleString('vi-VN')}đ</strong>
+                        💵 Phí khám:{' '}
+                        <strong className="text-primary">
+                          {(app.totalAmount || 0).toLocaleString('vi-VN')}đ
+                        </strong>
                       </div>
                     </div>
                   </div>
@@ -307,16 +343,26 @@ const MyAppointments: React.FC = () => {
                   {/* Mid: Examination Time Details */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-muted/20 border border-border/60 rounded-2xl p-4 leading-relaxed">
                     <div>
-                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground block">📅 LỊCH KHÁM</span>
-                      <span className="font-bold text-foreground text-xs">{formatDateLabel(app.expectedExaminationDate)}</span>
+                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground block">
+                        📅 LỊCH KHÁM
+                      </span>
+                      <span className="font-bold text-foreground text-xs">
+                        {formatDateLabel(app.expectedExaminationDate)}
+                      </span>
                     </div>
                     <div>
-                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground block">⏳ GIỜ KHÁM</span>
+                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground block">
+                        ⏳ GIỜ KHÁM
+                      </span>
                       <span className="font-bold text-primary text-xs">{timeSlot}</span>
                     </div>
                     <div className="col-span-2">
-                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground block">💬 LÝ DO KHÁM</span>
-                      <p className="text-xs text-muted-foreground truncate">{app.description || 'Không mô tả lý do khám'}</p>
+                      <span className="text-[9px] uppercase tracking-wider font-extrabold text-muted-foreground block">
+                        💬 LÝ DO KHÁM
+                      </span>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {app.description || 'Không mô tả lý do khám'}
+                      </p>
                     </div>
                   </div>
 
@@ -324,14 +370,18 @@ const MyAppointments: React.FC = () => {
                   {app.status === 2 && (
                     <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-2xl p-4 space-y-3">
                       <div>
-                        <span className="text-[9px] uppercase tracking-wider font-extrabold text-emerald-700 block">🩺 Chẩn đoán của bác sĩ</span>
+                        <span className="text-[9px] uppercase tracking-wider font-extrabold text-emerald-700 block">
+                          🩺 Chẩn đoán của bác sĩ
+                        </span>
                         <p className="text-xs text-foreground mt-0.5 leading-relaxed font-semibold">
                           {app.diagnosis || 'Đang cập nhật chẩn đoán...'}
                         </p>
                       </div>
                       {app.medicine && (
                         <div>
-                          <span className="text-[9px] uppercase tracking-wider font-extrabold text-emerald-700 block">💊 Đơn thuốc kê kèm</span>
+                          <span className="text-[9px] uppercase tracking-wider font-extrabold text-emerald-700 block">
+                            💊 Đơn thuốc kê kèm
+                          </span>
                           <p className="text-xs text-muted-foreground mt-0.5 whitespace-pre-line leading-relaxed italic bg-background/50 border border-border/40 p-3 rounded-xl">
                             {app.medicine}
                           </p>
@@ -373,7 +423,9 @@ const MyAppointments: React.FC = () => {
                         {isReviewed ? (
                           <div className="flex items-center gap-1 text-xs text-muted-foreground/80 bg-muted/30 px-3 py-2 rounded-xl">
                             <span>★</span>
-                            <span className="font-semibold">Bạn đã gửi đánh giá {app.reviews![0].rating}/5</span>
+                            <span className="font-semibold">
+                              Bạn đã gửi đánh giá {app.reviews![0].rating}/5
+                            </span>
                           </div>
                         ) : (
                           <button
@@ -413,9 +465,12 @@ const MyAppointments: React.FC = () => {
       {cancellingAppId !== null && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-background border border-border rounded-3xl p-6 w-full max-w-sm overflow-hidden shadow-2xl space-y-4">
-            <h3 className="font-black text-foreground text-base uppercase tracking-wide text-center">Xác nhận hủy lịch</h3>
+            <h3 className="font-black text-foreground text-base uppercase tracking-wide text-center">
+              Xác nhận hủy lịch
+            </h3>
             <p className="text-xs text-muted-foreground leading-normal text-center">
-              Bạn có chắc chắn muốn hủy lịch hẹn khám bệnh này không? Hành động này không thể hoàn tác.
+              Bạn có chắc chắn muốn hủy lịch hẹn khám bệnh này không? Hành động này không thể hoàn
+              tác.
             </p>
             <div className="flex gap-2.5 pt-2">
               <button
@@ -457,16 +512,13 @@ const MyAppointments: React.FC = () => {
                   Lòng bác sĩ thế nào? Hãy chia sẻ đánh giá của bạn về bác sĩ{' '}
                   <strong className="text-foreground">
                     {reviewApp.doctor?.name ? `BS. ${reviewApp.doctor.name}` : 'chăm sóc y tế'}
-                  </strong>:
+                  </strong>
+                  :
                 </p>
                 {/* Stars container */}
                 <div className="flex justify-center gap-1.5 pt-1">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <StarIcon
-                      key={star}
-                      filled={star <= rating}
-                      onClick={() => setRating(star)}
-                    />
+                    <StarIcon key={star} filled={star <= rating} onClick={() => setRating(star)} />
                   ))}
                 </div>
               </div>

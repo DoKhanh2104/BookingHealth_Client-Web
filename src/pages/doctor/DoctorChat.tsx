@@ -12,10 +12,16 @@ const DoctorChat: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [inputText, setInputText] = useState('');
   const [sending, setSending] = useState<boolean>(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   };
 
   // Fetch initial profile & rooms
@@ -128,6 +134,9 @@ const DoctorChat: React.FC = () => {
       })
       .finally(() => {
         setSending(false);
+        setTimeout(() => {
+          inputRef.current?.focus({ preventScroll: true });
+        }, 0);
       });
   };
 
@@ -163,13 +172,13 @@ const DoctorChat: React.FC = () => {
   }
 
   return (
-    <div className="bg-background border border-border rounded-2xl overflow-hidden shadow-sm h-[calc(100vh-12rem)] flex text-xs">
+    <div className="bg-background/95 backdrop-blur-xl border border-border/80 rounded-[2rem] overflow-hidden shadow-2xl shadow-primary/5 h-[calc(100vh-8rem)] flex text-sm font-sans mx-auto max-w-7xl mt-4">
       {/* Sidebar - Rooms List */}
-      <div className="w-80 border-r border-border flex flex-col flex-shrink-0 bg-muted/10">
-        <div className="p-4 border-b border-border bg-background">
-          <h3 className="font-extrabold text-foreground text-sm">Hộp thoại tư vấn</h3>
+      <div className="w-80 lg:w-96 border-r border-border flex flex-col flex-shrink-0 bg-muted/10">
+        <div className="p-6 border-b border-border bg-background/50 backdrop-blur-md">
+          <h3 className="font-extrabold text-foreground text-lg">Hộp thoại tư vấn</h3>
         </div>
-        <div className="flex-1 overflow-y-auto divide-y divide-border/60">
+        <div className="flex-1 overflow-y-auto divide-y divide-gray-100/50">
           {chatRooms.length === 0 ? (
             <div className="p-6 text-center text-muted-foreground">
               Không có cuộc hội thoại nào.
@@ -180,19 +189,20 @@ const DoctorChat: React.FC = () => {
                 key={room.id}
                 onClick={() => handleSelectRoom(room.id)}
                 className={`
-                  w-full p-4 text-left transition-colors flex items-start gap-3 hover:bg-accent/40 cursor-pointer
-                  ${activeRoomId === room.id ? 'bg-primary/5 hover:bg-primary/5' : ''}
+                  w-full p-4 text-left transition-all flex items-start gap-4 hover:bg-background cursor-pointer group border-l-4
+                  ${activeRoomId === room.id ? 'bg-background border-primary shadow-sm' : 'border-transparent'}
                 `}
               >
-                <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs flex-shrink-0 border border-primary/20">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 transition-colors border
+                  ${activeRoomId === room.id ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 border-primary/20' : 'bg-primary/5 text-primary border-primary/10 group-hover:bg-primary/10'}`}>
                   {room.userName ? room.userName.charAt(0) : 'B'}
                 </div>
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="flex items-center justify-between gap-1.5">
-                    <span className="font-bold truncate text-foreground">
+                <div className="min-w-0 flex-1 space-y-1.5 pt-0.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-bold text-foreground truncate text-base">
                       {room.userName || 'Bệnh nhân'}
                     </span>
-                    <span className="text-[9px] text-muted-foreground/60 flex-shrink-0">
+                    <span className="text-xs text-muted-foreground font-medium flex-shrink-0">
                       {formatTime(room.lastMessageTime)}
                     </span>
                   </div>
@@ -211,22 +221,26 @@ const DoctorChat: React.FC = () => {
         {activeRoom ? (
           <>
             {/* Chat header */}
-            <div className="h-14 border-b border-border flex items-center px-6 gap-3 flex-shrink-0 bg-muted/5">
-              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold border border-primary/20">
+            <div className="h-20 border-b border-border flex items-center px-8 gap-4 flex-shrink-0 bg-background/50 backdrop-blur-md">
+              <div className="w-12 h-12 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center font-bold text-lg shadow-md shadow-primary/10">
                 {activeRoom.userName ? activeRoom.userName.charAt(0) : 'B'}
               </div>
-              <div>
-                <h4 className="font-bold text-foreground">{activeRoom.userName || 'Bệnh nhân'}</h4>
-                <span className="text-[9px] text-emerald-600 font-semibold flex items-center gap-1">
-                  ● Kênh tư vấn trực tuyến (Lịch hẹn #{activeRoom.appointmentId})
-                </span>
+              <div className="space-y-1">
+                <h4 className="font-extrabold text-foreground text-lg">{activeRoom.userName || 'Bệnh nhân'}</h4>
+                <p className="text-xs text-emerald-600 font-medium flex items-center gap-1.5">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  Kênh tư vấn trực tuyến (Lịch hẹn #{activeRoom.appointmentId})
+                </p>
               </div>
             </div>
 
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-8 space-y-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5">
               {messages.length === 0 ? (
-                <div className="text-center py-20 text-muted-foreground">
+                <div className="text-center py-20 text-muted-foreground font-medium">
                   Bắt đầu cuộc trò chuyện tư vấn với bệnh nhân.
                 </div>
               ) : (
@@ -235,23 +249,23 @@ const DoctorChat: React.FC = () => {
                   return (
                     <div
                       key={msg.id}
-                      className={`flex ${isDoctor ? 'justify-end' : 'justify-start'}`}
+                      className={`flex ${isDoctor ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
                     >
                       <div
                         className={`
-                          max-w-sm px-4 py-2.5 rounded-2xl leading-relaxed shadow-sm text-xs
+                          max-w-[70%] px-5 py-3.5 rounded-[1.5rem] leading-relaxed shadow-sm text-sm
                           ${
                             isDoctor
-                              ? 'bg-primary text-primary-foreground rounded-tr-none'
-                              : 'bg-muted/50 border border-border text-foreground rounded-tl-none'
+                              ? 'bg-primary text-primary-foreground rounded-br-sm shadow-primary/20'
+                              : 'bg-background border border-border text-foreground rounded-bl-sm shadow-foreground/5'
                           }
                         `}
                       >
                         <p className="break-words">{msg.content}</p>
                         <span
                           className={`
-                            block text-[9px] mt-1 text-right
-                            ${isDoctor ? 'text-primary-foreground/70' : 'text-muted-foreground/70'}
+                            block text-[10px] mt-1.5 font-medium
+                            ${isDoctor ? 'text-primary-foreground/80 text-right' : 'text-muted-foreground text-left'}
                           `}
                         >
                           {formatTime(msg.sendTime)}
@@ -261,32 +275,38 @@ const DoctorChat: React.FC = () => {
                   );
                 })
               )}
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Chat Input form */}
             <form
               onSubmit={handleSendMessage}
-              className="p-4 border-t border-border flex gap-2 flex-shrink-0 bg-muted/5"
+              className="p-5 border-t border-border flex gap-3 flex-shrink-0 bg-background"
             >
               <input
+                ref={inputRef}
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Nhập nội dung phản hồi tư vấn..."
-                className="flex-1 px-4 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary text-xs"
+                className="flex-1 px-5 py-3.5 border border-border rounded-2xl bg-muted/30 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm transition-all"
               />
               <button
                 type="submit"
                 disabled={!inputText.trim() || sending}
-                className="px-5 py-2 bg-primary hover:bg-primary-hover disabled:bg-primary/50 text-primary-foreground font-bold rounded-xl shadow-md shadow-primary/20 cursor-pointer transition-all"
+                className="px-8 py-3.5 bg-primary hover:bg-primary-hover disabled:opacity-50 text-primary-foreground font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all text-sm cursor-pointer flex items-center justify-center min-w-[100px]"
               >
-                {sending ? 'Đang gửi...' : 'Gửi'}
+                {sending ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  </div>
+                ) : (
+                  'Gửi'
+                )}
               </button>
             </form>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          <div className="flex-1 flex items-center justify-center text-muted-foreground font-medium">
             Chọn một hộp thoại để bắt đầu tư vấn.
           </div>
         )}

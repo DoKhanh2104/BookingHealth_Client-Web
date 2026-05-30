@@ -75,7 +75,8 @@ const navLinks = [
   { label: 'Trang chủ', href: '/' },
   { label: 'Bác sĩ', href: '/doctors' },
   { label: 'Chuyên khoa', href: '/specialties' },
-  { label: 'Phòng khám', href: '/clinics' },
+  // { label: 'Phòng khám', href: '/clinics' },
+  { label: 'Tư Vấn AI', href: '/screening' },
   { label: 'Về chúng tôi', href: '/about' },
 ];
 
@@ -263,7 +264,8 @@ const Header = () => {
                       setNotificationMenuOpen((prev) => {
                         const next = !prev;
                         if (next) {
-                          notificationService.getMyNotifications(0, 5)
+                          notificationService
+                            .getMyNotifications(0, 5)
                             .then((res) => {
                               if (res?.result?.content) {
                                 setNotifications(res.result.content);
@@ -271,7 +273,8 @@ const Header = () => {
                             })
                             .catch((err) => console.error(err));
 
-                          notificationService.getUnreadCount()
+                          notificationService
+                            .getUnreadCount()
                             .then((res) => {
                               if (res?.result !== undefined) {
                                 setUnreadCount(Number(res.result));
