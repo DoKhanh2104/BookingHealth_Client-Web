@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { appointmentService } from '../../services/appointmentService';
 import type { Appointment as ApiAppointment } from '../../types';
@@ -31,7 +31,7 @@ const DoctorAppointments: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchAppointments = () => {
+  const fetchAppointments = useCallback(() => {
     setLoading(true);
     let statusNum: number | undefined = undefined;
     if (activeTab === 'PENDING') statusNum = 0;
@@ -78,11 +78,11 @@ const DoctorAppointments: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  };
+  }, [activeTab]);
 
   useEffect(() => {
     Promise.resolve().then(() => fetchAppointments());
-  }, [activeTab]);
+  }, [fetchAppointments]);
 
   const filteredAppointments = appointments.filter((app) => {
     if (activeTab === 'ALL') return true;

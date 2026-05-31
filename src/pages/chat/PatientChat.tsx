@@ -30,7 +30,8 @@ const PatientChat: React.FC = () => {
 
   // Get user profile on mount
   useEffect(() => {
-    userService.getProfile()
+    userService
+      .getProfile()
       .then((res) => {
         if (res.result) {
           setCurrentUser(res.result);
@@ -44,7 +45,8 @@ const PatientChat: React.FC = () => {
   // Fetch or create chat room for this appointment
   useEffect(() => {
     if (!id) return;
-    chatService.getRoomByAppointment(Number(id))
+    chatService
+      .getRoomByAppointment(Number(id))
       .then((res) => {
         if (res.result) {
           setRoom(res.result);
@@ -60,7 +62,8 @@ const PatientChat: React.FC = () => {
         }
       })
       .catch((err) => {
-        const errorMsg = err.response?.data?.message || 'Không thể tạo phòng chat. Đảm bảo ca khám đã hoàn thành!';
+        const errorMsg =
+          err.response?.data?.message || 'Không thể tạo phòng chat. Đảm bảo ca khám đã hoàn thành!';
         toast.error(errorMsg);
         // Redirect back after a delay
         setTimeout(() => navigate('/appointments'), 2000);
@@ -74,7 +77,8 @@ const PatientChat: React.FC = () => {
   useEffect(() => {
     if (!room) return;
     const interval = setInterval(() => {
-      chatService.getMessages(room.id)
+      chatService
+        .getMessages(room.id)
         .then((res) => {
           if (res.result && JSON.stringify(res.result) !== JSON.stringify(messages)) {
             const oldLength = messages.length;
@@ -87,7 +91,7 @@ const PatientChat: React.FC = () => {
         .catch((err) => {
           console.error('Error polling messages:', err);
         });
-  }, 3000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [room, messages]);
@@ -100,7 +104,8 @@ const PatientChat: React.FC = () => {
     const content = inputText.trim();
     setInputText('');
 
-    chatService.sendMessage({ chatRoomId: room.id, content })
+    chatService
+      .sendMessage({ chatRoomId: room.id, content })
       .then((res) => {
         if (res.result) {
           setMessages((prev) => [...prev, res.result]);
@@ -180,20 +185,27 @@ const PatientChat: React.FC = () => {
           </div>
 
           {/* Messages Area */}
-          <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-8 space-y-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5">
+          <div
+            ref={chatContainerRef}
+            className="flex-1 overflow-y-auto p-8 space-y-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5"
+          >
             {messages.length === 0 ? (
               <div className="text-center py-20 text-muted-foreground space-y-2">
                 <div className="text-2xl">💬</div>
                 <p className="font-medium text-xs">Phòng tư vấn trực tuyến đã sẵn sàng.</p>
                 <p className="text-[10px] opacity-75 max-w-xs mx-auto">
-                  Hãy gửi lời chào hoặc thắc mắc của bạn về đơn thuốc, tác dụng phụ hoặc chế độ ăn uống cho Bác sĩ.
+                  Hãy gửi lời chào hoặc thắc mắc của bạn về đơn thuốc, tác dụng phụ hoặc chế độ ăn
+                  uống cho Bác sĩ.
                 </p>
               </div>
             ) : (
               messages.map((msg) => {
                 const isMe = currentUser && msg.senderId === currentUser.id;
                 return (
-                  <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+                  <div
+                    key={msg.id}
+                    className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+                  >
                     <div className="flex items-end gap-3 max-w-[75%]">
                       {!isMe && (
                         <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shadow-md shadow-primary/10 flex-shrink-0 mb-1 border border-primary/20">

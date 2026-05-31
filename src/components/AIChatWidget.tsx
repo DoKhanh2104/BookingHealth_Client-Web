@@ -28,7 +28,15 @@ const SUGGESTED_QUESTIONS = [
 const AIChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: 'welcome',
+      role: 'assistant',
+      content:
+        '👋 Xin chào! Tôi là **Trợ lý AI BookingHealth**.\n\nTôi có thể giúp bạn:\n• 🔍 Tìm bác sĩ phù hợp theo chuyên khoa\n• 📍 Tìm phòng khám gần bạn nhất\n• 💰 So sánh phí khám bệnh\n• 🗓 Kiểm tra lịch khám trống\n\nBạn muốn hỏi gì hôm nay?',
+      timestamp: new Date(),
+    },
+  ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
@@ -55,18 +63,6 @@ const AIChatWidget: React.FC = () => {
     }
   }, [isOpen, isMinimized]);
 
-  // Auto-greet on first open
-  useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      setMessages([{
-        id: 'welcome',
-        role: 'assistant',
-        content: '👋 Xin chào! Tôi là **Trợ lý AI BookingHealth**.\n\nTôi có thể giúp bạn:\n• 🔍 Tìm bác sĩ phù hợp theo chuyên khoa\n• 📍 Tìm phòng khám gần bạn nhất\n• 💰 So sánh phí khám bệnh\n• 🗓 Kiểm tra lịch khám trống\n\nBạn muốn hỏi gì hôm nay?',
-        timestamp: new Date(),
-      }]);
-    }
-  }, [isOpen, messages.length]);
-
   const requestLocation = useCallback(() => {
     if (locationAsked) return;
     setLocationAsked(true);
@@ -77,72 +73,75 @@ const AIChatWidget: React.FC = () => {
         },
         () => {
           // User denied — that's fine, just no geo features
-        }
+        },
       );
     }
   }, [locationAsked]);
 
-  const sendMessage = useCallback(async (question: string) => {
-    if (!question.trim() || isLoading) return;
+  const sendMessage = useCallback(
+    async (question: string) => {
+      if (!question.trim() || isLoading) return;
 
-    const userMsg: ChatMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: question,
-      timestamp: new Date(),
-    };
+      const userMsg: ChatMessage = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: question,
+        timestamp: new Date(),
+      };
 
-    setMessages((prev) => [...prev, userMsg]);
-    setInputValue('');
-    setIsLoading(true);
+      setMessages((prev) => [...prev, userMsg]);
+      setInputValue('');
+      setIsLoading(true);
 
-    // Build history (last 6 messages excluding welcome)
-    const history = messages
-      .filter((m) => m.id !== 'welcome')
-      .slice(-6)
-      .map((m) => ({ role: m.role, content: m.content }));
+      // Build history (last 6 messages excluding welcome)
+      const history = messages
+        .filter((m) => m.id !== 'welcome')
+        .slice(-6)
+        .map((m) => ({ role: m.role, content: m.content }));
 
-    try {
-      const response = await fetch(`${AI_API_URL}/api/ai/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question,
-          chat_history: history,
-          user_location: userLocation,
-          stream: false,
-        }),
-      });
+      try {
+        const response = await fetch(`${AI_API_URL}/api/ai/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question,
+            chat_history: history,
+            user_location: userLocation,
+            stream: false,
+          }),
+        });
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: data.answer || 'Xin lỗi, tôi không thể xử lý câu hỏi này.',
-          timestamp: new Date(),
-        },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: '⚠️ Không thể kết nối đến AI server. Vui lòng thử lại sau.',
-          timestamp: new Date(),
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-      setTimeout(() => {
-        inputRef.current?.focus({ preventScroll: true });
-      }, 0);
-    }
-  }, [isLoading, messages, userLocation]);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: data.answer || 'Xin lỗi, tôi không thể xử lý câu hỏi này.',
+            timestamp: new Date(),
+          },
+        ]);
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: '⚠️ Không thể kết nối đến AI server. Vui lòng thử lại sau.',
+            timestamp: new Date(),
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+        setTimeout(() => {
+          inputRef.current?.focus({ preventScroll: true });
+        }, 0);
+      }
+    },
+    [isLoading, messages, userLocation],
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,13 +156,17 @@ const AIChatWidget: React.FC = () => {
 
   const formatContent = (content: string) => {
     // Simple markdown-like formatting
-    return content
-      .split('\n')
-      .map((line, i) => {
-        // Bold text
-        const formatted = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        return <p key={i} className="leading-relaxed" dangerouslySetInnerHTML={{ __html: formatted || '&nbsp;' }} />;
-      });
+    return content.split('\n').map((line, i) => {
+      // Bold text
+      const formatted = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      return (
+        <p
+          key={i}
+          className="leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: formatted || '&nbsp;' }}
+        />
+      );
+    });
   };
 
   return (
@@ -201,7 +204,9 @@ const AIChatWidget: React.FC = () => {
                 🤖
               </div>
               <div>
-                <p className="text-white font-bold text-sm leading-tight">Trợ lý AI BookingHealth</p>
+                <p className="text-white font-bold text-sm leading-tight">
+                  Trợ lý AI BookingHealth
+                </p>
                 <div className="flex items-center gap-1">
                   <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
                   <span className="text-blue-100 text-[10px]">Powered by Gemini</span>
@@ -236,7 +241,10 @@ const AIChatWidget: React.FC = () => {
           {!isMinimized && (
             <>
               {/* Messages Area */}
-              <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/50">
+              <div
+                ref={chatContainerRef}
+                className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/50"
+              >
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
@@ -252,8 +260,13 @@ const AIChatWidget: React.FC = () => {
                       <div className={msg.role === 'assistant' ? 'space-y-0.5' : ''}>
                         {formatContent(msg.content)}
                       </div>
-                      <span className={`block text-[9px] mt-1 ${msg.role === 'user' ? 'text-primary-foreground/70 text-right' : 'text-muted-foreground'}`}>
-                        {msg.timestamp.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                      <span
+                        className={`block text-[9px] mt-1 ${msg.role === 'user' ? 'text-primary-foreground/70 text-right' : 'text-muted-foreground'}`}
+                      >
+                        {msg.timestamp.toLocaleTimeString('vi-VN', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
                       </span>
                     </div>
                   </div>
@@ -263,9 +276,18 @@ const AIChatWidget: React.FC = () => {
                 {isLoading && (
                   <div className="flex justify-start">
                     <div className="bg-background border border-border rounded-2xl rounded-tl-none px-4 py-3 shadow-sm flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <span
+                        className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+                        style={{ animationDelay: '0ms' }}
+                      />
+                      <span
+                        className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+                        style={{ animationDelay: '150ms' }}
+                      />
+                      <span
+                        className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+                        style={{ animationDelay: '300ms' }}
+                      />
                     </div>
                   </div>
                 )}
@@ -319,8 +341,18 @@ const AIChatWidget: React.FC = () => {
                   {isLoading ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                    <svg
+                      className="w-5 h-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"
+                      />
                     </svg>
                   )}
                 </button>

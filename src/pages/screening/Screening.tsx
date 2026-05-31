@@ -54,8 +54,6 @@ const Screening: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-
-
   const requestLocation = useCallback(() => {
     if (locationAsked) return;
     setLocationAsked(true);
@@ -137,7 +135,7 @@ const Screening: React.FC = () => {
         if (data.intent === 'symptom_advice' && data.specialty) {
           await saveScreeningLog(question, data.specialty);
         }
-      } catch (error) {
+      } catch {
         setMessages((prev) => [
           ...prev,
           {

@@ -11,14 +11,15 @@ const DoctorReviews: React.FC = () => {
 
   useEffect(() => {
     let active = true;
-    userService.getProfile()
+    userService
+      .getProfile()
       .then((res) => {
         if (!active) return;
         const docId = res.result?.doctorId;
         if (docId) {
           return Promise.all([
             doctorService.getById(docId),
-            doctorService.getReviews(docId, 0, 100)
+            doctorService.getReviews(docId, 0, 100),
           ]);
         } else {
           toast.error('Không tìm thấy thông tin tài khoản bác sĩ!');
@@ -51,9 +52,8 @@ const DoctorReviews: React.FC = () => {
   }, []);
 
   const totalReviews = reviews.length;
-  const averageRating = totalReviews > 0
-    ? reviews.reduce((acc, r) => acc + r.rating, 0) / totalReviews
-    : 0;
+  const averageRating =
+    totalReviews > 0 ? reviews.reduce((acc, r) => acc + r.rating, 0) / totalReviews : 0;
 
   const starCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
   reviews.forEach((r) => {
@@ -90,7 +90,8 @@ const DoctorReviews: React.FC = () => {
     );
   }
 
-  const treatmentSpecialty = doctor?.specialties?.map(s => s.specialtyName).join(', ') || 'Chuyên khoa';
+  const treatmentSpecialty =
+    doctor?.specialties?.map((s) => s.specialtyName).join(', ') || 'Chuyên khoa';
 
   return (
     <div className="space-y-6 text-xs">
@@ -106,7 +107,10 @@ const DoctorReviews: React.FC = () => {
           </span>
           <div className="flex gap-0.5 text-amber-400 text-lg mt-2">
             {[...Array(5)].map((_, i) => (
-              <span key={i} className={i < Math.round(averageRating) ? 'text-amber-400' : 'text-muted/30'}>
+              <span
+                key={i}
+                className={i < Math.round(averageRating) ? 'text-amber-400' : 'text-muted/30'}
+              >
                 ★
               </span>
             ))}
@@ -150,7 +154,9 @@ const DoctorReviews: React.FC = () => {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">{rev.patientName || 'Bệnh nhân'}</span>
+                      <span className="font-bold text-foreground">
+                        {rev.patientName || 'Bệnh nhân'}
+                      </span>
                       <span className="text-[9px] bg-muted/50 border border-border px-1.5 py-0.5 rounded text-muted-foreground">
                         Khám: {treatmentSpecialty}
                       </span>
@@ -168,7 +174,9 @@ const DoctorReviews: React.FC = () => {
                   </div>
                   <span className="text-muted-foreground text-[10px]">{formatDate(rev.date)}</span>
                 </div>
-                <p className="text-muted-foreground leading-relaxed text-xs pl-0.5">{rev.comment || 'Không có bình luận.'}</p>
+                <p className="text-muted-foreground leading-relaxed text-xs pl-0.5">
+                  {rev.comment || 'Không có bình luận.'}
+                </p>
               </div>
             ))}
           </div>

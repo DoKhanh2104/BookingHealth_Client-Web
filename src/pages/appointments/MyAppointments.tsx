@@ -1,27 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { appointmentService } from '../../services/appointmentService';
 import { doctorService } from '../../services/doctorService';
 import type { Appointment } from '../../types';
-
-// Fallback Doctor Avatar
-const UserIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-    />
-  </svg>
-);
 
 const StarIcon = ({ filled, onClick }: { filled: boolean; onClick?: () => void }) => (
   <svg
@@ -58,16 +40,7 @@ const MyAppointments: React.FC = () => {
   const [comment, setComment] = useState<string>('');
   const [submittingReview, setSubmittingReview] = useState<boolean>(false);
 
-  // Stats
-  const [stats, setStats] = useState({
-    all: 0,
-    pending: 0,
-    confirmed: 0,
-    completed: 0,
-    cancelled: 0,
-  });
-
-  const fetchAppointments = () => {
+  const fetchAppointments = useCallback(() => {
     setLoading(true);
     let statusNum: number | undefined = undefined;
     if (activeTab === 'PENDING') statusNum = 0;
@@ -90,30 +63,11 @@ const MyAppointments: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  };
-
-  // Fetch stats based on a request fetching everything
-  const fetchStats = () => {
-    appointmentService
-      .getMyAppointments(0, 500)
-      .then((res) => {
-        if (res.result?.content) {
-          const list = res.result.content;
-          setStats({
-            all: list.length,
-            pending: list.filter((a) => a.status === 0).length,
-            confirmed: list.filter((a) => a.status === 1).length,
-            completed: list.filter((a) => a.status === 2).length,
-            cancelled: list.filter((a) => a.status === 3).length,
-          });
-        }
-      })
-      .catch(() => {});
-  };
+  }, [activeTab]);
 
   useEffect(() => {
     Promise.resolve().then(fetchAppointments);
-  }, [activeTab]);
+  }, [fetchAppointments]);
 
   const handleCancelClick = (id: number) => {
     setCancellingAppId(id);
@@ -127,7 +81,6 @@ const MyAppointments: React.FC = () => {
         toast.success('Hủy lịch hẹn thành công');
         setCancellingAppId(null);
         fetchAppointments();
-        fetchStats();
       })
       .catch((err) => {
         const msg = err.response?.data?.message || 'Có lỗi xảy ra khi hủy lịch.';
@@ -198,48 +151,6 @@ const MyAppointments: React.FC = () => {
           </button> */}
         </div>
 
-        {/* Stats Summary Panel */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 bg-background border border-border p-4 rounded-2xl shadow-sm">
-          <div className="p-3 text-center border-r border-border last:border-0">
-            <div className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">
-              Tất cả
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-foreground mt-1">{stats.all}</div>
-          </div>
-          <div className="p-3 text-center border-r border-border last:border-0">
-            <div className="text-amber-600 text-[10px] uppercase font-bold tracking-wider">
-              Chờ xác nhận
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-amber-500 mt-1">
-              {stats.pending}
-            </div>
-          </div>
-          <div className="p-3 text-center border-r border-border last:border-0">
-            <div className="text-blue-600 text-[10px] uppercase font-bold tracking-wider">
-              Đã xác nhận
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-blue-500 mt-1">
-              {stats.confirmed}
-            </div>
-          </div>
-          <div className="p-3 text-center border-r border-border last:border-0">
-            <div className="text-emerald-600 text-[10px] uppercase font-bold tracking-wider">
-              Đã khám xong
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-emerald-500 mt-1">
-              {stats.completed}
-            </div>
-          </div>
-          <div className="p-3 text-center last:border-0 col-span-2 sm:col-span-1">
-            <div className="text-red-600 text-[10px] uppercase font-bold tracking-wider">
-              Đã hủy
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-red-500 mt-1">
-              {stats.cancelled}
-            </div>
-          </div>
-        </div>
-
         {/* Tabs Filter */}
         <div className="flex flex-wrap gap-2 border-b border-border pb-3">
           {(['ALL', 'PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'] as const).map((tab) => (
@@ -256,10 +167,10 @@ const MyAppointments: React.FC = () => {
               `}
             >
               {tab === 'ALL' && 'Tất cả'}
-              {tab === 'PENDING' && `Chờ duyệt (${stats.pending})`}
-              {tab === 'CONFIRMED' && `Đã xác nhận (${stats.confirmed})`}
-              {tab === 'COMPLETED' && `Đã khám (${stats.completed})`}
-              {tab === 'CANCELLED' && `Đã hủy (${stats.cancelled})`}
+              {tab === 'PENDING' && 'Chờ duyệt'}
+              {tab === 'CONFIRMED' && 'Đã xác nhận'}
+              {tab === 'COMPLETED' && 'Đã khám'}
+              {tab === 'CANCELLED' && 'Đã hủy'}
             </button>
           ))}
         </div>
@@ -293,17 +204,6 @@ const MyAppointments: React.FC = () => {
                   {/* Top: Doctor Info & Badges */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
                     <div className="flex items-start gap-3.5">
-                      <div className="w-12 h-12 rounded-full overflow-hidden border border-border bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 shadow-inner">
-                        {app.doctor?.avatar ? (
-                          <img
-                            src={app.doctor.avatar}
-                            alt={doctorName}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <UserIcon className="w-6 h-6 text-primary" />
-                        )}
-                      </div>
                       <div className="space-y-0.5">
                         <h3 className="font-extrabold text-foreground text-sm sm:text-base leading-snug">
                           {doctorName}

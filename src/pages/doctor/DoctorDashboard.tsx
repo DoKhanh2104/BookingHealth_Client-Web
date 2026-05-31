@@ -11,7 +11,8 @@ const DoctorDashboard: React.FC = () => {
 
   useEffect(() => {
     let active = true;
-    appointmentService.getDashboardStats()
+    appointmentService
+      .getDashboardStats()
       .then((res) => {
         if (!active) return;
         if (res.result) {
@@ -40,9 +41,10 @@ const DoctorDashboard: React.FC = () => {
 
   // Format revenue display
   const monthlyRevenueVal = dashboardData?.monthlyRevenue || 0;
-  const formattedRevenue = monthlyRevenueVal >= 1000000
-    ? `${(monthlyRevenueVal / 1000000).toFixed(1)}Mđ`
-    : `${monthlyRevenueVal.toLocaleString('vi-VN')}đ`;
+  const formattedRevenue =
+    monthlyRevenueVal >= 1000000
+      ? `${(monthlyRevenueVal / 1000000).toFixed(1)}Mđ`
+      : `${monthlyRevenueVal.toLocaleString('vi-VN')}đ`;
 
   const stats = [
     {

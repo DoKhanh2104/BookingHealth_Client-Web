@@ -19,7 +19,7 @@ const DoctorChat: React.FC = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
         top: chatContainerRef.current.scrollHeight,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   };
@@ -28,10 +28,7 @@ const DoctorChat: React.FC = () => {
   useEffect(() => {
     let active = true;
 
-    Promise.all([
-      userService.getProfile(),
-      chatService.getMyChatRooms()
-    ])
+    Promise.all([userService.getProfile(), chatService.getMyChatRooms()])
       .then(([userRes, roomsRes]) => {
         if (!active) return;
         if (userRes.result) {
@@ -62,7 +59,8 @@ const DoctorChat: React.FC = () => {
     if (!activeRoomId) return;
     let active = true;
 
-    chatService.getMessages(activeRoomId)
+    chatService
+      .getMessages(activeRoomId)
       .then((res) => {
         if (!active) return;
         if (res.result) {
@@ -84,7 +82,8 @@ const DoctorChat: React.FC = () => {
     if (!activeRoomId) return;
 
     const interval = setInterval(() => {
-      chatService.getMessages(activeRoomId)
+      chatService
+        .getMessages(activeRoomId)
         .then((res) => {
           if (res.result && JSON.stringify(res.result) !== JSON.stringify(messages)) {
             const oldLength = messages.length;
@@ -96,7 +95,8 @@ const DoctorChat: React.FC = () => {
         })
         .catch(() => {});
 
-      chatService.getMyChatRooms()
+      chatService
+        .getMyChatRooms()
         .then((res) => {
           if (res.result) {
             setChatRooms(res.result);
@@ -116,16 +116,16 @@ const DoctorChat: React.FC = () => {
     const content = inputText.trim();
     setInputText('');
 
-    chatService.sendMessage({ chatRoomId: activeRoomId, content })
+    chatService
+      .sendMessage({ chatRoomId: activeRoomId, content })
       .then((res) => {
         if (res.result) {
           setMessages((prev) => [...prev, res.result]);
           setTimeout(scrollToBottom, 50);
 
-          chatService.getMyChatRooms()
-            .then((roomsRes) => {
-              if (roomsRes.result) setChatRooms(roomsRes.result);
-            });
+          chatService.getMyChatRooms().then((roomsRes) => {
+            if (roomsRes.result) setChatRooms(roomsRes.result);
+          });
         }
       })
       .catch(() => {
@@ -193,8 +193,10 @@ const DoctorChat: React.FC = () => {
                   ${activeRoomId === room.id ? 'bg-background border-primary shadow-sm' : 'border-transparent'}
                 `}
               >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 transition-colors border
-                  ${activeRoomId === room.id ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 border-primary/20' : 'bg-primary/5 text-primary border-primary/10 group-hover:bg-primary/10'}`}>
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 transition-colors border
+                  ${activeRoomId === room.id ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 border-primary/20' : 'bg-primary/5 text-primary border-primary/10 group-hover:bg-primary/10'}`}
+                >
                   {room.userName ? room.userName.charAt(0) : 'B'}
                 </div>
                 <div className="min-w-0 flex-1 space-y-1.5 pt-0.5">
@@ -226,7 +228,9 @@ const DoctorChat: React.FC = () => {
                 {activeRoom.userName ? activeRoom.userName.charAt(0) : 'B'}
               </div>
               <div className="space-y-1">
-                <h4 className="font-extrabold text-foreground text-lg">{activeRoom.userName || 'Bệnh nhân'}</h4>
+                <h4 className="font-extrabold text-foreground text-lg">
+                  {activeRoom.userName || 'Bệnh nhân'}
+                </h4>
                 <p className="text-xs text-emerald-600 font-medium flex items-center gap-1.5">
                   <span className="relative flex h-2.5 w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -238,7 +242,10 @@ const DoctorChat: React.FC = () => {
             </div>
 
             {/* Chat Messages */}
-            <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-8 space-y-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5">
+            <div
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto p-8 space-y-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5"
+            >
               {messages.length === 0 ? (
                 <div className="text-center py-20 text-muted-foreground font-medium">
                   Bắt đầu cuộc trò chuyện tư vấn với bệnh nhân.

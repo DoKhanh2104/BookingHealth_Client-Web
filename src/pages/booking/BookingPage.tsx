@@ -48,7 +48,8 @@ const BookingPage: React.FC = () => {
   // Load current user profile to pre-fill info
   useEffect(() => {
     let active = true;
-    userService.getProfile()
+    userService
+      .getProfile()
       .then((res) => {
         if (!active) return;
         if (res.result) {
@@ -151,7 +152,8 @@ const BookingPage: React.FC = () => {
         toast.success('Đặt lịch khám thành công!');
       })
       .catch((error) => {
-        const msg = error.response?.data?.message || 'Có lỗi xảy ra khi đặt lịch khám. Vui lòng thử lại.';
+        const msg =
+          error.response?.data?.message || 'Có lỗi xảy ra khi đặt lịch khám. Vui lòng thử lại.';
         toast.error(msg);
       })
       .finally(() => {

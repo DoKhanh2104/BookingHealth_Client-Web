@@ -1,5 +1,11 @@
 import apiClient from '../api/apiClient';
-import type { ApiResponse, PageResponse, Appointment, BookAppointmentRequest, DoctorDashboardResponse } from '../types';
+import type {
+  ApiResponse,
+  PageResponse,
+  Appointment,
+  BookAppointmentRequest,
+  DoctorDashboardResponse,
+} from '../types';
 
 export const appointmentService = {
   /** POST /appointments - Đặt lịch hẹn mới */
