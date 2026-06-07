@@ -26,6 +26,15 @@ const getPageTitle = (pathname: string): string => {
   if (path === '/terms') return 'Điều khoản dịch vụ';
   if (path === '/guide') return 'Hướng dẫn sử dụng';
   if (path === '/news') return 'Tin tức';
+  if (path === '/register-doctor') return 'Đăng ký Bác sĩ';
+
+  if (path.startsWith('/doctor/dashboard')) return 'Bảng điều khiển Bác sĩ';
+  if (path.startsWith('/doctor/appointments')) return 'Quản lý Lịch hẹn';
+  if (path.startsWith('/doctor/schedules')) return 'Lịch làm việc';
+  if (path.startsWith('/doctor/chat')) return 'Tin nhắn';
+  if (path.startsWith('/doctor/reviews')) return 'Đánh giá';
+  if (path.startsWith('/doctor/profile')) return 'Hồ sơ Bác sĩ';
+  if (path.startsWith('/doctor')) return 'Portal Bác sĩ';
 
   return 'Không tìm thấy trang';
 };

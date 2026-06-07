@@ -102,18 +102,31 @@ const DoctorSchedules: React.FC = () => {
       });
   };
 
-  const handleApplyLeave = (e: React.FormEvent) => {
+  const handleApplyLeave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!leaveStartDate || !leaveEndDate || !leaveReason.trim()) {
       toast.error('Vui lòng điền đầy đủ thông tin nghỉ phép');
       return;
     }
-    toast.success(
-      `Đăng ký nghỉ phép thành công từ ngày ${leaveStartDate} đến ${leaveEndDate}. Hệ thống sẽ tạm khóa lịch khám của bạn trong những ngày này.`,
-    );
-    setLeaveStartDate('');
-    setLeaveEndDate('');
-    setLeaveReason('');
+    if (leaveStartDate > leaveEndDate) {
+      toast.error('Ngày kết thúc phải sau ngày bắt đầu');
+      return;
+    }
+    try {
+      await doctorService.createDayOff({
+        startDate: leaveStartDate,
+        endDate: leaveEndDate,
+        reason: leaveReason.trim(),
+      });
+      toast.success(
+        `Đăng ký nghỉ phép thành công từ ngày ${leaveStartDate} đến ${leaveEndDate}. Đơn của bạn đang chờ Admin duyệt.`,
+      );
+      setLeaveStartDate('');
+      setLeaveEndDate('');
+      setLeaveReason('');
+    } catch {
+      toast.error('Không thể gửi đơn nghỉ phép. Vui lòng thử lại!');
+    }
   };
 
   const formatDateLabel = (dateStr: string) => {

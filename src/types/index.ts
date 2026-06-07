@@ -358,3 +358,12 @@ export interface DoctorDashboardResponse {
   monthlyRevenue: number;
   todayFeaturedAppointments: Appointment[];
 }
+
+export interface DayOffResponse {
+  id: number;
+  doctorId: number;
+  startDate: string;
+  endDate: string;
+  reason?: string;
+  status: number;
+}

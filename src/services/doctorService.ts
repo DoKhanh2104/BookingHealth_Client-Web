@@ -7,6 +7,7 @@ import type {
   CreateReviewRequest,
   WorkSchedule,
   AppointmentSlot,
+  DayOffResponse,
 } from '../types';
 
 export interface DoctorFilterParams {
@@ -58,6 +59,22 @@ export const doctorService = {
   /** PATCH /doctors/me/schedule-slots/:id - Bác sĩ bật/tắt ca khám */
   toggleSlotStatus: async (slotId: number): Promise<ApiResponse<AppointmentSlot>> => {
     const res = await apiClient.patch(`/doctors/me/schedule-slots/${slotId}`);
+    return res.data;
+  },
+
+  /** POST /doctors/me/day-offs - Bác sĩ gửi đơn nghỉ phép */
+  createDayOff: async (data: {
+    startDate: string;
+    endDate: string;
+    reason: string;
+  }): Promise<ApiResponse<DayOffResponse>> => {
+    const res = await apiClient.post('/doctors/me/day-offs', data);
+    return res.data;
+  },
+
+  /** GET /doctors/me/day-offs - Bác sĩ xem lịch sử đơn nghỉ phép */
+  getMyDayOffs: async (): Promise<ApiResponse<DayOffResponse[]>> => {
+    const res = await apiClient.get('/doctors/me/day-offs');
     return res.data;
   },
 };
