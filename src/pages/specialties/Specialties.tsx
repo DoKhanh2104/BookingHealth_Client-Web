@@ -464,7 +464,7 @@ const Specialties: React.FC = () => {
                             {/* Doctor Header Profile */}
                             <div className="flex items-start gap-3.5">
                               {/* Avatar wrapper */}
-                              <div className="w-14 h-14 rounded-2xl overflow-hidden bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 shadow-inner border border-border">
+                              <div className="w-16 h-16 rounded-2xl overflow-hidden bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 shadow-inner border border-border">
                                 {doc.avatar ? (
                                   <img
                                     src={doc.avatar}
@@ -472,15 +472,15 @@ const Specialties: React.FC = () => {
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
-                                  <UserIcon className="w-7 h-7 text-primary" />
+                                  <UserIcon className="w-8 h-8 text-primary" />
                                 )}
                               </div>
                               <div className="min-w-0">
-                                <h3 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors leading-snug truncate">
+                                <h3 className="font-bold text-base text-foreground group-hover:text-primary transition-colors leading-snug truncate">
                                   Bác sĩ {doc.name}
                                 </h3>
-                                <p className="text-[11px] text-muted-foreground leading-normal mt-0.5">
-                                  ⏳ {exp}
+                                <p className="text-xs text-muted-foreground leading-normal mt-0.5">
+                                  {exp}
                                 </p>
                                 <div className="flex items-center gap-1 mt-1.5">
                                   <div className="flex gap-0.5">
@@ -488,10 +488,10 @@ const Specialties: React.FC = () => {
                                       <StarIcon key={i} filled={i < Math.floor(rating)} />
                                     ))}
                                   </div>
-                                  <span className="text-[10px] font-bold text-foreground ml-1">
+                                  <span className="text-xs font-bold text-foreground ml-1">
                                     {rating.toFixed(1)}
                                   </span>
-                                  <span className="text-[10px] text-muted-foreground">
+                                  <span className="text-xs text-muted-foreground">
                                     ({reviewCount})
                                   </span>
                                 </div>
@@ -501,25 +501,23 @@ const Specialties: React.FC = () => {
                             <div className="border-t border-border/40 my-3" />
 
                             {/* Details: Clinic & Fee */}
-                            <div className="space-y-2 text-[11px] leading-relaxed text-muted-foreground">
+                            <div className="space-y-2.5 text-xs leading-relaxed text-muted-foreground">
                               {doc.clinic && (
                                 <div className="flex items-start gap-2">
-                                  <span className="text-primary text-xs mt-0.5">🏥</span>
                                   <div>
                                     <p className="font-bold text-foreground">
                                       {doc.clinic.clinicName}
                                     </p>
-                                    <p className="text-[10px] text-muted-foreground/80">
+                                    <p className="text-xs text-muted-foreground/80">
                                       {doc.clinic.address}
                                     </p>
                                   </div>
                                 </div>
                               )}
                               <div className="flex items-center gap-2">
-                                <span className="text-primary text-xs">💵</span>
                                 <span className="font-semibold text-foreground">
                                   Phí khám:{' '}
-                                  <span className="text-primary">
+                                  <span className="text-primary font-bold">
                                     {doc.examinationFee
                                       ? `${doc.examinationFee.toLocaleString('vi-VN')}đ`
                                       : 'Đang cập nhật'}
@@ -529,14 +527,21 @@ const Specialties: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Book Button */}
-                          <div className="pt-4 mt-2">
+                          {/* Action Buttons */}
+                          <div className="grid grid-cols-2 gap-3 pt-4 mt-2">
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/doctors/${doc.id}`)}
+                              className="py-3 bg-accent text-accent-foreground text-xs font-bold rounded-xl hover:bg-accent/80 transition-colors cursor-pointer text-center"
+                            >
+                              Xem thông tin
+                            </button>
                             <button
                               type="button"
                               onClick={() => handleBook(doc.id)}
-                              className="w-full py-2.5 bg-primary text-primary-foreground text-xs font-bold rounded-xl hover:bg-primary-hover transition-colors shadow-sm cursor-pointer active:scale-[0.98]"
+                              className="py-3 bg-primary text-primary-foreground text-xs font-bold rounded-xl hover:bg-primary-hover transition-colors shadow-sm cursor-pointer active:scale-[0.98] text-center"
                             >
-                              Đặt lịch hẹn ngay
+                              Đặt lịch ngay
                             </button>
                           </div>
                         </div>

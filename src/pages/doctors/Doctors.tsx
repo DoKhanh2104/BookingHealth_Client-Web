@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDoctorsHooks } from './Doctors.hooks';
 
@@ -71,6 +71,84 @@ const FilterIcon = () => (
   </svg>
 );
 
+/* ─── Custom Sort Dropdown ─── */
+const SORT_OPTIONS = [
+  { value: 'rating', label: 'Đánh giá tốt nhất' },
+  { value: 'experience', label: 'Nhiều kinh nghiệm nhất' },
+  { value: 'fee-asc', label: 'Giá khám tăng dần' },
+  { value: 'fee-desc', label: 'Giá khám giảm dần' },
+];
+
+interface SortDropdownProps {
+  value: string;
+  onChange: (val: string) => void;
+}
+
+const SortDropdown: React.FC<SortDropdownProps> = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const selected = SORT_OPTIONS.find((o) => o.value === value) ?? SORT_OPTIONS[0];
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-semibold bg-background transition-all cursor-pointer whitespace-nowrap ${
+          open
+            ? 'border-primary text-primary ring-2 ring-primary/15'
+            : 'border-border text-foreground hover:border-primary/50'
+        }`}
+      >
+        <span className="text-xs font-bold text-muted-foreground">Sắp xếp:</span>
+        <span>{selected.label}</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2.5}
+          stroke="currentColor"
+          className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? 'rotate-180 text-primary' : 'text-muted-foreground'}`}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-[calc(100%+6px)] z-50 w-52 bg-background border border-border rounded-2xl shadow-xl overflow-hidden">
+          {SORT_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2.5 text-sm transition-colors cursor-pointer ${
+                opt.value === value
+                  ? 'bg-primary/10 text-primary font-bold'
+                  : 'text-foreground hover:bg-muted font-medium'
+              }`}
+            >
+              {opt.value === value && <span className="mr-2 text-primary">✓</span>}
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Doctors: React.FC = () => {
   const navigate = useNavigate();
   const {
@@ -108,7 +186,7 @@ const Doctors: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
         {/* Page Header */}
-        <div className="mb-10 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border/50 pb-8">
+        <div className="mb-10 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="text-3xl font-black text-foreground tracking-tight">
               Đội Ngũ Bác Sĩ Chuyên Gia
@@ -120,7 +198,6 @@ const Doctors: React.FC = () => {
           </div>
           {/* Quick Stat */}
           <div className="bg-primary/10 border border-primary/20 text-primary font-bold px-4 py-2.5 rounded-2xl text-sm w-fit mx-auto md:mx-0 flex items-center gap-2">
-            <span>👨‍⚕️</span>
             <span>Tổng cộng: {totalCount} bác sĩ phù hợp</span>
           </div>
         </div>
@@ -133,7 +210,7 @@ const Doctors: React.FC = () => {
             </span>
             <input
               type="text"
-              placeholder="Tìm theo tên bác sĩ hoặc triệu chứng..."
+              placeholder="Tìm theo tên bác sĩ..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full pl-10 pr-24 py-3 text-sm text-foreground bg-background rounded-2xl border border-border outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15 placeholder:text-muted-foreground/60"
@@ -157,22 +234,11 @@ const Doctors: React.FC = () => {
               <span>Bộ lọc</span>
             </button>
 
-            {/* Sort Select */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-muted-foreground whitespace-nowrap">
-                Sắp xếp:
-              </span>
-              <select
-                value={filters.sortBy}
-                onChange={(e) => updateFilter({ sortBy: e.target.value })}
-                className="bg-background border border-border text-sm rounded-xl px-3 py-2 outline-none focus:border-primary cursor-pointer text-foreground font-semibold"
-              >
-                <option value="rating">Đánh giá tốt nhất</option>
-                <option value="experience">Nhiều kinh nghiệm nhất</option>
-                <option value="fee-asc">Giá khám tăng dần</option>
-                <option value="fee-desc">Giá khám giảm dần</option>
-              </select>
-            </div>
+            {/* Custom Sort Dropdown */}
+            <SortDropdown
+              value={filters.sortBy}
+              onChange={(val) => updateFilter({ sortBy: val })}
+            />
           </div>
         </div>
 
@@ -303,13 +369,13 @@ const Doctors: React.FC = () => {
                     return (
                       <div
                         key={doc.id}
-                        className="bg-background/80 backdrop-blur border border-border/80 rounded-3xl p-6 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 flex flex-col justify-between group"
+                        className="bg-background/80 backdrop-blur border border-border/80 rounded-3xl p-5 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 flex flex-col justify-between group"
                       >
                         <div className="space-y-4">
                           {/* Doctor Card Top Section */}
-                          <div className="flex items-start gap-4">
+                          <div className="flex items-start gap-3.5">
                             {/* Avatar */}
-                            <div className="w-20 h-20 rounded-2xl overflow-hidden bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 shadow-inner border border-border">
+                            <div className="w-16 h-16 rounded-2xl overflow-hidden bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 shadow-inner border border-border">
                               {doc.avatar ? (
                                 <img
                                   src={doc.avatar}
@@ -317,7 +383,7 @@ const Doctors: React.FC = () => {
                                   className="w-full h-full object-cover"
                                 />
                               ) : (
-                                <UserIcon className="w-10 h-10 text-primary" />
+                                <UserIcon className="w-8 h-8 text-primary" />
                               )}
                             </div>
 
@@ -329,7 +395,7 @@ const Doctors: React.FC = () => {
                                     ★ Đánh giá tốt
                                   </span>
                                 )}
-                                <h3 className="font-extrabold text-base sm:text-lg text-foreground group-hover:text-primary transition-colors leading-snug truncate">
+                                <h3 className="font-bold text-base text-foreground group-hover:text-primary transition-colors leading-snug truncate">
                                   BS. {doc.name}
                                 </h3>
                               </div>
@@ -346,8 +412,7 @@ const Doctors: React.FC = () => {
                                 ))}
                               </div>
 
-                              <p className="text-xs text-muted-foreground leading-normal mt-2">
-                                ⏳{' '}
+                              <p className="text-xs text-muted-foreground leading-normal mt-1.5">
                                 {expYears > 0
                                   ? `${expYears} năm kinh nghiệm`
                                   : 'Bác sĩ chuyên khoa'}
@@ -373,10 +438,9 @@ const Doctors: React.FC = () => {
                           <div className="border-t border-border/40 my-3" />
 
                           {/* Clinic Info & Examination Fee */}
-                          <div className="space-y-3 text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                          <div className="space-y-2.5 text-xs leading-relaxed text-muted-foreground">
                             {doc.clinic && (
                               <div className="flex items-start gap-2">
-                                <span className="text-primary text-sm mt-0.5">🏥</span>
                                 <div className="min-w-0">
                                   <p className="font-bold text-foreground truncate">
                                     {doc.clinic.clinicName}
@@ -388,10 +452,9 @@ const Doctors: React.FC = () => {
                               </div>
                             )}
                             <div className="flex items-center gap-2">
-                              <span className="text-primary text-sm">💵</span>
-                              <span className="font-semibold text-foreground text-xs sm:text-sm">
+                              <span className="font-semibold text-foreground">
                                 Phí khám:{' '}
-                                <span className="text-primary font-bold text-sm sm:text-base">
+                                <span className="text-primary font-bold">
                                   {doc.examinationFee
                                     ? `${doc.examinationFee.toLocaleString('vi-VN')}đ`
                                     : 'Đang cập nhật'}

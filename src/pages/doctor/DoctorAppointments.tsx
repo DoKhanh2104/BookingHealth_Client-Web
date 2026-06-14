@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { appointmentService } from '../../services/appointmentService';
+import { uploadService } from '../../services/uploadService';
 import type { Appointment as ApiAppointment } from '../../types';
 
 interface Appointment {
@@ -31,58 +32,73 @@ const DoctorAppointments: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchAppointments = useCallback(() => {
-    setLoading(true);
-    let statusNum: number | undefined = undefined;
-    if (activeTab === 'PENDING') statusNum = 0;
-    else if (activeTab === 'CONFIRMED') statusNum = 1;
-    else if (activeTab === 'COMPLETED') statusNum = 2;
-    else if (activeTab === 'CANCELLED') statusNum = 3;
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [uploadingFile, setUploadingFile] = useState(false);
 
-    appointmentService
-      .getMyAppointments(0, 100, statusNum)
-      .then((res) => {
-        if (res.result?.content) {
-          const mapped = res.result.content.map((apiApp: ApiAppointment) => {
-            const startTime = apiApp.appointmentSlot?.startTime || '00:00';
-            const endTime = apiApp.appointmentSlot?.endTime || '00:00';
-            const timeSlot = `${startTime.slice(0, 5)} - ${endTime.slice(0, 5)}`;
+  const fetchAppointments = useCallback(
+    (pageToFetch: number) => {
+      setLoading(true);
+      let statusNum: number | undefined = undefined;
+      if (activeTab === 'PENDING') statusNum = 0;
+      else if (activeTab === 'CONFIRMED') statusNum = 1;
+      else if (activeTab === 'COMPLETED') statusNum = 2;
+      else if (activeTab === 'CANCELLED') statusNum = 3;
 
-            let statusStr: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' = 'PENDING';
-            if (apiApp.status === 1) statusStr = 'CONFIRMED';
-            else if (apiApp.status === 2) statusStr = 'COMPLETED';
-            else if (apiApp.status === 3) statusStr = 'CANCELLED';
+      appointmentService
+        .getMyAppointments(pageToFetch, 10, statusNum)
+        .then((res) => {
+          if (res.result?.content) {
+            setTotalPages(res.result.totalPages || 1);
+            const mapped = res.result.content.map((apiApp: ApiAppointment) => {
+              const startTime = apiApp.appointmentSlot?.startTime || '00:00';
+              const endTime = apiApp.appointmentSlot?.endTime || '00:00';
+              const timeSlot = `${startTime.slice(0, 5)} - ${endTime.slice(0, 5)}`;
 
-            return {
-              id: apiApp.id,
-              patientName: apiApp.user?.name || 'Bệnh nhân ẩn danh',
-              phone: apiApp.user?.phone || 'Chưa cập nhật',
-              timeSlot,
-              date: apiApp.expectedExaminationDate || '',
-              symptoms: apiApp.description || 'Không có triệu chứng',
-              status: statusStr,
-              diagnosis: apiApp.diagnosis,
-              prescription: apiApp.medicine,
-              attachment: apiApp.attachment,
-              fee: apiApp.totalAmount || 0,
-            };
-          });
-          setAppointments(mapped);
-        } else {
-          setAppointments([]);
-        }
-      })
-      .catch(() => {
-        toast.error('Không thể tải danh sách ca khám từ hệ thống!');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [activeTab]);
+              let statusStr: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' = 'PENDING';
+              if (apiApp.status === 1) statusStr = 'CONFIRMED';
+              else if (apiApp.status === 2) statusStr = 'COMPLETED';
+              else if (apiApp.status === 3) statusStr = 'CANCELLED';
+
+              return {
+                id: apiApp.id,
+                patientName: apiApp.user?.name || 'Bệnh nhân ẩn danh',
+                phone: apiApp.user?.phone || 'Chưa cập nhật',
+                timeSlot,
+                date: apiApp.expectedExaminationDate || '',
+                symptoms: apiApp.description || 'Không có triệu chứng',
+                status: statusStr,
+                diagnosis: apiApp.diagnosis,
+                prescription: apiApp.medicine,
+                attachment: apiApp.attachment,
+                fee: apiApp.totalAmount || 0,
+              };
+            });
+            setAppointments(mapped);
+          } else {
+            setAppointments([]);
+            setTotalPages(1);
+          }
+        })
+        .catch(() => {
+          toast.error('Không thể tải danh sách ca khám từ hệ thống!');
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    [activeTab],
+  );
 
   useEffect(() => {
-    Promise.resolve().then(() => fetchAppointments());
-  }, [fetchAppointments]);
+    Promise.resolve().then(() => fetchAppointments(currentPage));
+  }, [fetchAppointments, currentPage]);
+
+  const handleTabChange = (tab: typeof activeTab) => {
+    setActiveTab(tab);
+    setCurrentPage(0); // Reset page when changing tab
+  };
 
   const filteredAppointments = appointments.filter((app) => {
     if (activeTab === 'ALL') return true;
@@ -94,7 +110,7 @@ const DoctorAppointments: React.FC = () => {
       .confirm(id)
       .then(() => {
         toast.success('Đã xác nhận ca khám thành công');
-        fetchAppointments();
+        fetchAppointments(currentPage);
       })
       .catch((err) => {
         const msg = err.response?.data?.message || 'Không thể duyệt ca khám.';
@@ -107,7 +123,7 @@ const DoctorAppointments: React.FC = () => {
       .cancel(id)
       .then(() => {
         toast.success('Đã hủy lịch hẹn');
-        fetchAppointments();
+        fetchAppointments(currentPage);
       })
       .catch((err) => {
         const msg = err.response?.data?.message || 'Không thể hủy lịch hẹn.';
@@ -139,12 +155,33 @@ const DoctorAppointments: React.FC = () => {
       .then(() => {
         toast.success('Lưu bệnh án & hoàn tất ca khám thành công!');
         setSelectedApp(null);
-        fetchAppointments();
+        fetchAppointments(currentPage);
       })
       .catch((err) => {
         const msg = err.response?.data?.message || 'Không thể lưu bệnh án.';
         toast.error(msg);
       });
+  };
+
+  const handleUploadAttachment = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingFile(true);
+    try {
+      const res = await uploadService.uploadFile(file);
+      if (res.code === 1000 && res.result) {
+        setAttachment(res.result);
+        toast.success('Tải lên tệp đính kèm thành công');
+      } else {
+        toast.error(res.message || 'Lỗi tải lên tệp đính kèm');
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Đã xảy ra lỗi khi tải lên tệp');
+    } finally {
+      setUploadingFile(false);
+    }
   };
 
   return (
@@ -154,7 +191,7 @@ const DoctorAppointments: React.FC = () => {
         {(['CONFIRMED', 'PENDING', 'COMPLETED', 'CANCELLED', 'ALL'] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => handleTabChange(tab)}
             className={`
               px-4 py-2 text-xs font-extrabold rounded-xl border transition-all cursor-pointer
               ${
@@ -286,12 +323,38 @@ const DoctorAppointments: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-border flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">
+              Trang <span className="font-bold text-foreground">{currentPage + 1}</span> /{' '}
+              {totalPages}
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                disabled={currentPage === 0 || loading}
+                className="px-3 py-1.5 border border-border text-xs font-bold rounded-lg disabled:opacity-50 hover:bg-accent"
+              >
+                Trước
+              </button>
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+                disabled={currentPage === totalPages - 1 || loading}
+                className="px-3 py-1.5 border border-border text-xs font-bold rounded-lg disabled:opacity-50 hover:bg-accent"
+              >
+                Sau
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Examination & Medical Record Modal */}
       {selectedApp && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-background border border-border rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="bg-background border border-border rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between">
               <div>
                 <h3 className="font-extrabold text-foreground text-sm">
@@ -357,16 +420,50 @@ const DoctorAppointments: React.FC = () => {
               {/* Đường dẫn kết quả/Tệp đính kèm */}
               <div className="space-y-1.5">
                 <label className="block font-bold text-foreground">
-                  Tệp đính kèm / Kết quả xét nghiệm (URL)
+                  Tệp đính kèm / Kết quả xét nghiệm (PDF, Ảnh)
                 </label>
-                <input
-                  type="text"
-                  value={attachment}
-                  onChange={(e) => setAttachment(e.target.value)}
-                  disabled={selectedApp.status === 'COMPLETED'}
-                  placeholder="Đường dẫn ảnh chụp X-quang, phiếu siêu âm, xét nghiệm..."
-                  className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary disabled:bg-muted/50 disabled:text-muted-foreground"
-                />
+                {selectedApp.status !== 'COMPLETED' ? (
+                  <div className="flex items-center gap-3">
+                    <label className="px-4 py-2 bg-muted/50 border border-border rounded-xl cursor-pointer hover:bg-muted text-foreground transition-colors flex items-center justify-center font-semibold text-xs min-w-[120px]">
+                      {uploadingFile ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                          Đang tải...
+                        </div>
+                      ) : (
+                        'Chọn tệp (PDF/Ảnh)'
+                      )}
+                      <input
+                        type="file"
+                        accept="application/pdf,image/*"
+                        className="hidden"
+                        onChange={handleUploadAttachment}
+                        disabled={uploadingFile}
+                      />
+                    </label>
+                    {attachment && (
+                      <a
+                        href={attachment}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary hover:underline truncate max-w-xs"
+                      >
+                        Đã tải lên tệp đính kèm
+                      </a>
+                    )}
+                  </div>
+                ) : attachment ? (
+                  <a
+                    href={attachment}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold border border-blue-100 hover:bg-blue-100 transition-colors"
+                  >
+                    Xem tệp đính kèm đã lưu
+                  </a>
+                ) : (
+                  <p className="text-muted-foreground italic">Không có tệp đính kèm</p>
+                )}
               </div>
 
               {selectedApp.status !== 'COMPLETED' && (

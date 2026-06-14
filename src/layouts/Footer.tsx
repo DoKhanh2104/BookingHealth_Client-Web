@@ -60,20 +60,13 @@ const footerLinks = {
     { label: 'Đặt lịch khám', href: '/booking' },
     { label: 'Tìm bác sĩ', href: '/doctors' },
     { label: 'Chuyên khoa', href: '/specialties' },
-    { label: 'Phòng khám', href: '/clinics' },
   ],
   'Hỗ trợ': [
     { label: 'Câu hỏi thường gặp', href: '/faq' },
-    { label: 'Hướng dẫn sử dụng', href: '/guide' },
     { label: 'Chính sách bảo mật', href: '/privacy' },
     { label: 'Điều khoản dịch vụ', href: '/terms' },
   ],
-  'Về chúng tôi': [
-    { label: 'Giới thiệu', href: '/about' },
-    { label: 'Đội ngũ', href: '/team' },
-    { label: 'Tuyển dụng', href: '/careers' },
-    { label: 'Tin tức', href: '/news' },
-  ],
+  'Về chúng tôi': [{ label: 'Giới thiệu', href: '/about' }],
 };
 
 const Footer = () => {

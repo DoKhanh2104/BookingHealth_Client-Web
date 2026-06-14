@@ -319,7 +319,7 @@ const Header = () => {
                         {unreadCount > 0 && (
                           <button
                             onClick={handleMarkAllAsRead}
-                            className="text-[10px] font-semibold text-primary hover:underline cursor-pointer"
+                            className="text-xs font-semibold text-primary hover:underline cursor-pointer"
                           >
                             Đọc tất cả
                           </button>
@@ -335,23 +335,23 @@ const Header = () => {
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <span
-                                  className={`text-xs font-bold text-foreground leading-tight ${!notif.isRead ? 'text-primary' : ''}`}
+                                  className={`text-sm font-bold text-foreground leading-tight ${!notif.isRead ? 'text-primary' : ''}`}
                                 >
                                   {notif.title}
                                 </span>
                                 {!notif.isRead && (
                                   <button
                                     onClick={(e) => handleMarkAsRead(notif.id, e)}
-                                    className="text-[9px] text-primary hover:underline cursor-pointer flex-shrink-0"
+                                    className="text-xs text-primary hover:underline cursor-pointer flex-shrink-0"
                                   >
                                     Đã đọc
                                   </button>
                                 )}
                               </div>
-                              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                              <p className="text-xs text-muted-foreground leading-relaxed mt-1">
                                 {notif.content}
                               </p>
-                              <span className="block text-[9px] text-muted-foreground/60 pt-0.5">
+                              <span className="block text-[11px] font-medium text-muted-foreground/60 pt-1">
                                 {new Date(notif.createdAt).toLocaleString('vi-VN')}
                               </span>
                             </div>

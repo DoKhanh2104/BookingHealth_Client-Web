@@ -1,41 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { userService } from '../../services/userService';
+import { doctorService } from '../../services/doctorService';
+import { uploadService } from '../../services/uploadService';
 
 interface Qualification {
   id: number;
-  degreeName: string;
+  degree: string;
   issueDate: string;
+  attachmentUrl?: string;
+  status: number;
 }
 
 const DoctorProfile: React.FC = () => {
-  const [bio, setBio] = useState(
-    'Bác sĩ nhiều năm kinh nghiệm tại các bệnh viện lớn miền Trung, chuyên chẩn đoán lâm sàng, nội tiêu hóa và nội soi dạ dày.',
-  );
-  const [experienceYears, setExperienceYears] = useState('14');
-  const [clinicName] = useState('Phòng khám Đa khoa Hòa Khánh');
-  const [licenseNumber] = useState('0012/ĐNA-GPHĐ');
+  const [doctorId, setDoctorId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Qualifications list
-  const [qualifications, setQualifications] = useState<Qualification[]>([
-    { id: 1, degreeName: 'Bác sĩ Đa khoa - Đại học Y Dược Huế', issueDate: '2012-06-15' },
-    {
-      id: 2,
-      degreeName: 'Thạc sĩ Y khoa chuyên ngành Nội khoa - Đại học Y Dược TP.HCM',
-      issueDate: '2016-09-20',
-    },
-    {
-      id: 3,
-      degreeName: 'Chứng chỉ Nội soi Tiêu hóa Can thiệp - Bệnh viện Chợ Rẫy',
-      issueDate: '2018-12-10',
-    },
-  ]);
+  // General Info States
+  const [bio, setBio] = useState('');
+  const [experienceYears, setExperienceYears] = useState('0');
+  const [clinicName, setClinicName] = useState('Đang cập nhật...');
+  const [licenseNumber, setLicenseNumber] = useState('Đang cập nhật...');
 
+  // Qualifications State
+  const [qualifications, setQualifications] = useState<Qualification[]>([]);
+
+  // New Qualification Form
   const [newDegreeName, setNewDegreeName] = useState('');
   const [newIssueDate, setNewIssueDate] = useState('');
+  const [attachmentUrl, setAttachmentUrl] = useState('');
+  const [uploadingFile, setUploadingFile] = useState(false);
+
+  useEffect(() => {
+    // Lấy profile user -> doctorId -> thông tin chi tiết bác sĩ
+    userService
+      .getProfile()
+      .then((res) => {
+        const u = res.result;
+        if (u.doctorId) {
+          setDoctorId(u.doctorId);
+          return doctorService.getById(u.doctorId);
+        }
+        throw new Error('User is not a doctor');
+      })
+      .then((docRes) => {
+        const doc = docRes.result;
+        setBio(doc.biography || '');
+        setClinicName(doc.clinic?.clinicName || 'Đang cập nhật...');
+        setLicenseNumber(doc.practiceLicenseNumber || 'Đang cập nhật...');
+        if (doc.practiceStartDate) {
+          const startYear = new Date(doc.practiceStartDate).getFullYear();
+          const currentYear = new Date().getFullYear();
+          setExperienceYears(String(currentYear - startYear));
+        }
+        if (doc.qualifications) {
+          setQualifications(doc.qualifications as unknown as Qualification[]);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error('Không thể lấy thông tin bác sĩ');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   const handleUpdateProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Cập nhật hồ sơ chuyên môn thành công');
+    if (!doctorId) return;
+    doctorService
+      .updateProfile(doctorId, { biography: bio })
+      .then(() => toast.success('Cập nhật hồ sơ chuyên môn thành công'))
+      .catch(() => toast.error('Lỗi khi cập nhật hồ sơ'));
+  };
+
+  const handleUploadAttachment = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingFile(true);
+    try {
+      const res = await uploadService.uploadFile(file);
+      if (res.code === 1000 && res.result) {
+        setAttachmentUrl(res.result);
+        toast.success('Tải lên tệp đính kèm thành công');
+      } else {
+        toast.error(res.message || 'Lỗi tải lên tệp đính kèm');
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Đã xảy ra lỗi khi tải lên tệp');
+    } finally {
+      setUploadingFile(false);
+    }
   };
 
   const handleAddQualification = (e: React.FormEvent) => {
@@ -44,16 +102,28 @@ const DoctorProfile: React.FC = () => {
       toast.error('Vui lòng điền tên văn bằng và ngày cấp');
       return;
     }
-    const newQual: Qualification = {
-      id: Date.now(),
-      degreeName: newDegreeName,
-      issueDate: newIssueDate,
-    };
-    setQualifications([...qualifications, newQual]);
-    setNewDegreeName('');
-    setNewIssueDate('');
-    toast.success('Thêm văn bằng/chứng chỉ chuyên môn mới thành công. Hồ sơ sẽ được cập nhật.');
+    if (!doctorId) return;
+
+    doctorService
+      .addQualification(doctorId, {
+        degree: newDegreeName,
+        issueDate: newIssueDate,
+        attachmentUrl: attachmentUrl,
+      })
+      .then((res) => {
+        const newQual = res.result as unknown as Qualification;
+        setQualifications([...qualifications, newQual]);
+        setNewDegreeName('');
+        setNewIssueDate('');
+        setAttachmentUrl('');
+        toast.success('Thêm văn bằng/chứng chỉ chuyên môn mới thành công. Hệ thống sẽ phê duyệt.');
+      })
+      .catch(() => {
+        toast.error('Lỗi khi đăng ký thêm văn bằng');
+      });
   };
+
+  if (loading) return <div className="text-center p-8">Đang tải hồ sơ...</div>;
 
   return (
     <div className="grid md:grid-cols-3 gap-6 text-xs">
@@ -85,8 +155,8 @@ const DoctorProfile: React.FC = () => {
                 <input
                   type="number"
                   value={experienceYears}
-                  onChange={(e) => setExperienceYears(e.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary text-xs"
+                  disabled
+                  className="w-full px-3 py-2 border border-border rounded-xl bg-muted/50 text-muted-foreground focus:outline-none text-xs"
                 />
               </div>
               <div className="space-y-1.5">
@@ -131,17 +201,41 @@ const DoctorProfile: React.FC = () => {
             {qualifications.map((qual) => (
               <div
                 key={qual.id}
-                className="py-4 first:pt-0 last:pb-0 flex items-start justify-between gap-4"
+                className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-start justify-between gap-4"
               >
                 <div>
-                  <div className="font-bold text-foreground">{qual.degreeName}</div>
+                  <div className="font-bold text-foreground">{qual.degree}</div>
                   <div className="text-[10px] text-muted-foreground mt-1">
-                    Ngày cấp: {qual.issueDate}
+                    Ngày cấp: {qual.issueDate ? qual.issueDate.substring(0, 10) : 'Chưa rõ'}
                   </div>
+                  {qual.attachmentUrl && (
+                    <a
+                      href={qual.attachmentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[10px] text-primary hover:underline mt-1 block"
+                    >
+                      Xem tệp đính kèm
+                    </a>
+                  )}
                 </div>
-                <span className="text-[9px] bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold">
-                  Đã duyệt
-                </span>
+                <div>
+                  {qual.status === 1 && (
+                    <span className="text-[9px] bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                      Đã duyệt
+                    </span>
+                  )}
+                  {qual.status === 0 && (
+                    <span className="text-[9px] bg-amber-500/10 text-amber-600 border border-amber-500/20 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                      Chờ duyệt
+                    </span>
+                  )}
+                  {qual.status === 2 && (
+                    <span className="text-[9px] bg-red-500/10 text-red-600 border border-red-500/20 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                      Từ chối
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -178,6 +272,38 @@ const DoctorProfile: React.FC = () => {
               onChange={(e) => setNewIssueDate(e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary text-xs"
             />
+          </div>
+
+          {/* Attachment upload */}
+          <div className="space-y-1.5">
+            <label className="block font-bold text-foreground">Bản sao (PDF/Ảnh) chứng chỉ</label>
+            <label className="flex items-center justify-center px-4 py-2 bg-muted/50 border border-border rounded-xl cursor-pointer hover:bg-muted text-foreground transition-colors font-semibold text-xs min-w-[120px]">
+              {uploadingFile ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  Đang tải lên...
+                </div>
+              ) : (
+                'Chọn tệp tải lên'
+              )}
+              <input
+                type="file"
+                accept="application/pdf,image/*"
+                className="hidden"
+                onChange={handleUploadAttachment}
+                disabled={uploadingFile}
+              />
+            </label>
+            {attachmentUrl && (
+              <a
+                href={attachmentUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary text-[10px] hover:underline truncate block"
+              >
+                Đã tải lên tệp: Nhấn để xem
+              </a>
+            )}
           </div>
 
           <button

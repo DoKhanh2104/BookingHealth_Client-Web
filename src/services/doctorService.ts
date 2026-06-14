@@ -77,4 +77,19 @@ export const doctorService = {
     const res = await apiClient.get('/doctors/me/day-offs');
     return res.data;
   },
+
+  /** PUT /doctors/:id/profile - Cập nhật tiểu sử bác sĩ */
+  updateProfile: async (id: number, data: { biography: string }): Promise<ApiResponse<Doctor>> => {
+    const res = await apiClient.put(`/doctors/${id}/profile`, data);
+    return res.data;
+  },
+
+  /** POST /doctors/:id/qualifications - Đăng ký thêm chứng chỉ mới */
+  addQualification: async (
+    id: number,
+    data: { degree: string; issueDate: string; attachmentUrl?: string },
+  ): Promise<ApiResponse<unknown>> => {
+    const res = await apiClient.post(`/doctors/${id}/qualifications`, data);
+    return res.data;
+  },
 };
