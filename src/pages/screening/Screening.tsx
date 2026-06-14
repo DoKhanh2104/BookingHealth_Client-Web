@@ -174,120 +174,124 @@ const Screening: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto h-[80vh] flex flex-col bg-background rounded-3xl shadow-xl border border-border overflow-hidden">
-        {/* Header */}
-        <div className="h-16 bg-primary flex items-center justify-between px-6 flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl backdrop-blur-sm shadow-sm">
-              🤖
-            </div>
-            <div>
-              <p className="text-white font-bold text-base leading-tight">Trợ lý AI</p>
-              <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-primary-foreground/80 text-xs">
-                  Sẵn sàng phân tích triệu chứng
-                </span>
-              </div>
+    <div className="flex-1 min-h-0 flex flex-col bg-background overflow-hidden">
+      {/* Header */}
+      <div className="h-14 bg-primary flex items-center justify-between px-32 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <div>
+            <p className="text-white font-bold text-sm leading-tight">Trợ lý AI BookingHealth</p>
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-primary-foreground/80 text-xs">
+                Sẵn sàng phân tích triệu chứng
+              </span>
             </div>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {userLocation && (
+            <span className="text-primary-foreground/70 text-xs bg-white/10 px-2.5 py-1 rounded-full">
+              GPS đã bật
+            </span>
+          )}
           <button
             onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-full hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+            className="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white transition-colors text-sm"
             title="Quay lại"
           >
             ✕
           </button>
         </div>
+      </div>
 
-        {/* Messages Area */}
-        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
-          {messages.map((msg) => (
+      {/* Messages Area */}
+      <div
+        ref={chatContainerRef}
+        className="flex-1 overflow-y-auto px-4 sm:px-8 lg:px-24 xl:px-48 py-6 space-y-4 bg-muted/20"
+      >
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            {msg.role === 'assistant' && (
+              <div className="w-7 h-7 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-0.5">
+                AI
+              </div>
+            )}
             <div
-              key={msg.id}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`max-w-[70%] sm:max-w-[60%] rounded-2xl px-5 py-3 text-sm space-y-1 ${
+                msg.role === 'user'
+                  ? 'bg-primary text-primary-foreground rounded-tr-none shadow-md shadow-primary/20'
+                  : 'bg-background border border-border text-foreground rounded-tl-none shadow-sm'
+              }`}
             >
-              {msg.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm mr-2 flex-shrink-0">
-                  🤖
-                </div>
-              )}
-              <div
-                className={`max-w-[75%] rounded-2xl px-5 py-3 text-sm space-y-1 ${
+              <div className={msg.role === 'assistant' ? 'space-y-1' : ''}>
+                {formatContent(msg.content)}
+              </div>
+              <span
+                className={`block text-[10px] mt-2 ${
                   msg.role === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-tr-none shadow-md shadow-primary/20'
-                    : 'bg-muted/50 border border-border text-foreground rounded-tl-none shadow-sm'
+                    ? 'text-primary-foreground/70 text-right'
+                    : 'text-muted-foreground'
                 }`}
               >
-                <div className={msg.role === 'assistant' ? 'space-y-1' : ''}>
-                  {formatContent(msg.content)}
-                </div>
-                <span
-                  className={`block text-[10px] mt-2 ${
-                    msg.role === 'user'
-                      ? 'text-primary-foreground/70 text-right'
-                      : 'text-muted-foreground'
-                  }`}
-                >
-                  {msg.timestamp.toLocaleTimeString('vi-VN', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </span>
-              </div>
+                {msg.timestamp.toLocaleTimeString('vi-VN', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </span>
             </div>
-          ))}
+          </div>
+        ))}
 
-          {/* Loading indicator */}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm mr-2 flex-shrink-0">
-                🤖
-              </div>
-              <div className="bg-muted/50 border border-border rounded-2xl rounded-tl-none px-5 py-4 shadow-sm flex items-center gap-1.5">
-                <span
-                  className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
-                  style={{ animationDelay: '0ms' }}
-                />
-                <span
-                  className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
-                  style={{ animationDelay: '150ms' }}
-                />
-                <span
-                  className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
-                  style={{ animationDelay: '300ms' }}
-                />
-              </div>
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="w-7 h-7 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-0.5">
+              AI
             </div>
-          )}
-        </div>
-
-        {/* Suggested Questions */}
-        {messages.filter((m) => m.role === 'user').length === 0 && !isLoading && (
-          <div className="px-6 pb-4 flex flex-wrap gap-2">
-            {SUGGESTED_QUESTIONS.map((q, i) => (
-              <button
-                key={i}
-                onClick={() => sendMessage(q)}
-                className="text-xs px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-full border border-primary/10 hover:border-primary/30 transition-colors text-left font-medium"
-              >
-                {q}
-              </button>
-            ))}
+            <div className="bg-background border border-border rounded-2xl rounded-tl-none px-5 py-4 shadow-sm flex items-center gap-1.5">
+              <span
+                className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+                style={{ animationDelay: '0ms' }}
+              />
+              <span
+                className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+                style={{ animationDelay: '150ms' }}
+              />
+              <span
+                className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
+                style={{ animationDelay: '300ms' }}
+              />
+            </div>
           </div>
         )}
+      </div>
 
-        {/* Input Area */}
-        <form
-          onSubmit={handleSubmit}
-          className="p-4 sm:p-6 border-t border-border flex gap-3 bg-background flex-shrink-0"
-        >
+      {/* Suggested Questions */}
+      {messages.filter((m) => m.role === 'user').length === 0 && !isLoading && (
+        <div className="px-4 sm:px-8 lg:px-24 xl:px-48 pb-3 flex flex-wrap gap-2 bg-muted/20">
+          {SUGGESTED_QUESTIONS.map((q, i) => (
+            <button
+              key={i}
+              onClick={() => sendMessage(q)}
+              className="text-xs px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-full border border-primary/10 hover:border-primary/30 transition-colors text-left font-medium"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Input Area */}
+      <div className="px-4 sm:px-8 lg:px-24 xl:px-48 py-4 border-t border-border bg-background flex-shrink-0">
+        <form onSubmit={handleSubmit} className="flex gap-3">
           {!userLocation && (
             <button
               type="button"
               onClick={requestLocation}
-              className="w-12 h-12 flex-shrink-0 rounded-2xl bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-center text-xl transition-colors"
+              className="w-11 h-11 flex-shrink-0 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary flex items-center justify-center text-lg transition-colors"
               title="Chia sẻ vị trí để tìm phòng khám gần bạn"
             >
               📍
@@ -299,15 +303,15 @@ const Screening: React.FC = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Mô tả triệu chứng của bạn hoặc hỏi bất kỳ điều gì..."
-            className="flex-1 px-5 py-3 text-sm border border-border rounded-2xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all placeholder-muted-foreground"
+            className="flex-1 px-5 py-3 text-sm border border-border rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 bg-muted/30 transition-all placeholder-muted-foreground"
           />
           <button
             type="submit"
             disabled={!inputValue.trim() || isLoading}
-            className="w-12 h-12 flex-shrink-0 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-50 hover:shadow-lg hover:shadow-primary/30 transition-all"
+            className="w-11 h-11 flex-shrink-0 rounded-xl bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-50 hover:shadow-lg hover:shadow-primary/30 transition-all"
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <svg
                 className="w-5 h-5"

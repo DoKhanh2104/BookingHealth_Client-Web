@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import ClientLayout from '../../layouts/ClientLayout';
 import RootLayout from '../../layouts/RootLayout';
+import ScreeningLayout from '../../layouts/ScreeningLayout';
 import Home from '../../pages/home/Home';
 import Login from '../../pages/auth/Login';
 import Register from '../../pages/auth/Register';
@@ -15,6 +16,9 @@ import BookingPage from '../../pages/booking/BookingPage';
 import MyAppointments from '../../pages/appointments/MyAppointments';
 import PatientChat from '../../pages/chat/PatientChat';
 import Screening from '../../pages/screening/Screening';
+import TermsOfService from '../../pages/legal/TermsOfService';
+import PrivacyPolicy from '../../pages/legal/PrivacyPolicy';
+import About from '../../pages/about/About';
 
 // Doctor Portal Components
 import DoctorGuard from '../../components/DoctorGuard';
@@ -71,8 +75,8 @@ export const router = createBrowserRouter([
           { path: 'clinics', element: <ComingSoon title="Phòng khám" /> },
           { path: 'clinics/:id', element: <ComingSoon title="Chi tiết Phòng khám" /> },
 
-          // AI Sàng lọc - NHAT_KY_SANG_LOC
-          { path: 'screening', element: <Screening /> },
+          // AI Sàng lọc — tách riêng sang ScreeningLayout (không Footer)
+          // { path: 'screening', element: <Screening /> },
 
           // Lịch hẹn - LICH_HEN
           { path: 'appointments', element: <MyAppointments /> },
@@ -91,10 +95,10 @@ export const router = createBrowserRouter([
           { path: 'notifications', element: <ComingSoon title="Thông báo" /> },
 
           // Thông tin tĩnh
-          { path: 'about', element: <ComingSoon title="Về chúng tôi" /> },
+          { path: 'about', element: <About /> },
           { path: 'faq', element: <ComingSoon title="Câu hỏi thường gặp" /> },
-          { path: 'privacy', element: <ComingSoon title="Chính sách bảo mật" /> },
-          { path: 'terms', element: <ComingSoon title="Điều khoản dịch vụ" /> },
+          { path: 'privacy', element: <PrivacyPolicy /> },
+          { path: 'terms', element: <TermsOfService /> },
           { path: 'guide', element: <ComingSoon title="Hướng dẫn sử dụng" /> },
           { path: 'news', element: <ComingSoon title="Tin tức" /> },
         ],
@@ -104,6 +108,12 @@ export const router = createBrowserRouter([
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> },
       { path: 'register-doctor', element: <RegisterDoctor /> },
+
+      // AI Screening — Header only, no Footer (full viewport chat UI)
+      {
+        element: <ScreeningLayout />,
+        children: [{ path: 'screening', element: <Screening /> }],
+      },
 
       // Doctor Portal Protected Routes
       {
