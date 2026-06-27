@@ -2,103 +2,35 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useRegisterDoctorHooks } from './RegisterDoctor.hooks';
 import Logo from '../../assets/logo.png';
+import {
+  UserIcon,
+  PhoneIcon,
+  EmailIcon,
+  LockIcon,
+  EyeIcon,
+  CheckIcon,
+  AlertTriangleIcon,
+  StethoscopeIcon,
+  SearchIcon,
+  ArrowRightIcon,
+  ArrowLeftIcon,
+  ChevronDownIcon,
+  BuildingIcon,
+  ClockIcon,
+} from '../../components/icons';
+import DatePicker from '../../components/DatePicker';
+import { todayYMD } from '../../utils/date';
 
-/* ─────────────── SVG Icons ─────────────── */
+/* ─────────────── Local-only icons (not in shared set) ─────────────── */
 
-const UserIcon = () => (
+const EyeOffIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.8}
     stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-    />
-  </svg>
-);
-
-const PhoneIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
-    />
-  </svg>
-);
-
-const EmailIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-    />
-  </svg>
-);
-
-const LockIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-    />
-  </svg>
-);
-
-const EyeIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-    />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-  </svg>
-);
-
-const EyeOffIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
+    className={className}
   >
     <path
       strokeLinecap="round"
@@ -108,50 +40,20 @@ const EyeOffIcon = () => (
   </svg>
 );
 
-const LicenseIcon = () => (
+const LicenseIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.8}
     stroke="currentColor"
-    className="w-5 h-5"
+    className={className}
   >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
       d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
     />
-  </svg>
-);
-
-const CalendarIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
-    />
-  </svg>
-);
-
-const CheckIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2.5}
-    stroke="currentColor"
-    className="w-3 h-3"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
   </svg>
 );
 
@@ -203,12 +105,9 @@ const Field = ({
         onChange={onChange}
         autoFocus={autoFocus}
         autoComplete={autoComplete}
-        className={`w-full rounded-xl border pl-11 ${rightElement ? 'pr-12' : 'pr-4'} py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60
-          ${
-            error
-              ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-              : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/15'
-          }`}
+        className={`input-field pl-11 ${rightElement ? 'pr-12' : 'pr-4'} ${
+          error ? 'border-red-400 focus:border-red-500' : ''
+        }`}
       />
       {rightElement && (
         <span className="absolute right-3.5 top-1/2 -translate-y-1/2">{rightElement}</span>
@@ -216,7 +115,7 @@ const Field = ({
     </div>
     {error && (
       <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-        <span>⚠</span> {error}
+        <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {error}
       </p>
     )}
   </div>
@@ -258,6 +157,11 @@ const RegisterDoctor: React.FC = () => {
     handleToggleConfirmPassword,
     handleRegister,
     validateStep1,
+    isAuthenticated,
+    applicationStatus,
+    rejectReason,
+    isResubmit,
+    loadingApplication,
   } = useRegisterDoctorHooks();
 
   const [step, setStep] = useState(1);
@@ -285,6 +189,36 @@ const RegisterDoctor: React.FC = () => {
     </button>
   );
 
+  // Đang kiểm tra hồ sơ hiện có (khi đã đăng nhập)
+  if (loadingApplication) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-10 h-10 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Hồ sơ đang chờ duyệt → chỉ hiển thị trạng thái, không cho nộp lại
+  if (applicationStatus === 0) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4 py-16">
+        <div className="card w-full max-w-md p-8 text-center space-y-4 shadow-lg">
+          <div className="w-16 h-16 mx-auto bg-amber-500/10 text-amber-600 rounded-full flex items-center justify-center">
+            <ClockIcon className="w-8 h-8" />
+          </div>
+          <h1 className="text-xl font-extrabold text-foreground">Hồ sơ đang chờ duyệt</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Hồ sơ đăng ký bác sĩ của bạn đã được gửi và đang chờ Ban quản trị xét duyệt. Chúng tôi
+            sẽ thông báo ngay khi có kết quả.
+          </p>
+          <Link to="/" className="btn btn-primary btn-md btn-block">
+            <ArrowLeftIcon className="w-4 h-4" /> Về trang chủ
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center py-16 px-4 relative overflow-hidden">
@@ -298,23 +232,10 @@ const RegisterDoctor: React.FC = () => {
             animation: fadeIn 0.4s ease-out forwards;
           }
         `}</style>
-        {/* Decorative glowing blobs in background */}
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] pointer-events-none" />
-
-        <div className="w-full max-w-lg bg-background/60 backdrop-blur-xl border border-border/85 rounded-3xl shadow-2xl p-8 sm:p-10 relative z-10 text-center space-y-6 animate-fadeIn">
+        <div className="card w-full max-w-lg shadow-lg p-8 sm:p-10 relative z-10 text-center space-y-6 animate-fadeIn">
           <div className="flex items-center justify-center">
             <div className="bg-emerald-500/10 text-emerald-500 p-5 rounded-full ring-8 ring-emerald-500/5">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2.5}
-                stroke="currentColor"
-                className="w-12 h-12"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-              </svg>
+              <CheckIcon className="w-12 h-12" />
             </div>
           </div>
 
@@ -326,11 +247,11 @@ const RegisterDoctor: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-accent/40 rounded-2xl p-5 text-left text-sm space-y-3.5 border border-border">
+          <div className="bg-accent/40 rounded-xl p-5 text-left text-sm space-y-3.5 border border-border">
             <h4 className="font-bold text-foreground">Các bước tiếp theo:</h4>
             <div className="space-y-2.5 text-muted-foreground text-xs leading-relaxed">
               <div className="flex gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold flex-shrink-0 text-[10px]">
+                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0 text-[10px]">
                   1
                 </span>
                 <span>
@@ -339,7 +260,7 @@ const RegisterDoctor: React.FC = () => {
                 </span>
               </div>
               <div className="flex gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold flex-shrink-0 text-[10px]">
+                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0 text-[10px]">
                   2
                 </span>
                 <span>
@@ -348,7 +269,7 @@ const RegisterDoctor: React.FC = () => {
                 </span>
               </div>
               <div className="flex gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold flex-shrink-0 text-[10px]">
+                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0 text-[10px]">
                   3
                 </span>
                 <span>
@@ -360,10 +281,7 @@ const RegisterDoctor: React.FC = () => {
           </div>
 
           <div className="pt-2">
-            <Link
-              to="/"
-              className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:scale-[0.98]"
-            >
+            <Link to="/" className="btn btn-primary btn-md btn-block">
               Quay lại Trang chủ
             </Link>
           </div>
@@ -374,6 +292,15 @@ const RegisterDoctor: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center py-16 px-4 relative overflow-hidden">
+      {/* Lối quay về trang chủ (luôn hiển thị, phòng khi người dùng bấm nhầm) */}
+      <Link
+        to="/"
+        className="absolute top-5 left-5 z-20 inline-flex items-center gap-1.5 rounded-lg border border-border bg-background/90 px-3 py-1.5 text-sm font-medium text-foreground shadow-sm backdrop-blur transition-colors hover:text-primary"
+      >
+        <ArrowLeftIcon className="w-4 h-4" />
+        Về trang chủ
+      </Link>
+
       {/* Style block for animations */}
       <style>{`
         @keyframes fadeIn {
@@ -385,15 +312,11 @@ const RegisterDoctor: React.FC = () => {
         }
       `}</style>
 
-      {/* Decorative glowing blobs in background */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] pointer-events-none" />
-
-      <div className="w-full max-w-3xl bg-background/60 backdrop-blur-xl border border-border/80 rounded-3xl shadow-2xl p-6 sm:p-10 relative z-10">
+      <div className="card w-full max-w-3xl shadow-lg p-6 sm:p-10 relative z-10">
         {/* Logo and Header */}
         <div className="text-center space-y-3 mb-8">
           <div className="flex items-center justify-center gap-2">
-            <div className="bg-primary-foreground p-2.5 rounded-2xl shadow-md shadow-primary/20">
+            <div className="bg-primary-foreground p-2.5 rounded-lg shadow-sm">
               <img src={Logo} alt="BookingHealth" className="w-7 h-7 object-contain" />
             </div>
             <span className="text-2xl font-black text-foreground tracking-tight">
@@ -401,14 +324,33 @@ const RegisterDoctor: React.FC = () => {
             </span>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-primary bg-primary/10 border border-primary/20">
-            ⚕ Cổng thông tin Bác sĩ
+          <div className="badge text-primary bg-primary/10 border border-primary/20">
+            <StethoscopeIcon className="w-4 h-4" /> Cổng thông tin Bác sĩ
           </div>
-          <h1 className="text-3xl font-extrabold text-foreground">Đăng ký làm Bác sĩ</h1>
+          <h1 className="text-3xl font-extrabold text-foreground">
+            {isResubmit ? 'Nộp lại hồ sơ Bác sĩ' : 'Đăng ký làm Bác sĩ'}
+          </h1>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
-            Tham gia mạng lưới y bác sĩ chuyên môn cao của BookingHealth.
+            {isResubmit
+              ? 'Thông tin cũ đã được điền sẵn. Vui lòng chỉnh sửa và gửi lại để được duyệt.'
+              : 'Tham gia mạng lưới y bác sĩ chuyên môn cao của BookingHealth.'}
           </p>
         </div>
+
+        {/* Banner: hồ sơ trước bị từ chối */}
+        {isResubmit && (
+          <div className="max-w-2xl mx-auto mb-8 flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3">
+            <AlertTriangleIcon className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-bold text-amber-800">Hồ sơ trước đã bị từ chối</p>
+              <p className="text-amber-700 mt-0.5 leading-relaxed">
+                {rejectReason
+                  ? `Lý do: ${rejectReason}`
+                  : 'Vui lòng kiểm tra và bổ sung thông tin chính xác trước khi gửi lại.'}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Stepper progress indicator */}
         <div className="max-w-md mx-auto mb-10">
@@ -427,11 +369,11 @@ const RegisterDoctor: React.FC = () => {
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-2
                   ${
                     step >= 1
-                      ? 'bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
+                      ? 'bg-primary border-primary text-primary-foreground shadow-sm'
                       : 'bg-background border-border text-muted-foreground'
                   }`}
               >
-                {step > 1 ? '✓' : '1'}
+                {step > 1 ? <CheckIcon className="w-5 h-5" /> : '1'}
               </div>
               <span
                 className={`text-xs font-bold transition-all duration-300 ${step === 1 ? 'text-primary' : 'text-muted-foreground'}`}
@@ -446,7 +388,7 @@ const RegisterDoctor: React.FC = () => {
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-2
                   ${
                     step === 2
-                      ? 'bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
+                      ? 'bg-primary border-primary text-primary-foreground shadow-sm'
                       : 'bg-background border-border text-muted-foreground'
                   }`}
               >
@@ -462,7 +404,12 @@ const RegisterDoctor: React.FC = () => {
         </div>
 
         {/* Form Container */}
-        <form id="register-doctor-form" onSubmit={handleRegister} noValidate className="space-y-6">
+        <form
+          id="register-doctor-form"
+          onSubmit={(e) => handleRegister(e, setStep)}
+          noValidate
+          className="space-y-6"
+        >
           {step === 1 && (
             <div className="space-y-5 animate-fadeIn">
               <div className="text-sm font-bold text-foreground border-l-4 border-primary pl-2.5 mb-2">
@@ -519,7 +466,11 @@ const RegisterDoctor: React.FC = () => {
                     </div>
                   )}
                 </div>
-                {errors.avatar && <p className="text-xs text-red-500 mt-1">⚠ {errors.avatar}</p>}
+                {errors.avatar && (
+                  <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                    <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {errors.avatar}
+                  </p>
+                )}
               </div>
 
               {/* Họ và tên */}
@@ -563,58 +514,49 @@ const RegisterDoctor: React.FC = () => {
                 />
               </div>
 
-              {/* Mật khẩu */}
-              <Field
-                id="password"
-                name="password"
-                label="Mật khẩu tài khoản"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Tối thiểu 8 ký tự"
-                value={formData.password}
-                onChange={handleChange}
-                error={errors.password}
-                icon={<LockIcon />}
-                autoComplete="new-password"
-                rightElement={toggleBtn(showPassword, handleTogglePassword)}
-              />
+              {/* Mật khẩu (Chỉ hiển thị khi chưa đăng nhập) */}
+              {!isAuthenticated && (
+                <>
+                  <Field
+                    id="password"
+                    name="password"
+                    label="Mật khẩu tài khoản"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Tối thiểu 8 ký tự"
+                    value={formData.password}
+                    onChange={handleChange}
+                    error={errors.password}
+                    icon={<LockIcon />}
+                    autoComplete="new-password"
+                    rightElement={toggleBtn(showPassword, handleTogglePassword)}
+                  />
 
-              {/* Xác nhận mật khẩu */}
-              <Field
-                id="confirmPassword"
-                name="confirmPassword"
-                label="Xác nhận mật khẩu"
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Nhập lại mật khẩu"
-                value={confirmPassword}
-                onChange={handleChange}
-                error={errors.confirmPassword}
-                icon={<LockIcon />}
-                autoComplete="new-password"
-                rightElement={toggleBtn(showConfirmPassword, handleToggleConfirmPassword)}
-              />
+                  {/* Xác nhận mật khẩu */}
+                  <Field
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    label="Xác nhận mật khẩu"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Nhập lại mật khẩu"
+                    value={confirmPassword}
+                    onChange={handleChange}
+                    error={errors.confirmPassword}
+                    icon={<LockIcon />}
+                    autoComplete="new-password"
+                    rightElement={toggleBtn(showConfirmPassword, handleToggleConfirmPassword)}
+                  />
+                </>
+              )}
 
               {/* Next Button */}
               <div className="pt-4">
                 <button
                   type="button"
                   onClick={handleNextStep}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:scale-[0.98] cursor-pointer"
+                  className="btn btn-primary btn-md btn-block"
                 >
                   Tiếp tục bước tiếp theo
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2.5}
-                    stroke="currentColor"
-                    className="w-4 h-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                    />
-                  </svg>
+                  <ArrowRightIcon className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -638,17 +580,30 @@ const RegisterDoctor: React.FC = () => {
                   error={errors.practiceLicenseNumber}
                   icon={<LicenseIcon />}
                 />
-                <Field
-                  id="practiceStartDate"
-                  name="practiceStartDate"
-                  label="Ngày bắt đầu hành nghề y"
-                  type="date"
-                  placeholder="Chọn ngày"
-                  value={formData.practiceStartDate}
-                  onChange={handleChange}
-                  error={errors.practiceStartDate}
-                  icon={<CalendarIcon />}
-                />
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="practiceStartDate"
+                    className="block text-sm font-semibold text-foreground"
+                  >
+                    Ngày bắt đầu hành nghề y
+                  </label>
+                  <DatePicker
+                    id="practiceStartDate"
+                    value={formData.practiceStartDate}
+                    onChange={(v) =>
+                      handleChange({
+                        target: { name: 'practiceStartDate', value: v },
+                      } as React.ChangeEvent<HTMLInputElement>)
+                    }
+                    max={todayYMD()}
+                    error={!!errors.practiceStartDate}
+                  />
+                  {errors.practiceStartDate && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                      <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {errors.practiceStartDate}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Tiểu sử ngắn */}
@@ -663,7 +618,7 @@ const RegisterDoctor: React.FC = () => {
                   value={formData.biography}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full rounded-xl border border-border px-4 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/15"
+                  className="input-field"
                 />
               </div>
 
@@ -677,36 +632,23 @@ const RegisterDoctor: React.FC = () => {
                   // Luồng tìm kiếm phòng khám
                   <div className="space-y-3">
                     <div className="flex gap-2">
-                      <div className="relative flex-grow">
+                      <div className="relative grow">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.8}
-                            stroke="currentColor"
-                            className="w-4 h-4"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.636Z"
-                            />
-                          </svg>
+                          <SearchIcon className="w-4 h-4" />
                         </span>
                         <input
                           type="text"
                           placeholder="Nhập tên phòng khám để tìm kiếm... (ví dụ: An Đức)"
                           value={clinicSearchQuery}
                           onChange={(e) => setClinicSearchQuery(e.target.value)}
-                          className="w-full rounded-xl border border-border pl-9 pr-4 py-2.5 text-xs text-foreground bg-background outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+                          className="input-field pl-9 pr-4 text-xs"
                         />
                       </div>
                       <button
                         type="button"
                         onClick={handleSearchClinic}
                         disabled={isClinicSearching}
-                        className="px-4 py-2.5 text-xs font-bold text-primary-foreground bg-primary rounded-xl hover:bg-primary-hover transition-colors shadow-sm disabled:opacity-60 flex items-center gap-1.5 cursor-pointer"
+                        className="btn btn-primary btn-sm"
                       >
                         {isClinicSearching ? (
                           <>
@@ -754,8 +696,8 @@ const RegisterDoctor: React.FC = () => {
                               <span className="font-semibold group-hover:text-primary transition-colors text-left">
                                 {name}
                               </span>
-                              <span className="text-[10px] text-primary hover:underline flex-shrink-0">
-                                Chọn →
+                              <span className="text-[10px] text-primary hover:underline shrink-0 inline-flex items-center gap-1">
+                                Chọn <ArrowRightIcon className="w-3 h-3" />
                               </span>
                             </button>
                           ))}
@@ -769,7 +711,7 @@ const RegisterDoctor: React.FC = () => {
                     {/* Badge phòng khám đã chọn */}
                     <div className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20">
                       <div className="flex items-center gap-2">
-                        <span className="text-primary text-sm">🏥</span>
+                        <BuildingIcon className="w-4 h-4 text-primary shrink-0" />
                         <span className="text-xs font-bold text-foreground">
                           {selectedClinicName}
                         </span>
@@ -797,12 +739,9 @@ const RegisterDoctor: React.FC = () => {
                             id="addressSelect"
                             value={selectedClinicId}
                             onChange={(e) => handleSelectAddress(Number(e.target.value))}
-                            className={`w-full rounded-xl border pl-4 pr-10 py-3 text-xs text-foreground bg-background outline-none transition-all duration-200 appearance-none
-                              ${
-                                errors.clinicId
-                                  ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-                                  : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/15'
-                              }`}
+                            className={`input-field pl-4 pr-10 text-xs appearance-none ${
+                              errors.clinicId ? 'border-red-400 focus:border-red-500' : ''
+                            }`}
                           >
                             <option value="">-- Chọn chi nhánh công tác --</option>
                             {availableAddresses.map((clinic) => (
@@ -812,20 +751,7 @@ const RegisterDoctor: React.FC = () => {
                             ))}
                           </select>
                           <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={2}
-                              stroke="currentColor"
-                              className="w-4 h-4"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                              />
-                            </svg>
+                            <ChevronDownIcon className="w-4 h-4" />
                           </span>
                         </div>
                       </div>
@@ -847,7 +773,7 @@ const RegisterDoctor: React.FC = () => {
 
                 {errors.clinicId && (
                   <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                    <span>⚠</span> {errors.clinicId}
+                    <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {errors.clinicId}
                   </p>
                 )}
               </div>
@@ -876,10 +802,10 @@ const RegisterDoctor: React.FC = () => {
                           }`}
                       >
                         <div
-                          className={`w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 transition-all
+                          className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 transition-all
                           ${isChecked ? 'bg-primary border-primary text-primary-foreground' : 'border-muted-foreground/45 bg-background'}`}
                         >
-                          {isChecked && <CheckIcon />}
+                          {isChecked && <CheckIcon className="w-3 h-3" />}
                         </div>
                         <span className="truncate">{spec.specialtyName}</span>
                       </button>
@@ -888,7 +814,7 @@ const RegisterDoctor: React.FC = () => {
                 </div>
                 {errors.specialties && (
                   <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                    <span>⚠</span> {errors.specialties}
+                    <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {errors.specialties}
                   </p>
                 )}
               </div>
@@ -900,7 +826,7 @@ const RegisterDoctor: React.FC = () => {
                   <span className="text-red-500">*</span>
                 </label>
                 <div
-                  className={`border-2 border-dashed rounded-xl p-4 text-center transition-all duration-200 bg-accent/10 hover:bg-accent/20 relative flex flex-col items-center justify-center gap-2 cursor-pointer min-h-[140px]
+                  className={`border-2 border-dashed rounded-xl p-4 text-center transition-all duration-200 bg-accent/10 hover:bg-accent/20 relative flex flex-col items-center justify-center gap-2 cursor-pointer min-h-35
                   ${errors.practiceLicenseImage ? 'border-red-400 hover:border-red-500' : 'border-border hover:border-primary'}`}
                 >
                   <input
@@ -946,7 +872,7 @@ const RegisterDoctor: React.FC = () => {
                 </div>
                 {errors.practiceLicenseImage && (
                   <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                    <span>⚠</span> {errors.practiceLicenseImage}
+                    <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {errors.practiceLicenseImage}
                   </p>
                 )}
               </div>
@@ -957,7 +883,7 @@ const RegisterDoctor: React.FC = () => {
                   htmlFor="terms-checkbox"
                   className="flex items-start gap-3 cursor-pointer group"
                 >
-                  <div className="relative mt-0.5 flex-shrink-0">
+                  <div className="relative mt-0.5 shrink-0">
                     <input
                       id="terms-checkbox"
                       type="checkbox"
@@ -966,14 +892,14 @@ const RegisterDoctor: React.FC = () => {
                       className="sr-only"
                     />
                     <div
-                      className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200
+                      className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-200
                         ${
                           agreedToTerms
                             ? 'bg-primary border-primary text-primary-foreground'
                             : 'border-border group-hover:border-primary/50 bg-background'
                         }`}
                     >
-                      {agreedToTerms && <CheckIcon />}
+                      {agreedToTerms && <CheckIcon className="w-3 h-3" />}
                     </div>
                   </div>
                   <span className="text-sm text-muted-foreground leading-relaxed">
@@ -989,7 +915,7 @@ const RegisterDoctor: React.FC = () => {
                 </label>
                 {errors.terms && (
                   <p className="text-xs text-red-500 flex items-center gap-1 pl-8">
-                    <span>⚠</span> {errors.terms}
+                    <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {errors.terms}
                   </p>
                 )}
               </div>
@@ -999,22 +925,9 @@ const RegisterDoctor: React.FC = () => {
                 <button
                   type="button"
                   onClick={handlePrevStep}
-                  className="w-full sm:w-1/3 flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-3.5 text-sm font-semibold text-foreground hover:bg-accent transition-all duration-200 cursor-pointer"
+                  className="btn btn-outline btn-md w-full sm:w-1/3"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2.5}
-                    stroke="currentColor"
-                    className="w-4 h-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M10.5 19.5 3 12m0 0 7-7m-7 7H21"
-                    />
-                  </svg>
+                  <ArrowLeftIcon className="w-4 h-4" />
                   Quay lại
                 </button>
 
@@ -1022,7 +935,7 @@ const RegisterDoctor: React.FC = () => {
                   id="register-doctor-submit-btn"
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-2/3 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                  className="btn btn-primary btn-md w-full sm:w-2/3"
                 >
                   {loading ? (
                     <>

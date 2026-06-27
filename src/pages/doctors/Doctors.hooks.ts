@@ -1,9 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { doctorService } from '../../services/doctorService';
-import { specialtyService } from '../../services/specialtyService';
-import { clinicService } from '../../services/clinicService';
-import type { Doctor, Specialty, Clinic } from '../../types';
+import type { Doctor } from '../../types';
 
 export interface FilterState {
   search: string;
@@ -19,12 +17,7 @@ const ITEMS_PER_PAGE = 6;
 export const useDoctorsHooks = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // 1. Available lists for filters
-  const [specialties, setSpecialties] = useState<Specialty[]>([]);
-  const [clinics, setClinics] = useState<Clinic[]>([]);
-  const [loadingFilters, setLoadingFilters] = useState(true);
-
-  // 2. Main data lists
+  // Main data list
   const [rawDoctors, setRawDoctors] = useState<Doctor[]>([]);
   const [loadingDoctors, setLoadingDoctors] = useState(true);
 
@@ -40,28 +33,6 @@ export const useDoctorsHooks = () => {
 
   // 4. Pagination
   const [currentPage, setCurrentPage] = useState(0);
-
-  // Load Specialties & Clinics once
-  useEffect(() => {
-    let active = true;
-
-    Promise.all([
-      specialtyService.getAll(0, 1000).catch(() => null),
-      clinicService.getAll(0, 1000).catch(() => null),
-    ])
-      .then(([specRes, clinicRes]) => {
-        if (!active) return;
-        if (specRes?.result?.content) setSpecialties(specRes.result.content);
-        if (clinicRes?.result?.content) setClinics(clinicRes.result.content);
-      })
-      .finally(() => {
-        if (active) setLoadingFilters(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
   // Sync state when URL params change (e.g. back/forward navigation or clicking header link)
   useEffect(() => {
@@ -238,9 +209,6 @@ export const useDoctorsHooks = () => {
   const totalPages = Math.ceil(filteredAndSortedDoctors.length / ITEMS_PER_PAGE);
 
   return {
-    specialties,
-    clinics,
-    loadingFilters,
     doctors: paginatedDoctors,
     totalCount: filteredAndSortedDoctors.length,
     loadingDoctors,

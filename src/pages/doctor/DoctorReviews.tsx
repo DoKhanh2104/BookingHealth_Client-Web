@@ -3,6 +3,7 @@ import { doctorService } from '../../services/doctorService';
 import { userService } from '../../services/userService';
 import type { Doctor, DoctorReview } from '../../types';
 import { toast } from 'sonner';
+import { StarIcon } from '../../components/icons';
 
 const DoctorReviews: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -98,21 +99,20 @@ const DoctorReviews: React.FC = () => {
       {/* Top section: stats breakdown */}
       <div className="grid md:grid-cols-3 gap-6">
         {/* Rating average big card */}
-        <div className="bg-background border border-border rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-sm">
+        <div className="card p-6 flex flex-col items-center justify-center text-center shadow-sm">
           <span className="text-muted-foreground font-semibold text-xs">
             Điểm đánh giá trung bình
           </span>
           <span className="text-5xl font-black text-foreground mt-4">
             {averageRating.toFixed(1)}
           </span>
-          <div className="flex gap-0.5 text-amber-400 text-lg mt-2">
+          <div className="flex gap-0.5 mt-2">
             {[...Array(5)].map((_, i) => (
-              <span
+              <StarIcon
                 key={i}
-                className={i < Math.round(averageRating) ? 'text-amber-400' : 'text-muted/30'}
-              >
-                ★
-              </span>
+                filled
+                className={`w-5 h-5 ${i < Math.round(averageRating) ? 'text-amber-400' : 'text-muted/30'}`}
+              />
             ))}
           </div>
           <span className="text-muted-foreground text-[10px] mt-2">
@@ -121,12 +121,15 @@ const DoctorReviews: React.FC = () => {
         </div>
 
         {/* Progress bars distribution */}
-        <div className="md:col-span-2 bg-background border border-border rounded-2xl p-6 flex flex-col justify-between shadow-sm">
+        <div className="md:col-span-2 card p-6 flex flex-col justify-between shadow-sm">
           <h3 className="font-extrabold text-foreground text-sm mb-4">Chi tiết mức độ hài lòng</h3>
           <div className="space-y-2">
             {distribution.map((item) => (
               <div key={item.stars} className="flex items-center gap-3">
-                <span className="w-10 font-bold text-foreground text-right">{item.stars} ★</span>
+                <span className="w-10 font-bold text-foreground flex items-center justify-end gap-0.5">
+                  {item.stars}
+                  <StarIcon filled className="w-3.5 h-3.5 text-amber-400" />
+                </span>
                 <div className="flex-1 h-2 bg-muted/40 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-amber-400 rounded-full"
@@ -141,7 +144,7 @@ const DoctorReviews: React.FC = () => {
       </div>
 
       {/* Reviews list */}
-      <div className="bg-background border border-border rounded-2xl p-6 space-y-4 shadow-sm">
+      <div className="card p-6 space-y-4 shadow-sm">
         <h3 className="font-extrabold text-foreground text-sm">Danh sách bình luận đánh giá</h3>
         {reviews.length === 0 ? (
           <div className="text-center py-10 text-muted-foreground">
@@ -157,18 +160,16 @@ const DoctorReviews: React.FC = () => {
                       <span className="font-bold text-foreground">
                         {rev.patientName || 'Bệnh nhân'}
                       </span>
-                      <span className="text-[9px] bg-muted/50 border border-border px-1.5 py-0.5 rounded text-muted-foreground">
+                      <span className="badge bg-muted/50 border border-border text-muted-foreground">
                         Khám: {treatmentSpecialty}
                       </span>
                     </div>
-                    <div className="flex text-amber-400 text-xs mt-1">
+                    <div className="flex gap-0.5 mt-1">
                       {[...Array(rev.rating)].map((_, i) => (
-                        <span key={i}>★</span>
+                        <StarIcon key={i} filled className="w-3.5 h-3.5 text-amber-400" />
                       ))}
                       {[...Array(5 - rev.rating)].map((_, i) => (
-                        <span key={i} className="text-muted/30">
-                          ★
-                        </span>
+                        <StarIcon key={i} filled className="w-3.5 h-3.5 text-muted/30" />
                       ))}
                     </div>
                   </div>

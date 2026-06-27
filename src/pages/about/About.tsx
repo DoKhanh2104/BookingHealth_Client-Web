@@ -11,7 +11,7 @@ const About = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* ─── Hero ─── */}
-      <section className="bg-gradient-to-br from-primary via-primary/90 to-secondary/80">
+      <section className="bg-primary">
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10 md:py-16">
           <p className="text-primary-foreground/70 text-xs font-semibold uppercase tracking-widest mb-2">
             BookingHealth
@@ -39,7 +39,7 @@ const About = () => {
             Sứ mệnh &amp; Tầm nhìn
           </h2>
           <div className="grid sm:grid-cols-2 gap-6">
-            <div className="p-6 bg-muted rounded-2xl border border-border">
+            <div className="p-6 bg-muted rounded-xl border border-border">
               <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">
                 Sứ mệnh
               </p>
@@ -52,7 +52,7 @@ const About = () => {
                 BookingHealth ra đời để hiện thực hoá điều đó thông qua công nghệ.
               </p>
             </div>
-            <div className="p-6 bg-muted rounded-2xl border border-border">
+            <div className="p-6 bg-muted rounded-xl border border-border">
               <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-3">
                 Tầm nhìn
               </p>
@@ -98,7 +98,7 @@ const About = () => {
           <h2 className="text-lg font-bold text-foreground mb-6 pb-3 border-b border-border">
             BookingHealth qua các con số
           </h2>
-          <div className="overflow-x-auto rounded-2xl border border-border">
+          <div className="overflow-x-auto rounded-xl border border-border">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-foreground text-background">
@@ -158,7 +158,7 @@ const About = () => {
                 desc: 'Mọi quyết định thiết kế sản phẩm đều bắt đầu từ câu hỏi: "Điều này có thực sự giúp ích cho bệnh nhân không?" Chúng tôi lắng nghe phản hồi và cải tiến liên tục.',
               },
             ].map((item) => (
-              <div key={item.title} className="border border-border rounded-2xl overflow-hidden">
+              <div key={item.title} className="border border-border rounded-xl overflow-hidden">
                 <div className="px-6 py-4 bg-muted border-b border-border">
                   <p className="font-bold text-foreground">{item.title}</p>
                 </div>
@@ -175,7 +175,7 @@ const About = () => {
           <h2 className="text-lg font-bold text-foreground mb-6 pb-3 border-b border-border">
             Đội ngũ lãnh đạo
           </h2>
-          <div className="overflow-x-auto rounded-2xl border border-border">
+          <div className="overflow-x-auto rounded-xl border border-border">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-foreground text-background">
@@ -187,22 +187,22 @@ const About = () => {
               <tbody>
                 {[
                   {
-                    name: 'Nguyễn Văn An',
+                    name: 'Đỗ Hùng Quốc Khánh',
                     role: 'CEO & Đồng sáng lập',
                     expertise: 'Kỹ sư phần mềm, 10 năm kinh nghiệm trong lĩnh vực y tế số',
                   },
                   {
-                    name: 'BS. Trần Thị Hoa',
+                    name: 'BS. Võ Mạnh Quang',
                     role: 'Giám đốc Y tế (CMO)',
                     expertise: 'Bác sĩ Nội khoa, cố vấn chuyên môn và đảm bảo chất lượng y tế',
                   },
                   {
-                    name: 'Lê Quốc Bảo',
+                    name: 'Nguyễn Mạnh Tuấn',
                     role: 'CTO & Đồng sáng lập',
                     expertise: 'Kiến trúc hệ thống, bảo mật dữ liệu và hạ tầng đám mây',
                   },
                   {
-                    name: 'Phạm Minh Tuấn',
+                    name: 'Trần Đình Việt',
                     role: 'Giám đốc Vận hành (COO)',
                     expertise: 'Quản lý đối tác bệnh viện, quy trình và mở rộng thị trường',
                   },
@@ -213,9 +213,7 @@ const About = () => {
                   >
                     <td className="p-4 font-semibold text-foreground">{person.name}</td>
                     <td className="p-4">
-                      <span className="bg-primary/10 text-primary text-xs font-semibold px-2.5 py-1 rounded-lg">
-                        {person.role}
-                      </span>
+                      <span className="badge bg-primary/10 text-primary">{person.role}</span>
                     </td>
                     <td className="p-4 text-muted-foreground">{person.expertise}</td>
                   </tr>
@@ -285,8 +283,8 @@ const About = () => {
           <h2 className="text-lg font-bold text-foreground mb-6 pb-3 border-b border-border">
             Liên hệ với chúng tôi
           </h2>
-          <div className="border border-border rounded-2xl overflow-hidden">
-            <div className="px-6 py-5 bg-gradient-to-r from-primary/10 to-secondary/5 border-b border-border">
+          <div className="border border-border rounded-xl overflow-hidden">
+            <div className="px-6 py-5 bg-muted border-b border-border">
               <p className="font-bold text-foreground text-base">
                 BookingHealth — Công ty Cổ phần Công nghệ Y tế Việt
               </p>
@@ -348,22 +346,13 @@ const About = () => {
         {/* ─── Footer Links ─── */}
         <div className="pt-8 border-t border-border">
           <div className="flex flex-col sm:flex-row gap-2 justify-center">
-            <Link
-              to="/terms"
-              className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors"
-            >
+            <Link to="/terms" className="btn btn-primary btn-sm">
               Điều khoản Dịch vụ
             </Link>
-            <Link
-              to="/privacy"
-              className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
-            >
+            <Link to="/privacy" className="btn btn-outline btn-sm">
               Chính sách Bảo mật
             </Link>
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
-            >
+            <Link to="/" className="btn btn-outline btn-sm">
               Về trang chủ
             </Link>
           </div>

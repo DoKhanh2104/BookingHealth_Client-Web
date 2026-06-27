@@ -18,7 +18,32 @@ export interface DoctorFilterParams {
   clinicId?: number;
 }
 
+/** Hồ sơ đăng ký bác sĩ của chính user (để xem trạng thái / nộp lại khi bị từ chối). */
+export interface MyDoctorApplication {
+  doctorId: number;
+  status: number; // 0=PENDING, 1=VERIFIED, 2=REJECTED, 3=LOCKED
+  rejectReason?: string | null;
+  name: string;
+  phone: string;
+  email: string;
+  avatar?: string | null;
+  practiceLicenseNumber: string;
+  practiceStartDate: string;
+  biography?: string | null;
+  practiceLicenseImage?: string | null;
+  clinicId?: number | null;
+  clinicName?: string | null;
+  specialtyIds: number[];
+  specialtyNames: string[];
+}
+
 export const doctorService = {
+  /** GET /doctors/me/application - Hồ sơ đăng ký bác sĩ của user hiện tại (null nếu chưa nộp) */
+  getMyApplication: async (): Promise<ApiResponse<MyDoctorApplication | null>> => {
+    const res = await apiClient.get('/doctors/me/application');
+    return res.data;
+  },
+
   /** GET /doctors - Danh sách bác sĩ với filter */
   getAll: async (params: DoctorFilterParams = {}): Promise<ApiResponse<PageResponse<Doctor>>> => {
     const res = await apiClient.get('/doctors', { params: { page: 0, size: 10, ...params } });

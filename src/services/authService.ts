@@ -114,6 +114,14 @@ export const authService = {
   },
 
   /**
+   * Refresh token: lấy token mới với roles cập nhật từ server
+   */
+  refreshToken: async (): Promise<LoginResponse> => {
+    const response = await apiClient.post('/auth/refresh-token');
+    return response.data;
+  },
+
+  /**
    * Lấy URL Google OAuth để redirect
    */
   getGoogleOAuthUrl: (): string => {

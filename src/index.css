@@ -34,3 +34,64 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* ───────────────────────────────────────────────────────────────
+   Design system — dùng để ĐỒNG BỘ kích cỡ & bo góc trên toàn app.
+   Bán kính: button/input/control = rounded-lg; card/panel = rounded-xl;
+   pill/badge/avatar = rounded-full.
+   ─────────────────────────────────────────────────────────────── */
+@layer components {
+  /* Buttons — luôn ghép: .btn + .btn-<variant> + .btn-<size> */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-lg
+      transition-colors cursor-pointer whitespace-nowrap select-none
+      disabled:opacity-60 disabled:pointer-events-none;
+  }
+  .btn-sm {
+    @apply text-xs px-3 py-1.5;
+  }
+  .btn-md {
+    @apply text-sm px-4 py-2;
+  }
+  .btn-lg {
+    @apply text-sm px-6 py-3;
+  }
+  .btn-block {
+    @apply w-full;
+  }
+  .btn-primary {
+    @apply bg-primary text-primary-foreground shadow-sm hover:bg-primary-hover;
+  }
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary-hover;
+  }
+  .btn-outline {
+    @apply border border-border text-foreground hover:bg-accent;
+  }
+  .btn-ghost {
+    @apply text-muted-foreground hover:text-primary hover:bg-accent;
+  }
+  .btn-danger {
+    @apply bg-red-500 text-white shadow-sm hover:bg-red-600;
+  }
+
+  /* Cards / panels */
+  .card {
+    @apply bg-background border border-border rounded-xl;
+  }
+  .card-hover {
+    @apply transition-shadow hover:shadow-md;
+  }
+
+  /* Pills / badges */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full text-xs font-semibold px-2.5 py-0.5;
+  }
+
+  /* Form inputs */
+  .input-field {
+    @apply w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground
+      outline-none transition-colors placeholder:text-muted-foreground/60
+      focus:border-primary focus:ring-2 focus:ring-ring/20;
+  }
+}

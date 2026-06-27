@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronDownIcon, CheckIcon } from '../../components/icons';
 
 /* ─── Types ─── */
 interface Section {
@@ -10,16 +11,9 @@ interface Section {
 
 /* ─── Chevron Icon ─── */
 const ChevronIcon = ({ open }: { open: boolean }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
+  <ChevronDownIcon
     className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-  </svg>
+  />
 );
 
 /* ─── Data ─── */
@@ -535,8 +529,8 @@ const sections: Section[] = [
               key={item}
               className="flex gap-3 p-4 bg-muted rounded-xl border border-border text-muted-foreground"
             >
-              <span className="w-5 h-5 rounded-full border-2 border-secondary text-secondary flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                ✓
+              <span className="w-5 h-5 rounded-full border-2 border-secondary text-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+                <CheckIcon className="w-3 h-3" />
               </span>
               <span>{item}</span>
             </li>
@@ -585,8 +579,8 @@ const sections: Section[] = [
           Nếu bạn có câu hỏi, khiếu nại hoặc yêu cầu liên quan đến Chính sách Bảo mật và dữ liệu cá
           nhân, hãy liên hệ với <strong>Cán bộ Bảo vệ Dữ liệu (DPO)</strong> của chúng tôi:
         </p>
-        <div className="border border-border rounded-2xl overflow-hidden">
-          <div className="px-6 py-5 bg-gradient-to-r from-secondary/10 to-primary/5 border-b border-border">
+        <div className="border border-border rounded-xl overflow-hidden">
+          <div className="px-6 py-5 bg-muted border-b border-border">
             <p className="font-bold text-foreground text-lg">
               Phòng Bảo vệ Dữ liệu — BookingHealth DPO
             </p>
@@ -659,7 +653,7 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* ─── Hero ─── */}
-      <section className="bg-gradient-to-br from-secondary via-secondary/90 to-primary/80">
+      <section className="bg-secondary">
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10 md:py-16">
           <p className="text-secondary-foreground/70 text-xs font-semibold uppercase tracking-widest mb-2">
             BookingHealth
@@ -684,7 +678,7 @@ const PrivacyPolicy = () => {
       {/* ─── Content ─── */}
       <div className="max-w-5xl mx-auto px-4 sm:px-8 py-12 md:py-16">
         {/* Quick Rights Banner */}
-        <div className="bg-secondary/5 border border-secondary/20 rounded-2xl p-5 mb-8">
+        <div className="bg-secondary/5 border border-secondary/20 rounded-xl p-5 mb-8">
           <p className="font-bold text-foreground mb-3">Quyền của bạn — tóm tắt</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
             {[
@@ -744,8 +738,8 @@ const PrivacyPolicy = () => {
               <div
                 key={section.id}
                 id={section.id}
-                className={`border rounded-2xl overflow-hidden transition-colors duration-200 ${
-                  isOpen ? 'border-secondary/30 shadow-sm shadow-secondary/10' : 'border-border'
+                className={`border rounded-xl overflow-hidden transition-colors duration-200 ${
+                  isOpen ? 'border-secondary/30 shadow-sm' : 'border-border'
                 }`}
               >
                 {/* Header */}
@@ -794,16 +788,10 @@ const PrivacyPolicy = () => {
             .
           </p>
           <div className="flex flex-col sm:flex-row gap-2 justify-center">
-            <Link
-              to="/terms"
-              className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary-hover transition-colors"
-            >
+            <Link to="/terms" className="btn btn-secondary btn-sm">
               Xem Điều khoản Dịch vụ
             </Link>
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
-            >
+            <Link to="/" className="btn btn-outline btn-sm">
               Về trang chủ
             </Link>
           </div>

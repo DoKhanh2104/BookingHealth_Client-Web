@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { chatService } from '../../services/chatService';
 import { userService } from '../../services/userService';
 import type { ChatRoom, ChatMessage, User } from '../../types';
+import { SendIcon } from '../../components/icons';
 
 const DoctorChat: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -172,10 +173,10 @@ const DoctorChat: React.FC = () => {
   }
 
   return (
-    <div className="bg-background/95 backdrop-blur-xl border border-border/80 rounded-[2rem] overflow-hidden shadow-2xl shadow-primary/5 h-[calc(100vh-8rem)] flex text-sm font-sans mx-auto max-w-7xl mt-4">
+    <div className="card overflow-hidden shadow-lg h-[calc(100vh-8rem)] flex text-sm font-sans mx-auto max-w-7xl mt-4">
       {/* Sidebar - Rooms List */}
       <div className="w-80 lg:w-96 border-r border-border flex flex-col flex-shrink-0 bg-muted/10">
-        <div className="p-6 border-b border-border bg-background/50 backdrop-blur-md">
+        <div className="p-6 border-b border-border bg-background/50">
           <h3 className="font-extrabold text-foreground text-lg">Hộp thoại tư vấn</h3>
         </div>
         <div className="flex-1 overflow-y-auto divide-y divide-gray-100/50">
@@ -195,7 +196,7 @@ const DoctorChat: React.FC = () => {
               >
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 transition-colors border
-                  ${activeRoomId === room.id ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 border-primary/20' : 'bg-primary/5 text-primary border-primary/10 group-hover:bg-primary/10'}`}
+                  ${activeRoomId === room.id ? 'bg-primary text-primary-foreground shadow-sm border-primary/20' : 'bg-primary/5 text-primary border-primary/10 group-hover:bg-primary/10'}`}
                 >
                   {room.userName ? room.userName.charAt(0) : 'B'}
                 </div>
@@ -223,8 +224,8 @@ const DoctorChat: React.FC = () => {
         {activeRoom ? (
           <>
             {/* Chat header */}
-            <div className="h-20 border-b border-border flex items-center px-8 gap-4 flex-shrink-0 bg-background/50 backdrop-blur-md">
-              <div className="w-12 h-12 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center font-bold text-lg shadow-md shadow-primary/10">
+            <div className="h-20 border-b border-border flex items-center px-8 gap-4 flex-shrink-0 bg-background/50">
+              <div className="w-12 h-12 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center font-bold text-lg">
                 {activeRoom.userName ? activeRoom.userName.charAt(0) : 'B'}
               </div>
               <div className="space-y-1">
@@ -232,10 +233,7 @@ const DoctorChat: React.FC = () => {
                   {activeRoom.userName || 'Bệnh nhân'}
                 </h4>
                 <p className="text-xs text-emerald-600 font-medium flex items-center gap-1.5">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                  </span>
+                  <span className="w-2 h-2 rounded-full bg-green-500" />
                   Kênh tư vấn trực tuyến (Lịch hẹn #{activeRoom.appointmentId})
                 </p>
               </div>
@@ -244,7 +242,7 @@ const DoctorChat: React.FC = () => {
             {/* Chat Messages */}
             <div
               ref={chatContainerRef}
-              className="flex-1 overflow-y-auto p-8 space-y-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5"
+              className="flex-1 overflow-y-auto p-8 space-y-6 bg-muted/10"
             >
               {messages.length === 0 ? (
                 <div className="text-center py-20 text-muted-foreground font-medium">
@@ -256,15 +254,15 @@ const DoctorChat: React.FC = () => {
                   return (
                     <div
                       key={msg.id}
-                      className={`flex ${isDoctor ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+                      className={`flex ${isDoctor ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
                         className={`
-                          max-w-[70%] px-5 py-3.5 rounded-[1.5rem] leading-relaxed shadow-sm text-sm
+                          max-w-[70%] px-5 py-3.5 rounded-xl leading-relaxed shadow-sm text-sm
                           ${
                             isDoctor
-                              ? 'bg-primary text-primary-foreground rounded-br-sm shadow-primary/20'
-                              : 'bg-background border border-border text-foreground rounded-bl-sm shadow-foreground/5'
+                              ? 'bg-primary text-primary-foreground rounded-br-sm'
+                              : 'bg-background border border-border text-foreground rounded-bl-sm'
                           }
                         `}
                       >
@@ -295,19 +293,20 @@ const DoctorChat: React.FC = () => {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Nhập nội dung phản hồi tư vấn..."
-                className="flex-1 px-5 py-3.5 border border-border rounded-2xl bg-muted/30 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm transition-all"
+                className="input-field flex-1"
               />
               <button
                 type="submit"
                 disabled={!inputText.trim() || sending}
-                className="px-8 py-3.5 bg-primary hover:bg-primary-hover disabled:opacity-50 text-primary-foreground font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all text-sm cursor-pointer flex items-center justify-center min-w-[100px]"
+                className="btn btn-primary btn-lg min-w-25"
               >
                 {sending ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  </div>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  'Gửi'
+                  <>
+                    <SendIcon className="w-4 h-4" />
+                    Gửi
+                  </>
                 )}
               </button>
             </form>

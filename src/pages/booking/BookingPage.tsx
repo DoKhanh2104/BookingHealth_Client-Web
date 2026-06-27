@@ -5,24 +5,16 @@ import { doctorService } from '../../services/doctorService';
 import { userService } from '../../services/userService';
 import { appointmentService } from '../../services/appointmentService';
 import type { Doctor } from '../../types';
-
-// User Profile Fallback Icon
-const UserIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-    />
-  </svg>
-);
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  UserIcon,
+  CalendarIcon,
+  ClockIcon,
+  BuildingIcon,
+  MoneyIcon,
+  LightbulbIcon,
+} from '../../components/icons';
 
 const BookingPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -204,31 +196,15 @@ const BookingPage: React.FC = () => {
     <div className="bg-muted/10 min-h-screen py-12 text-sm">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-foreground/80 hover:text-primary font-bold text-sm bg-background border border-border px-4.5 py-3 rounded-xl transition-all shadow-sm hover:border-primary/20 active:scale-[0.98] w-fit cursor-pointer"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.2}
-            stroke="currentColor"
-            className="w-3.5 h-3.5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-            />
-          </svg>
+        <button onClick={() => navigate(-1)} className="btn btn-outline btn-md w-fit">
+          <ArrowLeftIcon className="w-4 h-4" />
           Quay lại trang trước
         </button>
 
         {bookingSuccess ? (
-          <div className="bg-background border border-border rounded-3xl p-12 text-center space-y-6 shadow-md max-w-2xl mx-auto animate-fadeIn">
-            <div className="w-20 h-20 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 rounded-full flex items-center justify-center text-4xl mx-auto shadow-sm">
-              ✓
+          <div className="card p-12 text-center space-y-6 max-w-2xl mx-auto animate-fadeIn">
+            <div className="w-20 h-20 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto shadow-sm">
+              <CheckCircleIcon className="w-10 h-10" />
             </div>
             <div className="space-y-4">
               <h2 className="font-black text-foreground text-2xl tracking-tight">
@@ -242,7 +218,7 @@ const BookingPage: React.FC = () => {
                 ngày <strong className="text-foreground">{formatDateLabel(selectedDate)}</strong> đã
                 được ghi nhận thành công.
               </p>
-              <div className="border border-border rounded-2xl p-6 bg-muted/20 text-left max-w-md mx-auto space-y-2 leading-relaxed text-muted-foreground text-sm mt-4">
+              <div className="border border-border rounded-xl p-6 bg-muted/20 text-left max-w-md mx-auto space-y-2 leading-relaxed text-muted-foreground text-sm mt-4">
                 <p>
                   <span className="font-bold text-foreground">Họ tên người khám:</span>{' '}
                   {bookingName}
@@ -274,16 +250,10 @@ const BookingPage: React.FC = () => {
               </p>
             </div>
             <div className="pt-4 flex gap-4 justify-center">
-              <button
-                onClick={() => navigate('/specialties')}
-                className="px-6 py-3.5 border border-border hover:bg-accent text-muted-foreground font-bold rounded-2xl cursor-pointer transition-colors text-sm"
-              >
+              <button onClick={() => navigate('/specialties')} className="btn btn-outline btn-md">
                 Tiếp tục khám chuyên khoa
               </button>
-              <button
-                onClick={() => navigate('/')}
-                className="px-6 py-3.5 bg-primary hover:bg-primary-hover text-primary-foreground font-black rounded-2xl cursor-pointer shadow-lg shadow-primary/20 transition-all text-sm"
-              >
+              <button onClick={() => navigate('/')} className="btn btn-primary btn-md">
                 Quay lại Trang chủ
               </button>
             </div>
@@ -291,7 +261,7 @@ const BookingPage: React.FC = () => {
         ) : (
           <div className="grid md:grid-cols-5 gap-8">
             {/* LEFT COLUMN (3 cols): Spacious Booking Form */}
-            <div className="md:col-span-3 bg-background border border-border rounded-3xl p-8 space-y-6 shadow-sm">
+            <div className="md:col-span-3 card p-8 space-y-6">
               <div>
                 <h2 className="text-xl font-black text-foreground tracking-tight uppercase">
                   Thông Tin Đăng Ký Khám
@@ -314,7 +284,7 @@ const BookingPage: React.FC = () => {
                     value={bookingName}
                     onChange={(e) => setBookingName(e.target.value)}
                     placeholder="Nhập đầy đủ họ và tên giống trong CCCD..."
-                    className="w-full px-4 py-3 border border-border rounded-2xl bg-background text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium placeholder:text-muted-foreground/60"
+                    className="input-field"
                   />
                 </div>
 
@@ -329,7 +299,7 @@ const BookingPage: React.FC = () => {
                     value={bookingPhone}
                     onChange={(e) => setBookingPhone(e.target.value)}
                     placeholder="Nhập số điện thoại di động chính chủ..."
-                    className="w-full px-4 py-3 border border-border rounded-2xl bg-background text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium placeholder:text-muted-foreground/60"
+                    className="input-field"
                   />
                 </div>
 
@@ -343,7 +313,7 @@ const BookingPage: React.FC = () => {
                     onChange={(e) => setBookingReason(e.target.value)}
                     rows={6}
                     placeholder="Mô tả cụ thể các triệu chứng bệnh của bạn để bác sĩ nắm bắt thông tin nhanh nhất (ví dụ: đau ê buốt răng khi ăn nóng lạnh, đau vùng thắt lưng lan xuống chân...)"
-                    className="w-full px-4 py-3 border border-border rounded-2xl bg-background text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium leading-relaxed placeholder:text-muted-foreground/60"
+                    className="input-field leading-relaxed"
                   />
                 </div>
 
@@ -351,14 +321,14 @@ const BookingPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => navigate(-1)}
-                    className="px-6 py-3 border border-border hover:bg-accent text-muted-foreground font-extrabold rounded-2xl cursor-pointer transition-all text-sm"
+                    className="btn btn-outline btn-md"
                   >
                     Hủy lịch đặt
                   </button>
                   <button
                     type="submit"
                     disabled={bookingSubmitting}
-                    className="px-8 py-3 bg-primary hover:bg-primary-hover text-primary-foreground font-black rounded-2xl cursor-pointer shadow-lg shadow-primary/25 disabled:bg-primary/50 transition-all active:scale-[0.98] text-sm"
+                    className="btn btn-primary btn-md"
                   >
                     {bookingSubmitting ? 'Đang gửi hồ sơ...' : 'Xác nhận đặt lịch khám'}
                   </button>
@@ -369,14 +339,14 @@ const BookingPage: React.FC = () => {
             {/* RIGHT COLUMN (2 cols): Beautiful Appointment Summary Cards */}
             <div className="md:col-span-2 space-y-6">
               {/* Summary Card */}
-              <div className="bg-background border border-border rounded-3xl p-6 space-y-5 shadow-sm">
+              <div className="card p-6 space-y-5">
                 <h3 className="text-sm font-black text-foreground uppercase tracking-wider border-b border-border pb-3">
                   Tóm tắt lịch hẹn
                 </h3>
 
                 {/* Doctor Bio Card */}
                 <div className="flex gap-4">
-                  <div className="w-16 h-16 rounded-full overflow-hidden border border-border bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border border-border bg-primary/10 text-primary flex items-center justify-center shrink-0">
                     {doctor.avatar ? (
                       <img
                         src={doctor.avatar}
@@ -404,16 +374,16 @@ const BookingPage: React.FC = () => {
                 {/* Details Grid */}
                 <div className="grid grid-cols-2 gap-4 leading-normal">
                   <div className="space-y-1">
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
-                      📅 NGÀY ĐẶT KHÁM
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 flex items-center gap-1">
+                      <CalendarIcon className="w-4 h-4" /> NGÀY ĐẶT KHÁM
                     </span>
                     <span className="font-bold text-foreground text-sm">
                       {formatDateLabel(selectedDate)}
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
-                      ⏳ KHUNG GIỜ
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 flex items-center gap-1">
+                      <ClockIcon className="w-4 h-4" /> KHUNG GIỜ
                     </span>
                     <span className="font-bold text-primary text-sm">
                       {startTime} - {endTime}
@@ -421,8 +391,8 @@ const BookingPage: React.FC = () => {
                   </div>
                   <div className="col-span-2 border-t border-border/50 my-1"></div>
                   <div className="space-y-1 col-span-2">
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
-                      🏥 ĐỊA ĐIỂM KHÁM
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 flex items-center gap-1">
+                      <BuildingIcon className="w-4 h-4" /> ĐỊA ĐIỂM KHÁM
                     </span>
                     <span className="font-bold text-foreground text-sm">
                       {doctor.clinic?.clinicName}
@@ -434,8 +404,8 @@ const BookingPage: React.FC = () => {
                   <div className="col-span-2 border-t border-border/50 my-1"></div>
                   <div className="space-y-1 col-span-2 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 block">
-                        💵 GIÁ KHÁM NIÊM YẾT
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold text-muted-foreground/80 flex items-center gap-1">
+                        <MoneyIcon className="w-4 h-4" /> GIÁ KHÁM NIÊM YẾT
                       </span>
                       <span className="text-xs text-muted-foreground">
                         (Thanh toán trực tiếp tại phòng khám)
@@ -449,9 +419,9 @@ const BookingPage: React.FC = () => {
               </div>
 
               {/* Guide Card */}
-              <div className="bg-background border border-border rounded-3xl p-6 space-y-3 shadow-sm">
+              <div className="card p-6 space-y-3">
                 <h3 className="text-sm font-black text-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <span>💡</span> Hướng dẫn đặt khám
+                  <LightbulbIcon className="w-5 h-5" /> Hướng dẫn đặt khám
                 </h3>
                 <ul className="list-disc pl-4 text-xs sm:text-sm text-muted-foreground space-y-2 leading-relaxed">
                   <li>

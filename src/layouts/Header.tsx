@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
@@ -7,6 +7,7 @@ import { userService } from '../services/userService';
 import { notificationService } from '../services/notificationService';
 import { TOKEN_KEY } from '../api/apiClient';
 import Logo from '../assets/logo.png';
+import { StethoscopeIcon } from '../components/icons';
 import type { Notification } from '../types';
 
 /* ─── Icons ─── */
@@ -81,7 +82,6 @@ const navLinks = [
 ];
 
 const Header = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -91,6 +91,8 @@ const Header = () => {
 
   // Additional states for doctor check & notifications
   const [isDoctor, setIsDoctor] = useState(false);
+  // Có hồ sơ bác sĩ (đang chờ duyệt / bị từ chối) nhưng chưa được duyệt
+  const [hasDoctorApplication, setHasDoctorApplication] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
@@ -102,6 +104,7 @@ const Header = () => {
       setAvatar(null);
       setUserName('Tài khoản');
       setIsDoctor(false);
+      setHasDoctorApplication(false);
       setNotifications([]);
       setUnreadCount(0);
     }
@@ -116,13 +119,34 @@ const Header = () => {
     // Fetch profile and check role
     userService
       .getProfile()
-      .then((res) => {
+      .then(async (res) => {
         if (res?.result) {
           setAvatar(res.result.avatar ?? null);
           setUserName(res.result.name ?? 'Tài khoản');
           const hasDoctorRole =
             res.result.roles?.some((role) => role.roleName === 'DOCTOR') ?? false;
           setIsDoctor(hasDoctorRole);
+          // Có hồ sơ bác sĩ nhưng chưa được duyệt → hiện lối vào xem/nộp lại
+          setHasDoctorApplication(!!res.result.doctorId && !hasDoctorRole);
+
+          // Auto-refresh token nếu DB có role DOCTOR nhưng token cũ chưa có
+          const currentToken = localStorage.getItem(TOKEN_KEY);
+          if (hasDoctorRole && currentToken) {
+            const { parseJwt } = await import('../utils/jwt');
+            const decoded = parseJwt(currentToken);
+            const tokenHasDoctor = decoded?.scope?.includes('ROLE_DOCTOR') ?? false;
+            if (!tokenHasDoctor) {
+              try {
+                const refreshRes = await authService.refreshToken();
+                if (refreshRes?.result?.token) {
+                  localStorage.setItem(TOKEN_KEY, refreshRes.result.token);
+                  window.dispatchEvent(new Event('storage'));
+                }
+              } catch (err) {
+                console.error('Failed to refresh token', err);
+              }
+            }
+          }
         }
       })
       .catch(() => {});
@@ -250,9 +274,9 @@ const Header = () => {
                 {isDoctor && (
                   <Link
                     to="/doctor/dashboard"
-                    className="px-3.5 py-2 text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded-xl hover:bg-primary/20 transition-all flex items-center gap-1.5 cursor-pointer"
+                    className="px-3.5 py-2 text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded-lg hover:bg-primary/20 transition-all flex items-center gap-1.5 cursor-pointer"
                   >
-                    ⚕ Kênh Bác sĩ
+                    <StethoscopeIcon className="w-4 h-4" /> Kênh Bác sĩ
                   </Link>
                 )}
 
@@ -397,6 +421,16 @@ const Header = () => {
                       className="absolute right-0 mt-2 w-52 bg-background border border-border rounded-xl shadow-lg overflow-hidden z-50"
                       onClick={(e) => e.stopPropagation()}
                     >
+                      {hasDoctorApplication && (
+                        <Link
+                          to="/register-doctor"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2 px-4 py-3 text-sm font-semibold text-primary hover:bg-accent transition-colors border-b border-border"
+                        >
+                          <StethoscopeIcon className="w-4 h-4" />
+                          Hồ sơ bác sĩ
+                        </Link>
+                      )}
                       <Link
                         to="/profile"
                         onClick={() => setUserMenuOpen(false)}
@@ -472,19 +506,9 @@ const Header = () => {
                 >
                   Dành cho bác sĩ
                 </Link>
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-sm font-semibold text-primary hover:bg-accent rounded-xl transition-all duration-200 border border-border"
-                >
+                <Link id="header-login-btn" to="/login" className="btn btn-primary btn-md">
                   Đăng nhập
                 </Link>
-                <button
-                  id="header-book-btn"
-                  onClick={() => navigate('/login')}
-                  className="px-4 py-2 text-sm font-bold text-primary-foreground bg-primary rounded-xl hover:bg-primary-hover transition-all duration-200 shadow-sm hover:shadow-[0_4px_15px_rgba(26,113,180,0.35)] cursor-pointer"
-                >
-                  Đặt lịch ngay
-                </button>
               </>
             )}
           </div>
@@ -562,16 +586,9 @@ const Header = () => {
                 <Link
                   to="/login"
                   onClick={() => setMobileOpen(false)}
-                  className="block text-center px-4 py-3 text-sm font-semibold text-primary border border-border rounded-xl hover:bg-accent transition-all"
+                  className="block text-center px-4 py-3 text-sm font-bold text-primary-foreground bg-primary rounded-lg hover:bg-primary-hover transition-all"
                 >
                   Đăng nhập
-                </Link>
-                <Link
-                  to="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="block text-center px-4 py-3 text-sm font-bold text-primary-foreground bg-primary rounded-xl hover:bg-primary-hover transition-all"
-                >
-                  Đặt lịch ngay
                 </Link>
               </>
             )}

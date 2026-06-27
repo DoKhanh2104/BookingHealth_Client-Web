@@ -25,10 +25,7 @@ const PageNotFound: React.FC = () => {
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 text-center">
       <div className="flex flex-col items-center max-w-md w-full space-y-6">
         <div className="relative flex items-center justify-center mb-2">
-          {/* Subtle glowing effect in the background */}
-          <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-primary to-secondary opacity-20 blur-2xl select-none pointer-events-none" />
-
-          <h1 className="relative text-[120px] md:text-[200px] font-black leading-none bg-gradient-to-br from-primary to-primary-hover bg-clip-text text-transparent opacity-15 select-none tracking-tighter">
+          <h1 className="relative text-[120px] md:text-[200px] font-black leading-none text-primary opacity-15 select-none tracking-tighter">
             404
           </h1>
         </div>
@@ -42,10 +39,7 @@ const PageNotFound: React.FC = () => {
           trang chủ để tiếp tục công việc nhé.
         </p>
 
-        <button
-          onClick={() => navigate('/')}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-10 py-3.5 text-base font-bold text-primary-foreground shadow-[0_8px_25px_rgba(26,113,180,0.4)] transition-all duration-300 ease-in-out hover:-translate-y-[3px] hover:shadow-[0_12px_30px_rgba(26,113,180,0.6)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] cursor-pointer"
-        >
+        <button onClick={() => navigate('/')} className="btn btn-primary btn-lg">
           <HomeIcon className="w-5 h-5" />
           <span>Quay lại trang chủ</span>
         </button>

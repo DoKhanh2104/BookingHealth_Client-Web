@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronDownIcon, CheckIcon, XIcon } from '../../components/icons';
 
 /* ─── Types ─── */
 interface Section {
@@ -10,16 +11,9 @@ interface Section {
 
 /* ─── Chevron Icon ─── */
 const ChevronIcon = ({ open }: { open: boolean }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
+  <ChevronDownIcon
     className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-  </svg>
+  />
 );
 
 /* ─── Data ─── */
@@ -116,8 +110,8 @@ const sections: Section[] = [
               'Tuân thủ toàn bộ quy định pháp luật của nước Cộng hoà Xã hội Chủ nghĩa Việt Nam.',
             ].map((item) => (
               <li key={item} className="flex gap-3 text-muted-foreground">
-                <span className="w-5 h-5 rounded-full border-2 border-primary text-primary flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                  ✓
+                <span className="w-5 h-5 rounded-full border-2 border-primary text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <CheckIcon className="w-3 h-3" />
                 </span>
                 <span>{item}</span>
               </li>
@@ -134,8 +128,8 @@ const sections: Section[] = [
               'Đăng tải, chia sẻ thông tin sai lệch, giả mạo trên nền tảng.',
             ].map((item) => (
               <li key={item} className="flex gap-3 text-muted-foreground">
-                <span className="w-5 h-5 rounded-full border-2 border-red-400 text-red-500 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                  ✕
+                <span className="w-5 h-5 rounded-full border-2 border-red-400 text-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <XIcon className="w-3 h-3" />
                 </span>
                 <span>{item}</span>
               </li>
@@ -461,7 +455,7 @@ const TermsOfService = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* ─── Hero ─── */}
-      <section className="bg-gradient-to-br from-primary via-primary/90 to-primary/80">
+      <section className="bg-primary">
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10 md:py-16">
           <p className="text-primary-foreground/70 text-xs font-semibold uppercase tracking-widest mb-2">
             BookingHealth
@@ -514,8 +508,8 @@ const TermsOfService = () => {
               <div
                 key={section.id}
                 id={section.id}
-                className={`border rounded-2xl overflow-hidden transition-colors duration-200 ${
-                  isOpen ? 'border-primary/30 shadow-sm shadow-primary/10' : 'border-border'
+                className={`border rounded-xl overflow-hidden transition-colors duration-200 ${
+                  isOpen ? 'border-primary/30 shadow-sm' : 'border-border'
                 }`}
               >
                 {/* Header */}
@@ -568,16 +562,10 @@ const TermsOfService = () => {
             .
           </p>
           <div className="flex flex-col sm:flex-row gap-2 justify-center">
-            <Link
-              to="/privacy"
-              className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors"
-            >
+            <Link to="/privacy" className="btn btn-primary btn-sm">
               Xem Chính sách Bảo mật
             </Link>
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
-            >
+            <Link to="/" className="btn btn-outline btn-sm">
               Về trang chủ
             </Link>
           </div>

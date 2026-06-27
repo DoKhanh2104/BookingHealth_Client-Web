@@ -8,7 +8,7 @@ const apiClient = axios.create({
     Accept: 'application/json',
   },
   withCredentials: true, // Nếu BE có xài Cookie thì cứ giữ
-  timeout: 10000,
+  timeout: 30000,
 });
 
 // Thêm token vào Header trước khi gửi request

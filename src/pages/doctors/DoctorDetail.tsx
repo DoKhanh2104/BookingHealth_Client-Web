@@ -2,42 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doctorService } from '../../services/doctorService';
 import type { Doctor, AppointmentSlot } from '../../types';
-
-// Star Icon
-const StarIcon = ({ filled }: { filled: boolean }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill={filled ? '#fbbf24' : 'none'}
-    stroke={filled ? '#fbbf24' : 'currentColor'}
-    className="w-4 h-4"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.8}
-      d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
-    />
-  </svg>
-);
-
-// User Profile Fallback Icon
-const UserIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-    />
-  </svg>
-);
+import {
+  StarIcon,
+  UserIcon,
+  ArrowLeftIcon,
+  ChevronDownIcon,
+  CheckIcon,
+  CheckCircleIcon,
+  MapPinIcon,
+  CalendarIcon,
+} from '../../components/icons';
 
 const DoctorDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -212,22 +186,9 @@ const DoctorDetail: React.FC = () => {
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-foreground/80 hover:text-primary font-bold text-xs bg-background border border-border px-4 py-2.5 rounded-xl transition-all shadow-sm hover:border-primary/20 active:scale-[0.98] w-fit cursor-pointer animate-fadeIn"
+          className="btn btn-outline btn-sm w-fit animate-fadeIn"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.2}
-            stroke="currentColor"
-            className="w-3.5 h-3.5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-            />
-          </svg>
+          <ArrowLeftIcon className="w-4 h-4" />
           Quay lại trang trước
         </button>
 
@@ -236,7 +197,7 @@ const DoctorDetail: React.FC = () => {
           {/* LEFT 2 COLUMNS: Profile Bio & Schedules */}
           <div className="md:col-span-2 space-y-6">
             {/* Doctor Bio Card */}
-            <div className="bg-background border border-border rounded-2xl p-6 flex gap-6 shadow-sm">
+            <div className="card p-6 flex gap-6">
               <div className="w-24 h-24 rounded-full overflow-hidden border border-border bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
                 {doctor.avatar ? (
                   <img
@@ -250,8 +211,9 @@ const DoctorDetail: React.FC = () => {
               </div>
               <div className="space-y-3 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="bg-amber-400 text-amber-950 font-bold px-2 py-0.5 rounded text-[9px]">
-                    ★ Yêu thích
+                  <span className="badge bg-amber-400 text-amber-950 inline-flex items-center gap-1">
+                    <StarIcon filled className="w-3 h-3" />
+                    Yêu thích
                   </span>
                   <h2 className="text-xl font-black text-foreground tracking-tight leading-none">
                     {titlePrefix} {doctor.name}
@@ -259,7 +221,7 @@ const DoctorDetail: React.FC = () => {
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed">{doctor.biography}</p>
                 <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                  <span>📍</span>
+                  <MapPinIcon className="w-4 h-4" />
                   <span>
                     {doctor.clinic?.address.split(',').slice(-2).join(',').trim() || 'Việt Nam'}
                   </span>
@@ -268,31 +230,20 @@ const DoctorDetail: React.FC = () => {
             </div>
 
             {/* Schedule / Time slots Card */}
-            <div className="bg-background border border-border rounded-2xl p-6 space-y-6 shadow-sm">
+            <div className="card p-6 space-y-6">
               <div className="flex items-center gap-3 flex-wrap relative">
                 {/* Custom Date Dropdown */}
                 <div className="relative">
                   <button
                     type="button"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center gap-2 bg-background hover:bg-muted/10 border border-border text-foreground rounded-xl px-3.5 py-2 font-bold text-xs cursor-pointer shadow-sm focus:outline-none transition-all active:scale-[0.98]"
+                    className="btn btn-outline btn-sm"
                   >
-                    <span>📅</span>
+                    <CalendarIcon className="w-4 h-4" />
                     <span>{formatDateLabel(selectedDate)}</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
+                    <ChevronDownIcon
                       className={`w-3 h-3 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                      />
-                    </svg>
+                    />
                   </button>
 
                   {dropdownOpen && (
@@ -302,7 +253,7 @@ const DoctorDetail: React.FC = () => {
                         className="fixed inset-0 z-10 cursor-default"
                         onClick={() => setDropdownOpen(false)}
                       />
-                      <div className="absolute left-0 mt-2 w-56 bg-background border border-border rounded-2xl shadow-xl py-2 z-20 animate-fadeIn min-w-[200px]">
+                      <div className="absolute left-0 mt-2 w-56 bg-background border border-border rounded-xl shadow-xl py-2 z-20 animate-fadeIn min-w-[200px]">
                         {availableDates.map((date) => {
                           const isSelected = date === selectedDate;
                           return (
@@ -318,22 +269,7 @@ const DoctorDetail: React.FC = () => {
                               `}
                             >
                               <span>{formatDateLabel(date)}</span>
-                              {isSelected && (
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={3}
-                                  stroke="currentColor"
-                                  className="w-3 h-3 text-primary"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="m4.5 12.75 6 6 9-13.5"
-                                  />
-                                </svg>
-                              )}
+                              {isSelected && <CheckIcon className="w-3 h-3 text-primary" />}
                             </button>
                           );
                         })}
@@ -369,7 +305,7 @@ const DoctorDetail: React.FC = () => {
                             );
                           }}
                           className={`
-                            py-3 rounded-xl border text-center font-bold transition-all flex flex-col items-center gap-0.5
+                            py-3 rounded-lg border text-center font-bold transition-all flex flex-col items-center gap-0.5
                             ${
                               canBook
                                 ? 'bg-primary/5 text-primary border-primary/20 hover:bg-primary hover:text-primary-foreground hover:border-primary cursor-pointer'
@@ -406,7 +342,7 @@ const DoctorDetail: React.FC = () => {
           </div>
 
           {/* RIGHT COLUMN: Clinic Address & Booking Cost Card */}
-          <div className="bg-background border border-border rounded-2xl p-6 space-y-6 shadow-sm h-fit">
+          <div className="card p-6 space-y-6 h-fit">
             {/* Clinic details */}
             <div className="space-y-2">
               <h3 className="text-[11px] font-black text-muted-foreground uppercase tracking-wider">
@@ -453,7 +389,7 @@ const DoctorDetail: React.FC = () => {
         </div>
 
         {/* Detailed Biography, Specialties & Training Info */}
-        <div className="bg-background border border-border rounded-2xl p-8 space-y-8 shadow-sm">
+        <div className="card p-8 space-y-8">
           <div className="space-y-4">
             <h3 className="text-sm font-black text-foreground border-l-4 border-primary pl-3">
               Thông tin chuyên khoa & Lĩnh vực điều trị
@@ -483,7 +419,7 @@ const DoctorDetail: React.FC = () => {
                 doctor.qualifications.map((qual) => (
                   <div
                     key={qual.id}
-                    className="bg-muted/15 border border-border/80 rounded-xl p-4 flex flex-col justify-between"
+                    className="bg-muted/15 border border-border/80 rounded-lg p-4 flex flex-col justify-between"
                   >
                     <span className="font-bold text-foreground leading-normal">{qual.degree}</span>
                     <span className="text-[10px] text-muted-foreground mt-2">
@@ -501,7 +437,7 @@ const DoctorDetail: React.FC = () => {
         </div>
 
         {/* Patient reviews and comments */}
-        <div className="bg-background border border-border rounded-2xl p-8 space-y-6 shadow-sm">
+        <div className="card p-8 space-y-6">
           <h3 className="text-sm font-black text-foreground border-l-4 border-primary pl-3">
             Phản hồi của bệnh nhân sau khi đi khám
           </h3>
@@ -514,14 +450,15 @@ const DoctorDetail: React.FC = () => {
                     <div className="space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-foreground">{review.patientName}</span>
-                        <span className="text-[9px] bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-2 py-0.5 rounded font-bold">
-                          ✓ Đã khám ngày {review.date}
+                        <span className="badge bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 inline-flex items-center gap-1">
+                          <CheckCircleIcon className="w-3 h-3" />
+                          Đã khám ngày {review.date}
                         </span>
                       </div>
                       {/* Stars */}
                       <div className="flex text-amber-400 gap-0.5">
                         {[...Array(5)].map((_, i) => (
-                          <StarIcon key={i} filled={i < review.rating} />
+                          <StarIcon key={i} filled={i < review.rating} className="w-4 h-4" />
                         ))}
                       </div>
                     </div>

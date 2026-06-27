@@ -1,234 +1,70 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSpecialtiesHooks } from './Specialties.hooks';
+import {
+  SearchIcon,
+  StarIcon,
+  UserIcon,
+  ArrowRightIcon,
+  HeartIcon,
+  EyeIcon,
+  SparklesIcon,
+  StethoscopeIcon,
+  MedicalIcon,
+  BrainIcon,
+  FaceSmileIcon,
+  BoneIcon,
+  EarIcon,
+  ToothIcon,
+  FemaleIcon,
+  AppleIcon,
+  LeafIcon,
+  ActivityIcon,
+  BeakerIcon,
+  DropletIcon,
+  BoltIcon,
+} from '../../components/icons';
 
-/* ─── SVG Icons ─── */
-const SearchIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
-    className="w-4 h-4"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.636Z"
-    />
-  </svg>
-);
+type SpecIconType = React.FC<{ className?: string }>;
 
-const StarIcon = ({ filled = true }: { filled?: boolean }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill={filled ? 'currentColor' : 'none'}
-    stroke="currentColor"
-    strokeWidth={1.5}
-    className="w-3.5 h-3.5 text-amber-400"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
-    />
-  </svg>
-);
+// Map từ khóa (không dấu) → icon. Khớp theo thứ tự: cụ thể trước, chung sau.
+const SPECIALTY_ICON_RULES: { keywords: string[]; icon: SpecIconType }[] = [
+  { keywords: ['tim', 'mach', 'huyet ap'], icon: HeartIcon },
+  { keywords: ['than kinh'], icon: BrainIcon },
+  { keywords: ['tam than', 'tam ly', 'tam benh'], icon: BrainIcon },
+  { keywords: ['nhi', 'tre em'], icon: FaceSmileIcon },
+  { keywords: ['rang', 'nha khoa', 'ham mat'], icon: ToothIcon }, // trước "mat" để "Răng hàm mặt" không thành Mắt
+  { keywords: ['mat', 'nhan khoa', 'thi luc'], icon: EyeIcon },
+  { keywords: ['da lieu', 'tham my'], icon: SparklesIcon },
+  { keywords: ['tai mui hong', 'tai - mui', 'tai mui', 'tmh'], icon: EarIcon },
+  { keywords: ['xuong', 'khop', 'chan thuong', 'chinh hinh', 'co xuong'], icon: BoneIcon },
+  { keywords: ['san', 'phu khoa'], icon: FemaleIcon },
+  { keywords: ['dinh duong'], icon: AppleIcon },
+  { keywords: ['co truyen', 'dong y', 'cham cuu'], icon: LeafIcon },
+  { keywords: ['phuc hoi', 'vat ly tri lieu', 'tri lieu'], icon: ActivityIcon },
+  { keywords: ['xet nghiem', 'can lam sang', 'giai phau benh'], icon: BeakerIcon },
+  {
+    keywords: ['huyet hoc', 'tiet nieu', 'than - tiet nieu', 'than tiet nieu', 'than'],
+    icon: DropletIcon,
+  },
+  { keywords: ['cap cuu', 'hoi suc'], icon: BoltIcon },
+  { keywords: ['ho hap', 'phoi'], icon: StethoscopeIcon },
+  { keywords: ['noi', 'tong quat', 'tieu hoa', 'noi tiet', 'gan'], icon: StethoscopeIcon },
+];
 
-const UserIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-    />
-  </svg>
-);
+// Bỏ dấu tiếng Việt để khớp từ khóa ổn định
+const removeDiacritics = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
 
-// Trả về icon và gradient theo chuyên khoa
-const getSpecialtyMeta = (name: string) => {
-  const n = name.toLowerCase();
-
-  // 1. Răng - Hàm - Mặt
-  if (n.includes('răng') || n.includes('rang') || n.includes('hàm') || n.includes('ham')) {
-    return {
-      icon: '🦷',
-      color: 'from-cyan-500/10 to-blue-500/10 text-cyan-600 border-cyan-500/20 bg-cyan-500/5',
-    };
+// Trả về icon component theo chuyên khoa
+const getSpecialtyIcon = (name: string): SpecIconType => {
+  const n = removeDiacritics(name.toLowerCase());
+  for (const rule of SPECIALTY_ICON_RULES) {
+    if (rule.keywords.some((k) => n.includes(k))) {
+      return rule.icon;
+    }
   }
-
-  // 2. Tim mạch
-  if (n.includes('tim') || n.includes('mạch') || n.includes('mach')) {
-    return {
-      icon: '❤️',
-      color: 'from-red-500/10 to-pink-500/10 text-red-500 border-red-500/20 bg-red-500/5',
-    };
-  }
-
-  // 3. Thần kinh
-  if (
-    n.includes('thần kinh') ||
-    n.includes('than kinh') ||
-    n.includes('não') ||
-    n.includes('nao')
-  ) {
-    return {
-      icon: '🧠',
-      color:
-        'from-purple-500/10 to-indigo-500/10 text-purple-500 border-purple-500/20 bg-purple-500/5',
-    };
-  }
-
-  // 4. Nhi khoa
-  if (n.includes('nhi')) {
-    return {
-      icon: '👶',
-      color: 'from-amber-500/10 to-yellow-500/10 text-amber-500 border-amber-500/20 bg-amber-500/5',
-    };
-  }
-
-  // 5. Sản phụ khoa
-  if (n.includes('sản') || n.includes('san') || n.includes('phụ') || n.includes('phu')) {
-    return {
-      icon: '🤰',
-      color: 'from-pink-500/10 to-rose-500/10 text-pink-500 border-pink-500/20 bg-pink-500/5',
-    };
-  }
-
-  // 6. Tai Mũi Họng
-  if (
-    n.includes('tai') ||
-    n.includes('mũi') ||
-    n.includes('mui') ||
-    n.includes('họng') ||
-    n.includes('hong')
-  ) {
-    return {
-      icon: '👂',
-      color: 'from-rose-500/10 to-pink-500/10 text-rose-500 border-rose-500/20 bg-rose-500/5',
-    };
-  }
-
-  // 7. Mắt (Nhãn khoa)
-  if (n.includes('mắt') || n.includes('mat')) {
-    return {
-      icon: '👁️',
-      color: 'from-blue-500/10 to-cyan-500/10 text-blue-500 border-blue-500/20 bg-blue-500/5',
-    };
-  }
-
-  // 8. Da liễu
-  if (n.includes('da liễu') || n.includes('da lieu')) {
-    return {
-      icon: '✨',
-      color:
-        'from-emerald-500/10 to-green-500/10 text-emerald-500 border-emerald-500/20 bg-emerald-500/5',
-    };
-  }
-
-  // 9. Cơ xương khớp
-  if (n.includes('xương') || n.includes('xuong') || n.includes('khớp') || n.includes('khop')) {
-    return {
-      icon: '🦴',
-      color:
-        'from-orange-500/10 to-amber-500/10 text-orange-500 border-orange-500/20 bg-orange-500/5',
-    };
-  }
-
-  // 10. Tiêu hóa
-  if (
-    n.includes('tiêu hóa') ||
-    n.includes('tieu hoa') ||
-    n.includes('dạ dày') ||
-    n.includes('da day')
-  ) {
-    return {
-      icon: '🥗',
-      color:
-        'from-green-500/10 to-emerald-500/10 text-green-600 border-green-500/20 bg-green-500/5',
-    };
-  }
-
-  // 11. Tâm thần
-  if (
-    n.includes('tâm thần') ||
-    n.includes('tam than') ||
-    n.includes('tâm lý') ||
-    n.includes('tam ly')
-  ) {
-    return {
-      icon: '💭',
-      color:
-        'from-indigo-500/10 to-purple-500/10 text-indigo-500 border-indigo-500/20 bg-indigo-500/5',
-    };
-  }
-
-  // 12. Chấn thương chỉnh hình
-  if (
-    n.includes('chấn thương') ||
-    n.includes('chan thuong') ||
-    n.includes('chỉnh hình') ||
-    n.includes('chinh hinh')
-  ) {
-    return {
-      icon: '🩹',
-      color: 'from-amber-600/10 to-red-500/10 text-amber-600 border-amber-500/20 bg-amber-500/5',
-    };
-  }
-
-  // 13. Y học cổ truyền
-  if (
-    n.includes('cổ truyền') ||
-    n.includes('co truyen') ||
-    n.includes('đông y') ||
-    n.includes('dong y')
-  ) {
-    return {
-      icon: '🌿',
-      color:
-        'from-emerald-600/10 to-teal-600/10 text-emerald-700 border-emerald-600/20 bg-emerald-600/5',
-    };
-  }
-
-  // 14. Phục hồi chức năng
-  if (
-    n.includes('phục hồi') ||
-    n.includes('phuc hoi') ||
-    n.includes('chức năng') ||
-    n.includes('chuc nang')
-  ) {
-    return {
-      icon: '🚶',
-      color: 'from-lime-500/10 to-emerald-500/10 text-lime-600 border-lime-500/20 bg-lime-500/5',
-    };
-  }
-
-  // 15. Nội tổng quát
-  if (
-    n.includes('nội') ||
-    n.includes('noi') ||
-    n.includes('tổng quát') ||
-    n.includes('tong quat')
-  ) {
-    return {
-      icon: '🩺',
-      color: 'from-teal-500/10 to-emerald-500/10 text-teal-500 border-teal-500/20 bg-teal-500/5',
-    };
-  }
-
-  return {
-    icon: '🏥',
-    color: 'from-primary/10 to-secondary/10 text-primary border-primary/20 bg-primary/5',
-  };
+  // Không khớp → icon y tế chung
+  return MedicalIcon;
 };
 
 const Specialties: React.FC = () => {
@@ -250,12 +86,8 @@ const Specialties: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Background glow effects */}
-      <div className="absolute top-10 left-10 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Page Header */}
         <div className="mb-10 text-center md:text-left">
           <h1 className="text-3xl font-black text-foreground tracking-tight">Chuyên Khoa Y Học</h1>
@@ -270,29 +102,29 @@ const Specialties: React.FC = () => {
           {/* LEFT COLUMN: Specialties List (Sidebar on Desktop, Horizontal Scroll on Mobile) */}
           <div className="lg:col-span-4 space-y-4">
             {/* Search Specialties Box */}
-            <div className="bg-background/80 backdrop-blur border border-border/80 rounded-2xl p-4 shadow-sm space-y-3">
+            <div className="card p-4 space-y-3">
               <span className="text-sm font-bold text-foreground">Tìm kiếm chuyên khoa</span>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60">
-                  <SearchIcon />
+                  <SearchIcon className="w-4 h-4" />
                 </span>
                 <input
                   type="text"
                   placeholder="Ví dụ: Tim mạch, Nhi khoa..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 text-xs text-foreground bg-background rounded-xl border border-border outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15 placeholder:text-muted-foreground/60"
+                  className="input-field pl-9"
                 />
               </div>
             </div>
 
             {/* Specialties Listing */}
-            <div className="bg-background/80 backdrop-blur border border-border/80 rounded-3xl p-5 shadow-sm space-y-4">
+            <div className="card p-5 space-y-4">
               <div className="flex justify-between items-center pb-2 border-b border-border/50">
                 <span className="text-sm font-black text-foreground tracking-wider uppercase">
                   Danh sách chuyên khoa
                 </span>
-                <span className="text-[10px] bg-primary/10 text-primary font-bold px-2 py-0.5 rounded-full">
+                <span className="badge bg-primary/10 text-primary">
                   {allSpecialtiesCount} chuyên khoa
                 </span>
               </div>
@@ -325,23 +157,21 @@ const Specialties: React.FC = () => {
                 <div className="hidden lg:flex flex-col gap-2 max-h-[500px] overflow-y-auto pr-1">
                   {specialties.map((spec) => {
                     const isSelected = selectedSpecialty?.id === spec.id;
-                    const meta = getSpecialtyMeta(spec.specialtyName);
+                    const SpecIcon = getSpecialtyIcon(spec.specialtyName);
                     return (
                       <button
                         key={spec.id}
                         type="button"
                         onClick={() => handleSelectSpecialty(spec)}
-                        className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-left border transition-all duration-300 group cursor-pointer
+                        className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-lg text-left border transition-all duration-300 group cursor-pointer
                           ${
                             isSelected
-                              ? 'bg-primary/10 border-primary/50 text-primary shadow-sm shadow-primary/5'
+                              ? 'bg-primary/10 border-primary/50 text-primary shadow-sm'
                               : 'bg-background border-border hover:border-primary/30 hover:bg-accent/40 text-muted-foreground'
                           }`}
                       >
-                        <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg bg-gradient-to-br border transition-transform group-hover:scale-105 ${meta.color}`}
-                        >
-                          {meta.icon}
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10 text-primary border border-border transition-transform group-hover:scale-105">
+                          <SpecIcon className="w-5 h-5" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p
@@ -350,9 +180,7 @@ const Specialties: React.FC = () => {
                             {spec.specialtyName}
                           </p>
                         </div>
-                        <span className="text-xs transition-transform group-hover:translate-x-0.5 text-muted-foreground/60">
-                          →
-                        </span>
+                        <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5 text-muted-foreground/60" />
                       </button>
                     );
                   })}
@@ -368,20 +196,20 @@ const Specialties: React.FC = () => {
                 <div className="lg:hidden flex gap-2.5 overflow-x-auto pb-2 scrollbar-none snap-x">
                   {specialties.map((spec) => {
                     const isSelected = selectedSpecialty?.id === spec.id;
-                    const meta = getSpecialtyMeta(spec.specialtyName);
+                    const SpecIcon = getSpecialtyIcon(spec.specialtyName);
                     return (
                       <button
                         key={spec.id}
                         type="button"
                         onClick={() => handleSelectSpecialty(spec)}
-                        className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl border snap-start transition-all cursor-pointer
+                        className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg border snap-start transition-all cursor-pointer
                           ${
                             isSelected
                               ? 'bg-primary/15 border-primary text-primary font-bold shadow-sm'
                               : 'bg-background border-border text-muted-foreground'
                           }`}
                       >
-                        <span className="text-sm">{meta.icon}</span>
+                        <SpecIcon className="w-4 h-4" />
                         <span className="text-xs">{spec.specialtyName}</span>
                       </button>
                     );
@@ -396,14 +224,16 @@ const Specialties: React.FC = () => {
             {selectedSpecialty ? (
               <div className="space-y-6">
                 {/* Selected Specialty Banner Card */}
-                <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-secondary/10 border border-primary/15 rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden animate-fadeIn">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+                <div className="card p-6 sm:p-8 animate-fadeIn">
                   <div className="flex flex-col sm:flex-row items-start gap-4">
-                    <div
-                      className={`w-14 h-14 rounded-xl flex items-center justify-center text-xl bg-background border shadow-inner ${getSpecialtyMeta(selectedSpecialty.specialtyName).color}`}
-                    >
-                      {getSpecialtyMeta(selectedSpecialty.specialtyName).icon}
-                    </div>
+                    {(() => {
+                      const BannerIcon = getSpecialtyIcon(selectedSpecialty.specialtyName);
+                      return (
+                        <div className="w-14 h-14 rounded-lg flex items-center justify-center bg-primary/10 text-primary border border-border">
+                          <BannerIcon className="w-6 h-6" />
+                        </div>
+                      );
+                    })()}
                     <div className="space-y-2 flex-1 min-w-0">
                       <h2 className="text-xl font-black text-foreground leading-tight">
                         Chuyên khoa {selectedSpecialty.specialtyName}
@@ -458,13 +288,13 @@ const Specialties: React.FC = () => {
                       return (
                         <div
                           key={doc.id}
-                          className="bg-background/80 backdrop-blur border border-border/80 rounded-3xl p-5 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 flex flex-col justify-between group"
+                          className="card card-hover p-5 flex flex-col justify-between group"
                         >
                           <div className="space-y-4">
                             {/* Doctor Header Profile */}
                             <div className="flex items-start gap-3.5">
                               {/* Avatar wrapper */}
-                              <div className="w-16 h-16 rounded-2xl overflow-hidden bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 shadow-inner border border-border">
+                              <div className="w-16 h-16 rounded-lg overflow-hidden bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 border border-border">
                                 {doc.avatar ? (
                                   <img
                                     src={doc.avatar}
@@ -485,7 +315,11 @@ const Specialties: React.FC = () => {
                                 <div className="flex items-center gap-1 mt-1.5">
                                   <div className="flex gap-0.5">
                                     {[...Array(5)].map((_, i) => (
-                                      <StarIcon key={i} filled={i < Math.floor(rating)} />
+                                      <StarIcon
+                                        key={i}
+                                        filled={i < Math.floor(rating)}
+                                        className="w-3.5 h-3.5 text-amber-400"
+                                      />
                                     ))}
                                   </div>
                                   <span className="text-xs font-bold text-foreground ml-1">
@@ -527,19 +361,12 @@ const Specialties: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Action Buttons */}
-                          <div className="grid grid-cols-2 gap-3 pt-4 mt-2">
-                            <button
-                              type="button"
-                              onClick={() => navigate(`/doctors/${doc.id}`)}
-                              className="py-3 bg-accent text-accent-foreground text-xs font-bold rounded-xl hover:bg-accent/80 transition-colors cursor-pointer text-center"
-                            >
-                              Xem thông tin
-                            </button>
+                          {/* Action Button → trang chi tiết bác sĩ (chọn khung giờ mới yêu cầu đăng nhập) */}
+                          <div className="pt-4 mt-2">
                             <button
                               type="button"
                               onClick={() => handleBook(doc.id)}
-                              className="py-3 bg-primary text-primary-foreground text-xs font-bold rounded-xl hover:bg-primary-hover transition-colors shadow-sm cursor-pointer active:scale-[0.98] text-center"
+                              className="btn btn-primary btn-md btn-block"
                             >
                               Đặt lịch ngay
                             </button>
@@ -549,8 +376,10 @@ const Specialties: React.FC = () => {
                     })}
                   </div>
                 ) : (
-                  <div className="bg-background/80 backdrop-blur border border-border/80 rounded-3xl p-16 text-center text-xs text-muted-foreground leading-relaxed animate-fadeIn">
-                    <span className="text-4xl block mb-3">👨‍⚕️</span>
+                  <div className="card p-16 text-center text-xs text-muted-foreground leading-relaxed animate-fadeIn">
+                    <span className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3">
+                      <UserIcon className="w-6 h-6" />
+                    </span>
                     Hiện tại chưa có bác sĩ nào đăng ký thuộc chuyên khoa này.
                     <br />
                     Vui lòng chọn chuyên khoa khác hoặc quay lại sau.
@@ -559,9 +388,9 @@ const Specialties: React.FC = () => {
               </div>
             ) : (
               /* PLACEHOLDER State when no specialty is selected yet */
-              <div className="bg-background/80 backdrop-blur border border-border/80 rounded-3xl p-16 text-center text-xs text-muted-foreground leading-relaxed shadow-inner py-24 flex flex-col items-center justify-center gap-3 animate-fadeIn">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-3xl mb-1 text-primary shadow-sm">
-                  🩺
+              <div className="card p-16 text-center text-xs text-muted-foreground leading-relaxed py-24 flex flex-col items-center justify-center gap-3 animate-fadeIn">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-1 text-primary">
+                  <StethoscopeIcon className="w-7 h-7" />
                 </div>
                 <h3 className="text-sm font-black text-foreground">
                   Vui lòng chọn một Chuyên khoa

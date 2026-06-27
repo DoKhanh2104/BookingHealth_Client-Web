@@ -3,6 +3,8 @@ import { toast } from 'sonner';
 import { userService } from '../../services/userService';
 import { doctorService } from '../../services/doctorService';
 import { uploadService } from '../../services/uploadService';
+import DatePicker from '../../components/DatePicker';
+import { todayYMD } from '../../utils/date';
 
 interface Qualification {
   id: number;
@@ -129,7 +131,7 @@ const DoctorProfile: React.FC = () => {
     <div className="grid md:grid-cols-3 gap-6 text-xs">
       {/* General info updates */}
       <div className="md:col-span-2 space-y-6">
-        <div className="bg-background border border-border rounded-2xl p-6 space-y-4 shadow-sm">
+        <div className="card p-6 space-y-4 shadow-sm">
           <h3 className="font-extrabold text-foreground text-sm">Hồ sơ thông tin chuyên khoa</h3>
 
           <form onSubmit={handleUpdateProfile} className="space-y-4">
@@ -142,7 +144,7 @@ const DoctorProfile: React.FC = () => {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary text-xs leading-relaxed"
+                className="input-field leading-relaxed"
               />
             </div>
 
@@ -156,7 +158,7 @@ const DoctorProfile: React.FC = () => {
                   type="number"
                   value={experienceYears}
                   disabled
-                  className="w-full px-3 py-2 border border-border rounded-xl bg-muted/50 text-muted-foreground focus:outline-none text-xs"
+                  className="input-field bg-muted/50 text-muted-foreground"
                 />
               </div>
               <div className="space-y-1.5">
@@ -167,7 +169,7 @@ const DoctorProfile: React.FC = () => {
                   type="text"
                   value={licenseNumber}
                   disabled
-                  className="w-full px-3 py-2 border border-border rounded-xl bg-muted/50 text-muted-foreground focus:outline-none text-xs"
+                  className="input-field bg-muted/50 text-muted-foreground"
                 />
               </div>
             </div>
@@ -179,21 +181,18 @@ const DoctorProfile: React.FC = () => {
                 type="text"
                 value={clinicName}
                 disabled
-                className="w-full px-3 py-2 border border-border rounded-xl bg-muted/50 text-muted-foreground focus:outline-none text-xs"
+                className="input-field bg-muted/50 text-muted-foreground"
               />
             </div>
 
-            <button
-              type="submit"
-              className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-primary-foreground font-bold rounded-xl shadow-md shadow-primary/25 cursor-pointer"
-            >
+            <button type="submit" className="btn btn-primary btn-md">
               Cập nhật thông tin
             </button>
           </form>
         </div>
 
         {/* Credentials / Qualifications list */}
-        <div className="bg-background border border-border rounded-2xl p-6 space-y-4 shadow-sm">
+        <div className="card p-6 space-y-4 shadow-sm">
           <h3 className="font-extrabold text-foreground text-sm">
             Văn bằng & Chứng chỉ chuyên khoa
           </h3>
@@ -221,17 +220,17 @@ const DoctorProfile: React.FC = () => {
                 </div>
                 <div>
                   {qual.status === 1 && (
-                    <span className="text-[9px] bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                    <span className="badge bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 whitespace-nowrap">
                       Đã duyệt
                     </span>
                   )}
                   {qual.status === 0 && (
-                    <span className="text-[9px] bg-amber-500/10 text-amber-600 border border-amber-500/20 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                    <span className="badge bg-amber-500/10 text-amber-600 border border-amber-500/20 whitespace-nowrap">
                       Chờ duyệt
                     </span>
                   )}
                   {qual.status === 2 && (
-                    <span className="text-[9px] bg-red-500/10 text-red-600 border border-red-500/20 px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
+                    <span className="badge bg-red-500/10 text-red-600 border border-red-500/20 whitespace-nowrap">
                       Từ chối
                     </span>
                   )}
@@ -243,7 +242,7 @@ const DoctorProfile: React.FC = () => {
       </div>
 
       {/* Add Qualification column */}
-      <div className="bg-background border border-border rounded-2xl p-6 space-y-4 shadow-sm h-fit">
+      <div className="card p-6 space-y-4 shadow-sm h-fit">
         <h3 className="font-extrabold text-foreground text-sm">Thêm văn bằng mới</h3>
         <p className="text-[10px] text-muted-foreground leading-normal">
           Hãy bổ sung bằng cấp, học vị hoặc chứng chỉ đào tạo y khoa mới nhất. Quản trị viên hệ
@@ -259,25 +258,20 @@ const DoctorProfile: React.FC = () => {
               value={newDegreeName}
               onChange={(e) => setNewDegreeName(e.target.value)}
               placeholder="e.g. Chứng chỉ Siêu âm Tổng quát"
-              className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary text-xs"
+              className="input-field"
             />
           </div>
 
           {/* Date of issue */}
           <div className="space-y-1.5">
             <label className="block font-bold text-foreground">Ngày cấp chứng chỉ</label>
-            <input
-              type="date"
-              value={newIssueDate}
-              onChange={(e) => setNewIssueDate(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary text-xs"
-            />
+            <DatePicker value={newIssueDate} onChange={setNewIssueDate} max={todayYMD()} />
           </div>
 
           {/* Attachment upload */}
           <div className="space-y-1.5">
             <label className="block font-bold text-foreground">Bản sao (PDF/Ảnh) chứng chỉ</label>
-            <label className="flex items-center justify-center px-4 py-2 bg-muted/50 border border-border rounded-xl cursor-pointer hover:bg-muted text-foreground transition-colors font-semibold text-xs min-w-[120px]">
+            <label className="btn btn-outline btn-md btn-block">
               {uploadingFile ? (
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -306,10 +300,7 @@ const DoctorProfile: React.FC = () => {
             )}
           </div>
 
-          <button
-            type="submit"
-            className="w-full py-2.5 bg-primary hover:bg-primary-hover text-primary-foreground font-bold rounded-xl shadow-md shadow-primary/25 transition-all text-xs cursor-pointer"
-          >
+          <button type="submit" className="btn btn-primary btn-md btn-block">
             Đăng ký thêm văn bằng
           </button>
         </form>

@@ -2,32 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { userService, type UpdateProfileRequest } from '../../services/userService';
 import type { User } from '../../types';
+import { UserIcon, PencilIcon, CheckIcon } from '../../components/icons';
 
-/* ─── SVG Icons ─── */
-const UserCircleIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-    />
-  </svg>
-);
-
-const CameraIcon = () => (
+/* ─── SVG Icons cục bộ ─── */
+const CameraIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.8}
     stroke="currentColor"
-    className="w-5 h-5"
+    className={className}
   >
     <path
       strokeLinecap="round"
@@ -39,36 +24,6 @@ const CameraIcon = () => (
       strokeLinejoin="round"
       d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
     />
-  </svg>
-);
-
-const PencilIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-4 h-4"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-    />
-  </svg>
-);
-
-const CheckIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2.5}
-    stroke="currentColor"
-    className="w-4 h-4"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
   </svg>
 );
 
@@ -119,16 +74,11 @@ const InputField: React.FC<InputFieldProps> = ({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
-        className={`w-full rounded-xl border px-4 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200
-          placeholder:text-muted-foreground/60
-          ${rightSlot ? 'pr-12' : ''}
-          ${
-            disabled
-              ? 'border-border bg-accent/40 text-muted-foreground cursor-not-allowed'
-              : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/15'
-          }`}
+        className={`input-field ${rightSlot ? 'pr-12' : ''} ${
+          disabled ? 'bg-accent/40 text-muted-foreground cursor-not-allowed' : ''
+        }`}
       />
-      {rightSlot && <div className="absolute right-3.5 top-1/2 -translate-y-1/2">{rightSlot}</div>}
+      {rightSlot && <div className="absolute right-3 top-1/2 -translate-y-1/2">{rightSlot}</div>}
     </div>
     {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
   </div>
@@ -268,7 +218,7 @@ const Profile: React.FC = () => {
         {/* ── Left: Avatar card ── */}
         <div className="space-y-5">
           {/* Avatar */}
-          <div className="bg-background border border-border rounded-2xl p-6 flex flex-col items-center gap-4 shadow-sm">
+          <div className="card p-6 flex flex-col items-center gap-4 shadow-sm">
             <div className="relative group">
               <div className="w-28 h-28 rounded-full overflow-hidden ring-4 ring-primary/20 bg-primary/10 flex items-center justify-center">
                 {avatarPreview ? (
@@ -279,9 +229,7 @@ const Profile: React.FC = () => {
                     onError={() => setAvatarPreview(null)}
                   />
                 ) : (
-                  <div className="text-primary w-14 h-14">
-                    <UserCircleIcon />
-                  </div>
+                  <UserIcon className="w-14 h-14 text-primary" />
                 )}
                 {uploadingAvatar && (
                   <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
@@ -294,10 +242,10 @@ const Profile: React.FC = () => {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingAvatar}
-                className="absolute bottom-0 right-0 w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary-hover transition-colors cursor-pointer disabled:opacity-60"
+                className="absolute bottom-0 right-0 w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center shadow-sm hover:bg-primary-hover transition-colors cursor-pointer disabled:opacity-60"
                 title="Thay ảnh đại diện"
               >
-                <CameraIcon />
+                <CameraIcon className="w-5 h-5" />
               </button>
               <input
                 ref={fileInputRef}
@@ -313,23 +261,23 @@ const Profile: React.FC = () => {
               <p className="text-sm text-muted-foreground">
                 {profile?.email ?? profile?.phone ?? '—'}
               </p>
-              <span className="mt-2 inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 text-xs font-semibold px-2.5 py-1 rounded-full">
-                <CheckIcon /> Tài khoản hoạt động
+              <span className="badge mt-2 bg-emerald-50 text-emerald-600">
+                <CheckIcon className="w-4 h-4" /> Tài khoản hoạt động
               </span>
             </div>
 
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingAvatar}
-              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-primary border border-primary/30 rounded-xl hover:bg-primary/5 transition-colors cursor-pointer disabled:opacity-60"
+              className="btn btn-outline btn-md btn-block text-primary border-primary/30 hover:bg-primary/5"
             >
-              <CameraIcon />
+              <CameraIcon className="w-5 h-5" />
               {uploadingAvatar ? 'Đang tải...' : 'Thay ảnh đại diện'}
             </button>
           </div>
 
           {/* Account info summary */}
-          <div className="bg-background border border-border rounded-2xl p-5 space-y-3 shadow-sm">
+          <div className="card p-5 space-y-3 shadow-sm">
             <h3 className="text-sm font-semibold text-foreground">Thông tin tài khoản</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -345,11 +293,11 @@ const Profile: React.FC = () => {
         </div>
 
         {/* ── Right: Personal Info Form ── */}
-        <div className="bg-background border border-border rounded-2xl shadow-sm overflow-hidden">
+        <div className="card shadow-sm overflow-hidden">
           {/* Section Header */}
           <div className="border-b border-border px-6 py-4 bg-accent/10">
             <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <PencilIcon /> Thông tin cá nhân
+              <PencilIcon className="w-4 h-4" /> Thông tin cá nhân
             </h2>
           </div>
 
@@ -392,9 +340,7 @@ const Profile: React.FC = () => {
                 id="save-info-btn"
                 type="submit"
                 disabled={savingInfo}
-                className="flex items-center gap-2 px-6 py-3 text-sm font-bold text-primary-foreground bg-primary rounded-xl
-                  shadow-[0_4px_15px_rgba(26,113,180,0.3)] hover:bg-primary-hover hover:shadow-[0_6px_20px_rgba(26,113,180,0.4)]
-                  transition-all duration-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                className="btn btn-primary btn-lg"
               >
                 {savingInfo ? (
                   <>
@@ -402,7 +348,7 @@ const Profile: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <CheckIcon /> Lưu thay đổi
+                    <CheckIcon className="w-4 h-4" /> Lưu thay đổi
                   </>
                 )}
               </button>

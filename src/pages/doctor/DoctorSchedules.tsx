@@ -3,6 +3,9 @@ import { toast } from 'sonner';
 import { doctorService } from '../../services/doctorService';
 import { userService } from '../../services/userService';
 import type { AppointmentSlot } from '../../types';
+import { AlertTriangleIcon, LockIcon } from '../../components/icons';
+import DatePicker from '../../components/DatePicker';
+import { todayYMD } from '../../utils/date';
 
 const DoctorSchedules: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>(() => {
@@ -155,7 +158,7 @@ const DoctorSchedules: React.FC = () => {
       {/* Left 2 Columns: Schedule Config */}
       <div className="md:col-span-2 space-y-6">
         {/* Date selection card */}
-        <div className="bg-background border border-border rounded-2xl p-6 space-y-4 shadow-sm">
+        <div className="card p-6 space-y-4 shadow-sm">
           <h3 className="font-extrabold text-foreground text-sm">Cấu hình ca khám theo ngày</h3>
           <div className="flex flex-wrap gap-2">
             {availableDates.map((date) => (
@@ -167,14 +170,7 @@ const DoctorSchedules: React.FC = () => {
                     setSelectedDate(date);
                   }
                 }}
-                className={`
-                  px-4 py-2.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer
-                  ${
-                    selectedDate === date
-                      ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                      : 'bg-background text-muted-foreground border-border hover:bg-accent hover:text-foreground'
-                  }
-                `}
+                className={`btn btn-md ${selectedDate === date ? 'btn-primary' : 'btn-outline'}`}
               >
                 {formatDateLabel(date)}
               </button>
@@ -183,7 +179,7 @@ const DoctorSchedules: React.FC = () => {
         </div>
 
         {/* Time slots toggles grid */}
-        <div className="bg-background border border-border rounded-2xl p-6 space-y-6 shadow-sm">
+        <div className="card p-6 space-y-6 shadow-sm">
           <div>
             <h3 className="font-extrabold text-foreground text-sm">
               Danh sách khung giờ khám ({formatDateLabel(selectedDate)})
@@ -208,7 +204,7 @@ const DoctorSchedules: React.FC = () => {
                     onClick={() => handleToggleSlot(slot.id, slot.startTime, slot.endTime)}
                     disabled={slot.booked}
                     className={`
-                      p-4 rounded-xl border text-center transition-all relative flex flex-col items-center justify-center gap-1.5
+                      p-4 rounded-lg border text-center transition-colors relative flex flex-col items-center justify-center gap-1.5
                       ${
                         slot.booked
                           ? 'bg-rose-500/10 border-rose-500/20 text-rose-600 cursor-not-allowed opacity-95'
@@ -219,23 +215,36 @@ const DoctorSchedules: React.FC = () => {
                     `}
                   >
                     <span className="font-bold text-xs">{label}</span>
-                    <span className="text-[9px] font-semibold">
-                      {slot.booked ? '🔒 Đã có lịch' : isOpen ? '🟢 Đang mở' : '⚪ Đang đóng'}
+                    <span className="text-[9px] font-semibold flex items-center gap-1">
+                      {slot.booked ? (
+                        <>
+                          <LockIcon className="w-3 h-3" /> Đã có lịch
+                        </>
+                      ) : isOpen ? (
+                        <>
+                          <span className="w-2 h-2 rounded-full bg-green-500" /> Đang mở
+                        </>
+                      ) : (
+                        <>
+                          <span className="w-2 h-2 rounded-full bg-gray-400" /> Đang đóng
+                        </>
+                      )}
                     </span>
                   </button>
                 );
               })}
             </div>
           ) : (
-            <div className="py-12 text-center text-muted-foreground bg-muted/5 rounded-2xl border border-dashed border-border/80">
-              ⚠️ Không tìm thấy lịch trực hoặc ca khám được phân công cho ngày này.
+            <div className="py-12 flex items-center justify-center gap-2 text-center text-muted-foreground bg-muted/5 rounded-xl border border-dashed border-border/80">
+              <AlertTriangleIcon className="w-4 h-4 flex-shrink-0" />
+              Không tìm thấy lịch trực hoặc ca khám được phân công cho ngày này.
             </div>
           )}
         </div>
       </div>
 
       {/* Right Column: Day Off/Leave Registration */}
-      <div className="bg-background border border-border rounded-2xl p-6 space-y-4 shadow-sm h-fit">
+      <div className="card p-6 space-y-4 shadow-sm h-fit">
         <h3 className="font-extrabold text-foreground text-sm">Đăng ký ngày nghỉ phép</h3>
         <p className="text-[10px] text-muted-foreground leading-normal">
           Đăng ký kỳ nghỉ phép giúp hệ thống tự động khóa các khung giờ khám và thông báo tới các
@@ -246,22 +255,16 @@ const DoctorSchedules: React.FC = () => {
           {/* Start Date */}
           <div className="space-y-1.5">
             <label className="block font-bold text-foreground">Ngày bắt đầu</label>
-            <input
-              type="date"
-              value={leaveStartDate}
-              onChange={(e) => setLeaveStartDate(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary text-xs"
-            />
+            <DatePicker value={leaveStartDate} onChange={setLeaveStartDate} min={todayYMD()} />
           </div>
 
           {/* End Date */}
           <div className="space-y-1.5">
             <label className="block font-bold text-foreground">Ngày kết thúc</label>
-            <input
-              type="date"
+            <DatePicker
               value={leaveEndDate}
-              onChange={(e) => setLeaveEndDate(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary text-xs"
+              onChange={setLeaveEndDate}
+              min={leaveStartDate || todayYMD()}
             />
           </div>
 
@@ -273,14 +276,11 @@ const DoctorSchedules: React.FC = () => {
               onChange={(e) => setLeaveReason(e.target.value)}
               rows={3}
               placeholder="Nhập lý do nghỉ phép..."
-              className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary text-xs"
+              className="input-field"
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-md shadow-red-500/25 transition-all text-xs cursor-pointer"
-          >
+          <button type="submit" className="btn btn-danger btn-md btn-block">
             Gửi yêu cầu nghỉ phép
           </button>
         </form>

@@ -4,12 +4,14 @@ import { toast } from 'sonner';
 import { authService, type DoctorSignupPayload } from '../../services/authService';
 import { clinicService } from '../../services/clinicService';
 import { specialtyService } from '../../services/specialtyService';
+import { doctorService } from '../../services/doctorService';
 import { TOKEN_KEY } from '../../api/apiClient';
+import { useAuth } from '../../contexts/AuthContext';
 import type { Clinic, Specialty } from '../../types';
 
 export const useRegisterDoctorHooks = () => {
   const navigate = useNavigate();
-
+  const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState<DoctorSignupPayload>({
     name: '',
     phone: '',
@@ -47,6 +49,61 @@ export const useRegisterDoctorHooks = () => {
   const [availableAddresses, setAvailableAddresses] = useState<Clinic[]>([]);
 
   const serverErrorsRef = useRef<Record<string, string>>({});
+
+  // Trạng thái hồ sơ bác sĩ hiện có (khi đã đăng nhập) — để nộp lại nếu bị từ chối
+  const [applicationStatus, setApplicationStatus] = useState<number | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [loadingApplication, setLoadingApplication] = useState(false);
+  const isResubmit = applicationStatus === 2; // 2 = REJECTED
+
+  // Nếu đã đăng nhập: lấy hồ sơ bác sĩ hiện có để hiển thị trạng thái & prefill khi nộp lại
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let active = true;
+
+    const loadApplication = async () => {
+      setLoadingApplication(true);
+      try {
+        const res = await doctorService.getMyApplication();
+        const app = res?.result;
+        if (!active || !app) return;
+
+        setApplicationStatus(app.status);
+
+        if (app.status === 1) {
+          // Đã là bác sĩ → vào kênh bác sĩ
+          navigate('/doctor/dashboard');
+          return;
+        }
+
+        // Prefill cho hồ sơ đang chờ duyệt / bị từ chối
+        setRejectReason(app.rejectReason || '');
+        setFormData((prev) => ({
+          ...prev,
+          name: app.name || '',
+          phone: app.phone || '',
+          email: app.email || '',
+          practiceLicenseNumber: app.practiceLicenseNumber || '',
+          practiceStartDate: app.practiceStartDate || '',
+          biography: app.biography || '',
+        }));
+        if (app.clinicId) setSelectedClinicId(app.clinicId);
+        if (app.clinicName) setSelectedClinicName(app.clinicName);
+        if (app.specialtyIds?.length) setSelectedSpecialtyIds(app.specialtyIds);
+        if (app.practiceLicenseImage) setLicenseImagePreview(app.practiceLicenseImage);
+        if (app.avatar) setAvatarPreview(app.avatar);
+      } catch (err) {
+        console.error('Failed to load my doctor application', err);
+      } finally {
+        if (active) setLoadingApplication(false);
+      }
+    };
+
+    loadApplication();
+    return () => {
+      active = false;
+    };
+  }, [isAuthenticated, navigate]);
 
   // Fetch clinics and specialties on mount
   useEffect(() => {
@@ -257,16 +314,18 @@ export const useRegisterDoctorHooks = () => {
       newErrors.email = 'Email không đúng định dạng';
     }
 
-    if (!formData.password) {
-      newErrors.password = 'Vui lòng nhập mật khẩu';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
-    }
+    if (!isAuthenticated) {
+      if (!formData.password) {
+        newErrors.password = 'Vui lòng nhập mật khẩu';
+      } else if (formData.password.length < 8) {
+        newErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
+      }
 
-    if (!confirmPassword) {
-      newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
-    } else if (confirmPassword !== formData.password) {
-      newErrors.confirmPassword = 'Mật khẩu xác nhận không khớp';
+      if (!confirmPassword) {
+        newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
+      } else if (confirmPassword !== formData.password) {
+        newErrors.confirmPassword = 'Mật khẩu xác nhận không khớp';
+      }
     }
 
     const step1ServerErrors: Record<string, string> = {};
@@ -303,7 +362,8 @@ export const useRegisterDoctorHooks = () => {
       newErrors.specialties = 'Vui lòng chọn ít nhất một chuyên khoa';
     }
 
-    if (!licenseImageFile) {
+    // Khi nộp lại, nếu đã có ảnh chứng chỉ cũ (preview) thì không bắt buộc tải lại
+    if (!licenseImageFile && !(isResubmit && licenseImagePreview)) {
       newErrors.practiceLicenseImage = 'Vui lòng tải lên ảnh chụp chứng chỉ hành nghề';
     }
 
@@ -340,13 +400,15 @@ export const useRegisterDoctorHooks = () => {
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim()))
         step1Errors.email = 'Email không đúng định dạng';
 
-      if (!formData.password) step1Errors.password = 'Vui lòng nhập mật khẩu';
-      else if (formData.password.length < 8)
-        step1Errors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
+      if (!isAuthenticated) {
+        if (!formData.password) step1Errors.password = 'Vui lòng nhập mật khẩu';
+        else if (formData.password.length < 8)
+          step1Errors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
 
-      if (!confirmPassword) step1Errors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
-      else if (confirmPassword !== formData.password)
-        step1Errors.confirmPassword = 'Mật khẩu xác nhận không khớp';
+        if (!confirmPassword) step1Errors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
+        else if (confirmPassword !== formData.password)
+          step1Errors.confirmPassword = 'Mật khẩu xác nhận không khớp';
+      }
 
       const step2Errors: Record<string, string> = {};
       if (!formData.practiceLicenseNumber.trim())
@@ -361,7 +423,7 @@ export const useRegisterDoctorHooks = () => {
       if (!selectedClinicId) step2Errors.clinicId = 'Vui lòng chọn nơi công tác (phòng khám)';
       if (selectedSpecialtyIds.length === 0)
         step2Errors.specialties = 'Vui lòng chọn ít nhất một chuyên khoa';
-      if (!licenseImageFile)
+      if (!licenseImageFile && !(isResubmit && licenseImagePreview))
         step2Errors.practiceLicenseImage = 'Vui lòng tải lên ảnh chụp chứng chỉ hành nghề';
       if (!agreedToTerms) step2Errors.terms = 'Vui lòng đồng ý với điều khoản dịch vụ';
 
@@ -371,7 +433,10 @@ export const useRegisterDoctorHooks = () => {
     return true;
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (
+    e: React.FormEvent,
+    setStep?: React.Dispatch<React.SetStateAction<number>>,
+  ) => {
     e.preventDefault();
     if (!validate()) {
       toast.error('Vui lòng điền đầy đủ và chính xác thông tin yêu cầu!');
@@ -433,6 +498,8 @@ export const useRegisterDoctorHooks = () => {
           const msg = backendMsg || 'Số điện thoại này đã được sử dụng';
           serverErrorsRef.current.phone = msg;
           setErrors((prev) => ({ ...prev, phone: msg }));
+          toast.error('Lỗi ở Bước 1: ' + msg);
+          if (setStep) setStep(1);
           return;
         }
 
@@ -440,6 +507,8 @@ export const useRegisterDoctorHooks = () => {
           const msg = backendMsg || 'Email này đã được sử dụng';
           serverErrorsRef.current.email = msg;
           setErrors((prev) => ({ ...prev, email: msg }));
+          toast.error('Lỗi ở Bước 1: ' + msg);
+          if (setStep) setStep(1);
           return;
         }
 
@@ -497,5 +566,10 @@ export const useRegisterDoctorHooks = () => {
     handleRegister,
     validateStep1,
     validateStep2,
+    isAuthenticated,
+    applicationStatus,
+    rejectReason,
+    isResubmit,
+    loadingApplication,
   };
 };

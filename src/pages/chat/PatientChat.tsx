@@ -4,6 +4,7 @@ import { chatService } from '../../services/chatService';
 import { userService } from '../../services/userService';
 import type { ChatRoom, ChatMessage, User } from '../../types';
 import { toast } from 'sonner';
+import { ArrowLeftIcon, ChatBubbleIcon } from '../../components/icons';
 
 const PatientChat: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -156,11 +157,11 @@ const PatientChat: React.FC = () => {
     <div className="bg-muted/10 min-h-screen py-8 text-sm font-sans">
       <div className="max-w-4xl mx-auto px-4">
         {/* Chat Widget */}
-        <div className="bg-background/95 backdrop-blur-xl border border-border rounded-[2rem] overflow-hidden shadow-2xl shadow-primary/5 flex flex-col h-[calc(100vh-6rem)]">
+        <div className="card overflow-hidden shadow-md flex flex-col h-[calc(100vh-6rem)]">
           {/* Header */}
-          <div className="h-20 border-b border-border/50 flex items-center justify-between px-8 bg-background/50 flex-shrink-0">
+          <div className="h-20 border-b border-border flex items-center justify-between px-8 bg-muted/20 shrink-0">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg shadow-lg shadow-primary/10 flex-shrink-0 border border-primary/20">
+              <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg shrink-0 border border-primary/20">
                 {room.doctorName ? room.doctorName.charAt(0) : 'B'}
               </div>
               <div className="space-y-1">
@@ -168,30 +169,22 @@ const PatientChat: React.FC = () => {
                   {room.doctorName ? `BS. ${room.doctorName}` : 'Bác sĩ phụ trách'}
                 </h4>
                 <p className="text-xs text-emerald-600 font-medium flex items-center gap-1.5">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                  </span>
+                  <span className="inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                   Kênh tư vấn sau khám (Lịch hẹn #{room.appointmentId})
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => navigate('/appointments')}
-              className="px-5 py-2.5 border border-border text-muted-foreground hover:text-foreground hover:border-border/80 font-semibold text-sm rounded-2xl hover:bg-accent/50 cursor-pointer transition-all shadow-sm"
-            >
-              ← Quay lại
+            <button onClick={() => navigate('/appointments')} className="btn btn-outline btn-md">
+              <ArrowLeftIcon className="w-4 h-4" />
+              Quay lại
             </button>
           </div>
 
           {/* Messages Area */}
-          <div
-            ref={chatContainerRef}
-            className="flex-1 overflow-y-auto p-8 space-y-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5"
-          >
+          <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-8 space-y-6 bg-muted/20">
             {messages.length === 0 ? (
-              <div className="text-center py-20 text-muted-foreground space-y-2">
-                <div className="text-2xl">💬</div>
+              <div className="flex flex-col items-center text-center py-20 text-muted-foreground space-y-2">
+                <ChatBubbleIcon className="w-8 h-8" />
                 <p className="font-medium text-xs">Phòng tư vấn trực tuyến đã sẵn sàng.</p>
                 <p className="text-[10px] opacity-75 max-w-xs mx-auto">
                   Hãy gửi lời chào hoặc thắc mắc của bạn về đơn thuốc, tác dụng phụ hoặc chế độ ăn
@@ -202,23 +195,20 @@ const PatientChat: React.FC = () => {
               messages.map((msg) => {
                 const isMe = currentUser && msg.senderId === currentUser.id;
                 return (
-                  <div
-                    key={msg.id}
-                    className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
-                  >
+                  <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                     <div className="flex items-end gap-3 max-w-[75%]">
                       {!isMe && (
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shadow-md shadow-primary/10 flex-shrink-0 mb-1 border border-primary/20">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0 mb-1 border border-primary/20">
                           {msg.senderName ? msg.senderName.charAt(0) : 'B'}
                         </div>
                       )}
                       <div
                         className={`
-                          px-5 py-3.5 rounded-[1.5rem] leading-relaxed text-sm shadow-sm
+                          px-5 py-3.5 rounded-xl leading-relaxed text-sm shadow-sm
                           ${
                             isMe
-                              ? 'bg-primary text-primary-foreground rounded-br-sm shadow-primary/20'
-                              : 'bg-background border border-border text-foreground rounded-bl-sm shadow-foreground/5'
+                              ? 'bg-primary text-primary-foreground rounded-br-sm'
+                              : 'bg-background border border-border text-foreground rounded-bl-sm'
                           }
                         `}
                       >
@@ -242,7 +232,7 @@ const PatientChat: React.FC = () => {
           {/* Footer Input */}
           <form
             onSubmit={handleSendMessage}
-            className="p-5 border-t border-border flex gap-3 flex-shrink-0 bg-background/95 backdrop-blur-md rounded-b-[2rem]"
+            className="p-5 border-t border-border flex gap-3 shrink-0 bg-background"
           >
             <input
               ref={inputRef}
@@ -250,17 +240,15 @@ const PatientChat: React.FC = () => {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Nhập câu hỏi tư vấn bác sĩ..."
-              className="flex-1 px-5 py-3.5 border border-border rounded-2xl bg-muted/30 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm transition-all"
+              className="flex-1 px-5 py-3.5 border border-border rounded-lg bg-muted/30 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 text-sm transition-all"
             />
             <button
               type="submit"
               disabled={!inputText.trim() || sending}
-              className="px-8 py-3.5 bg-primary hover:bg-primary-hover disabled:opacity-50 text-primary-foreground font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all text-sm cursor-pointer flex items-center justify-center min-w-[100px]"
+              className="btn btn-primary btn-lg min-w-25"
             >
               {sending ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                </div>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 'Gửi'
               )}

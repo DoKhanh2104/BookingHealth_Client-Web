@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { appointmentService } from '../../services/appointmentService';
 import { uploadService } from '../../services/uploadService';
 import type { Appointment as ApiAppointment } from '../../types';
+import { XIcon } from '../../components/icons';
 
 interface Appointment {
   id: number;
@@ -17,6 +18,17 @@ interface Appointment {
   attachment?: string;
   fee: number;
 }
+
+/**
+ * Lịch còn "Chờ duyệt" nhưng đã qua giờ khám (hết slot) → coi là quá hạn.
+ * Phòng hờ ở FE; backend cũng tự huỷ các lịch PENDING quá hạn.
+ */
+const isOverduePending = (app: Appointment): boolean => {
+  if (app.status !== 'PENDING' || !app.date) return false;
+  const endPart = app.timeSlot.split('-')[1]?.trim() || '23:59';
+  const dt = new Date(`${app.date}T${endPart}:00`);
+  return !Number.isNaN(dt.getTime()) && dt.getTime() < Date.now();
+};
 
 const DoctorAppointments: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
@@ -192,14 +204,7 @@ const DoctorAppointments: React.FC = () => {
           <button
             key={tab}
             onClick={() => handleTabChange(tab)}
-            className={`
-              px-4 py-2 text-xs font-extrabold rounded-xl border transition-all cursor-pointer
-              ${
-                activeTab === tab
-                  ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                  : 'bg-background text-muted-foreground border-border hover:text-foreground hover:bg-accent'
-              }
-            `}
+            className={`btn btn-sm ${activeTab === tab ? 'btn-primary' : 'btn-outline'}`}
           >
             {tab === 'CONFIRMED' && 'Đã xác nhận'}
             {tab === 'PENDING' && 'Chờ duyệt'}
@@ -211,7 +216,7 @@ const DoctorAppointments: React.FC = () => {
       </div>
 
       {/* Appointment table/list card */}
-      <div className="bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
+      <div className="card overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -235,84 +240,84 @@ const DoctorAppointments: React.FC = () => {
                   </td>
                 </tr>
               ) : filteredAppointments.length > 0 ? (
-                filteredAppointments.map((app) => (
-                  <tr key={app.id} className="hover:bg-muted/10 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-bold text-foreground">{app.patientName}</div>
-                      <div className="text-[10px] text-muted-foreground/80 mt-0.5">{app.phone}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-foreground">{app.timeSlot}</div>
-                      <div className="text-[10px] text-muted-foreground mt-0.5">{app.date}</div>
-                    </td>
-                    <td className="px-6 py-4 max-w-xs truncate text-muted-foreground">
-                      {app.symptoms}
-                    </td>
-                    <td className="px-6 py-4 font-bold text-primary">
-                      {app.fee.toLocaleString('vi-VN')}đ
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`
-                        px-2.5 py-1 rounded-full text-[9px] font-black uppercase border
-                        ${app.status === 'CONFIRMED' && 'bg-blue-500/10 text-blue-600 border-blue-500/20'}
-                        ${app.status === 'PENDING' && 'bg-amber-500/10 text-amber-600 border-amber-500/20'}
+                filteredAppointments.map((app) => {
+                  const overdue = isOverduePending(app);
+                  return (
+                    <tr key={app.id} className="hover:bg-muted/10 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="font-bold text-foreground">{app.patientName}</div>
+                        <div className="text-[10px] text-muted-foreground/80 mt-0.5">
+                          {app.phone}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="font-semibold text-foreground">{app.timeSlot}</div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">{app.date}</div>
+                      </td>
+                      <td className="px-6 py-4 max-w-xs truncate text-muted-foreground">
+                        {app.symptoms}
+                      </td>
+                      <td className="px-6 py-4 font-bold text-primary">
+                        {app.fee.toLocaleString('vi-VN')}đ
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`badge uppercase border
+                        ${overdue && 'bg-slate-500/10 text-slate-600 border-slate-500/20'}
+                        ${!overdue && app.status === 'CONFIRMED' && 'bg-blue-500/10 text-blue-600 border-blue-500/20'}
+                        ${!overdue && app.status === 'PENDING' && 'bg-amber-500/10 text-amber-600 border-amber-500/20'}
                         ${app.status === 'COMPLETED' && 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'}
                         ${app.status === 'CANCELLED' && 'bg-red-500/10 text-red-600 border-red-500/20'}
                       `}
-                      >
-                        {app.status === 'CONFIRMED' && 'Đã duyệt'}
-                        {app.status === 'PENDING' && 'Chờ duyệt'}
-                        {app.status === 'COMPLETED' && 'Đã khám'}
-                        {app.status === 'CANCELLED' && 'Đã hủy'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-1.5">
-                        {app.status === 'PENDING' && (
-                          <>
-                            <button
-                              onClick={() => handleApprove(app.id)}
-                              className="px-2.5 py-1.5 bg-emerald-500 text-white hover:bg-emerald-600 text-[10px] font-bold rounded-lg cursor-pointer"
-                            >
-                              Duyệt
-                            </button>
-                            <button
-                              onClick={() => handleCancel(app.id)}
-                              className="px-2.5 py-1.5 bg-red-500 text-white hover:bg-red-600 text-[10px] font-bold rounded-lg cursor-pointer"
-                            >
-                              Hủy
-                            </button>
-                          </>
-                        )}
-                        {app.status === 'CONFIRMED' && (
-                          <>
+                        >
+                          {overdue && 'Quá hạn'}
+                          {!overdue && app.status === 'CONFIRMED' && 'Đã duyệt'}
+                          {!overdue && app.status === 'PENDING' && 'Chờ duyệt'}
+                          {app.status === 'COMPLETED' && 'Đã khám'}
+                          {app.status === 'CANCELLED' && 'Đã hủy'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-1.5">
+                          {app.status === 'PENDING' && (
+                            <>
+                              {!overdue && (
+                                <button
+                                  onClick={() => handleApprove(app.id)}
+                                  className="btn btn-sm bg-emerald-500 text-white shadow-sm hover:bg-emerald-600"
+                                >
+                                  Duyệt
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleCancel(app.id)}
+                                className="btn btn-danger btn-sm"
+                              >
+                                Hủy
+                              </button>
+                            </>
+                          )}
+                          {app.status === 'CONFIRMED' && (
                             <button
                               onClick={() => handleOpenExam(app)}
-                              className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary-hover text-[10px] font-bold rounded-lg cursor-pointer"
+                              className="btn btn-primary btn-sm"
                             >
                               Khám bệnh
                             </button>
+                          )}
+                          {app.status === 'COMPLETED' && (
                             <button
-                              onClick={() => handleCancel(app.id)}
-                              className="px-2.5 py-1.5 border border-border text-muted-foreground hover:bg-accent text-[10px] font-bold rounded-lg cursor-pointer"
+                              onClick={() => handleOpenExam(app)}
+                              className="btn btn-outline btn-sm border-primary/20 text-primary bg-primary/5 hover:bg-primary/10"
                             >
-                              Hủy lịch
+                              Xem bệnh án
                             </button>
-                          </>
-                        )}
-                        {app.status === 'COMPLETED' && (
-                          <button
-                            onClick={() => handleOpenExam(app)}
-                            className="px-3 py-1.5 border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 text-[10px] font-bold rounded-lg cursor-pointer"
-                          >
-                            Xem bệnh án
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
@@ -335,14 +340,14 @@ const DoctorAppointments: React.FC = () => {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
                 disabled={currentPage === 0 || loading}
-                className="px-3 py-1.5 border border-border text-xs font-bold rounded-lg disabled:opacity-50 hover:bg-accent"
+                className="btn btn-outline btn-sm"
               >
                 Trước
               </button>
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
                 disabled={currentPage === totalPages - 1 || loading}
-                className="px-3 py-1.5 border border-border text-xs font-bold rounded-lg disabled:opacity-50 hover:bg-accent"
+                className="btn btn-outline btn-sm"
               >
                 Sau
               </button>
@@ -354,7 +359,7 @@ const DoctorAppointments: React.FC = () => {
       {/* Examination & Medical Record Modal */}
       {selectedApp && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-background border border-border rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="card w-full max-w-3xl overflow-hidden shadow-lg flex flex-col max-h-[90vh]">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between">
               <div>
                 <h3 className="font-extrabold text-foreground text-sm">
@@ -368,9 +373,10 @@ const DoctorAppointments: React.FC = () => {
               </div>
               <button
                 onClick={() => setSelectedApp(null)}
-                className="text-muted-foreground hover:text-foreground text-xs font-bold border border-border p-1.5 rounded-lg hover:bg-accent cursor-pointer"
+                className="btn btn-outline btn-sm px-2"
+                aria-label="Đóng"
               >
-                Đóng
+                <XIcon className="w-4 h-4" />
               </button>
             </div>
 
@@ -400,7 +406,7 @@ const DoctorAppointments: React.FC = () => {
                   disabled={selectedApp.status === 'COMPLETED'}
                   rows={3}
                   placeholder="Nhập chẩn đoán lâm sàng chi tiết..."
-                  className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary disabled:bg-muted/50 disabled:text-muted-foreground"
+                  className="input-field disabled:bg-muted/50 disabled:text-muted-foreground"
                 />
               </div>
 
@@ -413,7 +419,7 @@ const DoctorAppointments: React.FC = () => {
                   disabled={selectedApp.status === 'COMPLETED'}
                   rows={3}
                   placeholder="Nhập tên thuốc, liều lượng, cách dùng chi tiết..."
-                  className="w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary disabled:bg-muted/50 disabled:text-muted-foreground"
+                  className="input-field disabled:bg-muted/50 disabled:text-muted-foreground"
                 />
               </div>
 
@@ -424,7 +430,7 @@ const DoctorAppointments: React.FC = () => {
                 </label>
                 {selectedApp.status !== 'COMPLETED' ? (
                   <div className="flex items-center gap-3">
-                    <label className="px-4 py-2 bg-muted/50 border border-border rounded-xl cursor-pointer hover:bg-muted text-foreground transition-colors flex items-center justify-center font-semibold text-xs min-w-[120px]">
+                    <label className="btn btn-outline btn-md min-w-30">
                       {uploadingFile ? (
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -457,7 +463,7 @@ const DoctorAppointments: React.FC = () => {
                     href={attachment}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold border border-blue-100 hover:bg-blue-100 transition-colors"
+                    className="btn btn-outline btn-md bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100"
                   >
                     Xem tệp đính kèm đã lưu
                   </a>
@@ -471,14 +477,11 @@ const DoctorAppointments: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setSelectedApp(null)}
-                    className="px-4 py-2 border border-border hover:bg-accent text-muted-foreground font-bold rounded-xl cursor-pointer"
+                    className="btn btn-outline btn-md"
                   >
                     Hủy bỏ
                   </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 bg-primary hover:bg-primary-hover text-primary-foreground font-bold rounded-xl cursor-pointer shadow-md shadow-primary/25"
-                  >
+                  <button type="submit" className="btn btn-primary btn-md">
                     Hoàn tất khám & Lưu
                   </button>
                 </div>

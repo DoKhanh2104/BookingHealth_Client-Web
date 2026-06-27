@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { appointmentService } from '../../services/appointmentService';
 import type { DoctorDashboardResponse } from '../../types';
+import { StarIcon } from '../../components/icons';
 
 const DoctorDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -52,24 +53,28 @@ const DoctorDashboard: React.FC = () => {
       value: String(dashboardData?.todayAppointmentsCount || 0),
       desc: `${dashboardData?.todayPendingCount || 0} chờ khám, ${dashboardData?.todayCompletedCount || 0} đã hoàn thành`,
       color: 'border-blue-500/20 bg-blue-500/5 text-blue-600',
+      showStar: false,
     },
     {
       label: 'Tổng bệnh nhân',
       value: String(dashboardData?.totalPatientsCount || 0),
       desc: 'Thành viên đã tư vấn & điều trị',
-      color: 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600',
+      color: 'border-blue-500/20 bg-blue-500/5 text-blue-600',
+      showStar: false,
     },
     {
       label: 'Đánh giá trung bình',
-      value: `${dashboardData?.averageRating || 5.0} ★`,
+      value: `${dashboardData?.averageRating || 5.0}`,
       desc: `Dựa trên ${dashboardData?.reviewCount || 0} lượt đánh giá thực tế`,
-      color: 'border-amber-500/20 bg-amber-500/5 text-amber-600',
+      color: 'border-blue-500/20 bg-blue-500/5 text-blue-600',
+      showStar: true,
     },
     {
       label: 'Doanh thu tháng này',
       value: formattedRevenue,
       desc: 'Từ các ca đặt lịch trực tuyến',
-      color: 'border-purple-500/20 bg-purple-500/5 text-purple-600',
+      color: 'border-blue-500/20 bg-blue-500/5 text-blue-600',
+      showStar: false,
     },
   ];
 
@@ -87,16 +92,16 @@ const DoctorDashboard: React.FC = () => {
   return (
     <div className="space-y-8 text-xs">
       {/* Welcome banner */}
-      <div className="bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/10 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="card bg-primary/5 border-primary/10 p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-2xl font-black text-foreground">Chào ngày mới, Bác sĩ! 👋</h2>
+          <h2 className="text-2xl font-black text-foreground">Chào ngày mới, Bác sĩ!</h2>
           <p className="text-muted-foreground text-sm mt-1">
             Chúc bác sĩ một ngày làm việc hiệu quả và nhiều niềm vui.
           </p>
         </div>
         <button
           onClick={() => navigate('/doctor/appointments')}
-          className="px-5 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary-hover shadow-lg shadow-primary/25 self-start md:self-auto cursor-pointer"
+          className="btn btn-primary btn-md self-start md:self-auto"
         >
           Xem lịch khám hôm nay
         </button>
@@ -105,13 +110,11 @@ const DoctorDashboard: React.FC = () => {
       {/* Stats grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s, idx) => (
-          <div
-            key={idx}
-            className={`border rounded-2xl p-5 bg-background flex flex-col justify-between ${s.color}`}
-          >
+          <div key={idx} className={`card p-5 flex flex-col justify-between ${s.color}`}>
             <span className="text-xs font-semibold text-muted-foreground">{s.label}</span>
-            <div className="my-3">
+            <div className="my-3 flex items-center gap-1.5">
               <span className="text-3xl font-black tracking-tight text-foreground">{s.value}</span>
+              {s.showStar && <StarIcon filled className="w-6 h-6 text-amber-400" />}
             </div>
             <span className="text-[10px] text-muted-foreground leading-normal">{s.desc}</span>
           </div>
@@ -119,7 +122,7 @@ const DoctorDashboard: React.FC = () => {
       </div>
 
       {/* Today schedule preview */}
-      <div className="bg-background border border-border rounded-2xl overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="px-6 py-4 border-b border-border flex items-center justify-between">
           <h3 className="font-extrabold text-foreground text-sm">Các ca hẹn nổi bật hôm nay</h3>
           <button
@@ -139,7 +142,7 @@ const DoctorDashboard: React.FC = () => {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2.5">
                     <span className="font-bold text-foreground text-sm">{app.patient}</span>
-                    <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-md font-semibold">
+                    <span className="badge bg-primary/10 text-primary border border-primary/20">
                       {app.time}
                     </span>
                   </div>
@@ -148,7 +151,7 @@ const DoctorDashboard: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => navigate('/doctor/appointments')}
-                    className="px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                    className="btn btn-outline btn-sm border-primary/20 text-primary bg-primary/10 hover:bg-primary/20"
                   >
                     Vào ca khám
                   </button>

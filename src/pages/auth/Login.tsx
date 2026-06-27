@@ -1,68 +1,29 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useLoginHooks } from './Login.hooks';
+import {
+  PhoneIcon,
+  LockIcon,
+  EyeIcon,
+  EmailIcon,
+  KeyIcon,
+  ArrowLeftIcon,
+  HeartIcon,
+  BuildingIcon,
+  CalendarIcon,
+  AlertTriangleIcon,
+} from '../../components/icons';
 
-/* ─────────────── SVG Icons (inline, no library dep) ─────────────── */
+/* ─────────────── Local-only icons (not in shared set) ─────────────── */
 
-const PhoneIcon = () => (
+const EyeOffIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.8}
     stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
-    />
-  </svg>
-);
-
-const LockIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-    />
-  </svg>
-);
-
-const EyeIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-    />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-  </svg>
-);
-
-const EyeOffIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
+    className={className}
   >
     <path
       strokeLinecap="round"
@@ -89,70 +50,6 @@ const GoogleIcon = () => (
     <path
       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
       fill="#EA4335"
-    />
-  </svg>
-);
-
-const EmailIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-    />
-  </svg>
-);
-
-const KeyIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 0 1 21.75 8.25Z"
-    />
-  </svg>
-);
-
-const ArrowLeftIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
-    className="w-4 h-4"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-  </svg>
-);
-
-const HeartPulseIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
-    className="w-7 h-7"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
     />
   </svg>
 );
@@ -193,15 +90,12 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex">
       {/* ── Left panel (decorative) ── */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary via-primary-hover to-secondary overflow-hidden flex-col items-center justify-center px-12">
-        {/* Decorative circles */}
-        <div className="absolute top-1/3 right-8 w-40 h-40 bg-secondary/20 rounded-full blur-2xl" />
-
+      <div className="hidden lg:flex lg:w-1/2 relative bg-primary overflow-hidden flex-col items-center justify-center px-12">
         <div className="relative z-10 text-center text-white space-y-8 max-w-sm">
           {/* Logo */}
           <div className="flex items-center justify-center gap-3">
-            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
-              <HeartPulseIcon />
+            <div className="bg-white/20 p-3 rounded-xl">
+              <HeartIcon className="w-7 h-7" />
             </div>
             <span className="text-3xl font-extrabold tracking-tight">BookingHealth</span>
           </div>
@@ -224,15 +118,25 @@ const Login: React.FC = () => {
           {/* Feature pills */}
           <div className="flex flex-col gap-3 text-sm">
             {[
-              '🏥 Hàng nghìn bác sĩ chuyên khoa',
-              '📅 Đặt lịch nhanh chóng, dễ dàng',
-              '🔒 Bảo mật thông tin tuyệt đối',
+              {
+                icon: <BuildingIcon className="w-5 h-5 shrink-0" />,
+                text: 'Hàng nghìn bác sĩ chuyên khoa',
+              },
+              {
+                icon: <CalendarIcon className="w-5 h-5 shrink-0" />,
+                text: 'Đặt lịch nhanh chóng, dễ dàng',
+              },
+              {
+                icon: <LockIcon className="w-5 h-5 shrink-0" />,
+                text: 'Bảo mật thông tin tuyệt đối',
+              },
             ].map((item) => (
               <div
-                key={item}
-                className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2.5"
+                key={item.text}
+                className="flex items-center gap-2 bg-white/10 rounded-xl px-4 py-2.5"
               >
-                <span>{item}</span>
+                {item.icon}
+                <span>{item.text}</span>
               </div>
             ))}
           </div>
@@ -244,15 +148,22 @@ const Login: React.FC = () => {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center justify-center gap-2 mb-8">
-            <div className="bg-primary p-2 rounded-xl text-primary-foreground">
-              <HeartPulseIcon />
+            <div className="bg-primary p-2 rounded-lg text-primary-foreground">
+              <HeartIcon className="w-7 h-7" />
             </div>
             <span className="text-2xl font-extrabold text-foreground">BookingHealth</span>
           </div>
 
-          {/* ════════ LOGIN VIEW ════════ */}
+          {/* LOGIN VIEW */}
           {view === 'login' && (
             <div className="space-y-7 animate-in fade-in duration-300">
+              <Link
+                to="/"
+                className=" flex justify-center items-center gap-1.5 rounded-lg border border-primary px-3 py-1.5 text-sm font-medium text-primary shadow-sm"
+              >
+                <ArrowLeftIcon className="w-4 h-4" />
+                Về trang chủ
+              </Link>
               <div>
                 <h1 className="text-3xl font-extrabold text-foreground">Đăng nhập</h1>
                 <p className="mt-1.5 text-muted-foreground text-sm">
@@ -265,7 +176,7 @@ const Login: React.FC = () => {
                 id="google-login-btn"
                 type="button"
                 onClick={() => loginWithGoogle()}
-                className="w-full flex items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground shadow-sm transition-all duration-200 hover:bg-accent hover:border-primary/30 hover:shadow-md active:scale-[0.98] cursor-pointer"
+                className="btn btn-outline btn-md btn-block"
               >
                 <GoogleIcon />
                 Tiếp tục với Google
@@ -300,17 +211,12 @@ const Login: React.FC = () => {
                       placeholder="0912 345 678"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={`w-full rounded-xl border pl-11 pr-4 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60
-                        ${
-                          errors.phone
-                            ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-                            : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/15'
-                        }`}
+                      className={`input-field pl-11 pr-4 ${errors.phone ? 'border-red-400 focus:border-red-500' : ''}`}
                     />
                   </div>
                   {errors.phone && (
                     <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                      <span>⚠</span> {errors.phone}
+                      <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {errors.phone}
                     </p>
                   )}
                 </div>
@@ -345,12 +251,7 @@ const Login: React.FC = () => {
                       placeholder="••••••••"
                       value={formData.password}
                       onChange={handleChange}
-                      className={`w-full rounded-xl border pl-11 pr-12 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60
-                        ${
-                          errors.password
-                            ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-                            : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/15'
-                        }`}
+                      className={`input-field pl-11 pr-12 ${errors.password ? 'border-red-400 focus:border-red-500' : ''}`}
                     />
                     <button
                       type="button"
@@ -363,7 +264,7 @@ const Login: React.FC = () => {
                   </div>
                   {errors.password && (
                     <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                      <span>⚠</span> {errors.password}
+                      <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {errors.password}
                     </p>
                   )}
                 </div>
@@ -373,7 +274,7 @@ const Login: React.FC = () => {
                   id="login-submit-btn"
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_8px_20px_rgba(26,113,180,0.35)] cursor-pointer"
+                  className="btn btn-primary btn-md btn-block"
                 >
                   {loading ? (
                     <>
@@ -423,7 +324,7 @@ const Login: React.FC = () => {
                 onClick={() => setView('login')}
                 className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
-                <ArrowLeftIcon />
+                <ArrowLeftIcon className="w-4 h-4" />
                 Quay lại đăng nhập
               </button>
 
@@ -456,7 +357,7 @@ const Login: React.FC = () => {
                       placeholder="example@email.com"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
-                      className="w-full rounded-xl border border-border pl-11 pr-4 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/15"
+                      className="input-field pl-11 pr-4"
                     />
                   </div>
                 </div>
@@ -465,7 +366,7 @@ const Login: React.FC = () => {
                   id="forgot-password-submit-btn"
                   type="submit"
                   disabled={forgotLoading}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                  className="btn btn-primary btn-md btn-block"
                 >
                   {forgotLoading ? (
                     <>
@@ -504,7 +405,7 @@ const Login: React.FC = () => {
                 onClick={() => setView('forgotPassword')}
                 className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
-                <ArrowLeftIcon />
+                <ArrowLeftIcon className="w-4 h-4" />
                 Quay lại
               </button>
 
@@ -519,7 +420,7 @@ const Login: React.FC = () => {
 
               {/* Info box */}
               <div className="flex items-start gap-3 bg-primary/8 border border-primary/20 rounded-xl p-4">
-                <span className="text-xl mt-0.5">🔑</span>
+                <KeyIcon className="w-5 h-5 mt-0.5 text-primary shrink-0" />
                 <div className="text-sm">
                   <p className="font-semibold text-foreground">Token có hiệu lực trong 10 phút</p>
                   <p className="text-muted-foreground mt-0.5">
@@ -548,7 +449,7 @@ const Login: React.FC = () => {
                       placeholder="Dán token vào đây..."
                       value={resetToken}
                       onChange={(e) => setResetToken(e.target.value)}
-                      className="w-full rounded-xl border border-border pl-11 pr-4 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/15 font-mono"
+                      className="input-field pl-11 pr-4 font-mono"
                     />
                   </div>
                 </div>
@@ -556,7 +457,7 @@ const Login: React.FC = () => {
                 <button
                   id="token-submit-btn"
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] cursor-pointer"
+                  className="btn btn-primary btn-md btn-block"
                 >
                   Tiếp tục
                 </button>
@@ -574,7 +475,7 @@ const Login: React.FC = () => {
                 onClick={() => setView('tokenInput')}
                 className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
-                <ArrowLeftIcon />
+                <ArrowLeftIcon className="w-4 h-4" />
                 Quay lại
               </button>
 
@@ -606,7 +507,7 @@ const Login: React.FC = () => {
                       placeholder="••••••••"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full rounded-xl border border-border pl-11 pr-12 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/15"
+                      className="input-field pl-11 pr-12"
                     />
                     <button
                       type="button"
@@ -639,12 +540,11 @@ const Login: React.FC = () => {
                       placeholder="••••••••"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className={`w-full rounded-xl border pl-11 pr-12 py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60
-                        ${
-                          confirmPassword && newPassword !== confirmPassword
-                            ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-                            : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/15'
-                        }`}
+                      className={`input-field pl-11 pr-12 ${
+                        confirmPassword && newPassword !== confirmPassword
+                          ? 'border-red-400 focus:border-red-500'
+                          : ''
+                      }`}
                     />
                     <button
                       type="button"
@@ -657,7 +557,8 @@ const Login: React.FC = () => {
                   </div>
                   {confirmPassword && newPassword !== confirmPassword && (
                     <p className="text-xs text-red-500 flex items-center gap-1">
-                      <span>⚠</span> Mật khẩu xác nhận không khớp
+                      <AlertTriangleIcon className="w-4 h-4 shrink-0" /> Mật khẩu xác nhận không
+                      khớp
                     </p>
                   )}
                 </div>
@@ -666,7 +567,7 @@ const Login: React.FC = () => {
                   id="reset-password-submit-btn"
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                  className="btn btn-primary btn-md btn-block"
                 >
                   {resetLoading ? (
                     <>

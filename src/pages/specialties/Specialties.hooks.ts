@@ -1,13 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { specialtyService } from '../../services/specialtyService';
 import { doctorService } from '../../services/doctorService';
 import type { Specialty, Doctor } from '../../types';
 
+// Helper chuyển tiếng Việt không dấu để so sánh/tìm kiếm
+const removeAccents = (str: string): string =>
+  str.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+
 export const useSpecialtiesHooks = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
-  const [selectedSpecialty, setSelectedSpecialty] = useState<Specialty | null>(null);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loadingSpecialties, setLoadingSpecialties] = useState(true);
   const [loadingDoctors, setLoadingDoctors] = useState(false);
@@ -28,74 +31,60 @@ export const useSpecialtiesHooks = () => {
       });
   }, []);
 
-  // Helper chuyển đổi tiếng Việt không dấu để so sánh
-  const removeAccents = (str: string): string => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/đ/g, 'd')
-      .replace(/Đ/g, 'D')
-      .toLowerCase();
-  };
-
-  // 2. Lắng nghe tham số URL (?id hoặc ?name) để tự động chọn chuyên khoa tương ứng
-  useEffect(() => {
-    if (specialties.length === 0) return;
+  // 2. Chuyên khoa đang chọn = SUY RA từ URL (?id / ?name) + danh sách.
+  //    Không dùng state + effect (tránh cascading render & gọi API thừa).
+  const selectedSpecialty = useMemo<Specialty | null>(() => {
+    if (specialties.length === 0) return null;
 
     const idParam = searchParams.get('id');
     const nameParam = searchParams.get('name');
 
-    let matched: Specialty | undefined;
-
     if (idParam) {
-      const id = Number(idParam);
-      matched = specialties.find((s) => s.id === id);
-    } else if (nameParam) {
-      const normalizedQuery = removeAccents(nameParam.trim());
-      matched = specialties.find((s) => removeAccents(s.specialtyName).includes(normalizedQuery));
+      return specialties.find((s) => s.id === Number(idParam)) ?? null;
     }
-
-    if (matched && matched.id !== selectedSpecialty?.id) {
-      Promise.resolve().then(() => {
-        setSelectedSpecialty(matched || null);
-      });
+    if (nameParam) {
+      const q = removeAccents(nameParam.trim());
+      return specialties.find((s) => removeAccents(s.specialtyName).includes(q)) ?? null;
     }
-  }, [specialties, searchParams, selectedSpecialty]);
+    return null;
+  }, [specialties, searchParams]);
 
-  // 3. Tải danh sách bác sĩ khi thay đổi chuyên khoa đã chọn
+  const selectedId = selectedSpecialty?.id ?? null;
+
+  // 3. Tải bác sĩ theo chuyên khoa đang chọn (đồng bộ với API ngoài) — có chống race
   useEffect(() => {
-    if (!selectedSpecialty) {
-      if (doctors.length > 0) {
-        Promise.resolve().then(() => {
-          setDoctors([]);
-        });
-      }
-      return;
-    }
+    if (selectedId == null) return;
 
-    Promise.resolve().then(() => {
+    let cancelled = false;
+
+    const loadDoctors = async () => {
       setLoadingDoctors(true);
-    });
-    doctorService
-      .getAll({ specialtyId: selectedSpecialty.id, size: 100 })
-      .then((res) => {
-        if (res?.result?.content) {
-          setDoctors(res.result.content);
-        } else {
+      try {
+        const res = await doctorService.getAll({ specialtyId: selectedId, size: 100 });
+        if (!cancelled) setDoctors(res?.result?.content ?? []);
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Failed to fetch doctors', err);
           setDoctors([]);
         }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch doctors', err);
-        setDoctors([]);
-      })
-      .finally(() => setLoadingDoctors(false));
-  }, [selectedSpecialty, doctors.length]);
+      } finally {
+        if (!cancelled) setLoadingDoctors(false);
+      }
+    };
 
-  // Chọn chuyên khoa thủ công trên giao diện
+    loadDoctors();
+
+    // Huỷ response cũ nếu đổi chuyên khoa trước khi request hoàn tất
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedId]);
+
+  // Bác sĩ hiển thị: rỗng khi chưa chọn chuyên khoa (suy ra, không setState trong effect)
+  const visibleDoctors = selectedId == null ? [] : doctors;
+
+  // Chọn chuyên khoa thủ công: chỉ cần đổi URL, selectedSpecialty tự suy ra ở render kế
   const handleSelectSpecialty = (specialty: Specialty) => {
-    setSelectedSpecialty(specialty);
-    // Cập nhật URL query param để đồng bộ
     setSearchParams({ id: specialty.id.toString() });
   };
 
@@ -108,7 +97,7 @@ export const useSpecialtiesHooks = () => {
     specialties: filteredSpecialties,
     allSpecialtiesCount: specialties.length,
     selectedSpecialty,
-    doctors,
+    doctors: visibleDoctors,
     loadingSpecialties,
     loadingDoctors,
     searchQuery,

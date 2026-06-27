@@ -2,120 +2,28 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useRegisterHooks } from './Register.hooks';
 import Logo from '../../assets/logo.png';
+import {
+  HeartIcon,
+  UserIcon,
+  PhoneIcon,
+  EmailIcon,
+  LockIcon,
+  EyeIcon,
+  CheckIcon,
+  AlertTriangleIcon,
+  ArrowLeftIcon,
+} from '../../components/icons';
 
-/* ─────────────── SVG Icons ─────────────── */
+/* ─────────────── Local-only icons (not in shared set) ─────────────── */
 
-const HeartIcon = () => (
+const EyeOffIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.8}
     stroke="currentColor"
-    className="w-7 h-7"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-    />
-  </svg>
-);
-
-const UserIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-    />
-  </svg>
-);
-
-const PhoneIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
-    />
-  </svg>
-);
-
-const EmailIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-    />
-  </svg>
-);
-
-const LockIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-    />
-  </svg>
-);
-
-const EyeIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-    />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-  </svg>
-);
-
-const EyeOffIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.8}
-    stroke="currentColor"
-    className="w-5 h-5"
+    className={className}
   >
     <path
       strokeLinecap="round"
@@ -143,19 +51,6 @@ const GoogleIcon = () => (
       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
       fill="#EA4335"
     />
-  </svg>
-);
-
-const CheckIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2.5}
-    stroke="currentColor"
-    className="w-3 h-3"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
   </svg>
 );
 
@@ -207,12 +102,9 @@ const Field = ({
         onChange={onChange}
         autoFocus={autoFocus}
         autoComplete={autoComplete}
-        className={`w-full rounded-xl border pl-11 ${rightElement ? 'pr-12' : 'pr-4'} py-3 text-sm text-foreground bg-background outline-none transition-all duration-200 placeholder:text-muted-foreground/60
-          ${
-            error
-              ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-              : 'border-border focus:border-primary focus:ring-2 focus:ring-primary/15'
-          }`}
+        className={`input-field pl-11 ${rightElement ? 'pr-12' : 'pr-4'} ${
+          error ? 'border-red-400 focus:border-red-500' : ''
+        }`}
       />
       {rightElement && (
         <span className="absolute right-3.5 top-1/2 -translate-y-1/2">{rightElement}</span>
@@ -220,7 +112,7 @@ const Field = ({
     </div>
     {error && (
       <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-        <span>⚠</span> {error}
+        <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {error}
       </p>
     )}
   </div>
@@ -259,17 +151,12 @@ const Register: React.FC = () => {
   return (
     <div className="min-h-screen flex">
       {/* ── Left decorative panel ── */}
-      <div className="hidden lg:flex lg:w-[50%] relative bg-gradient-to-br from-primary via-primary-hover to-secondary overflow-hidden flex-col items-center justify-center px-12">
-        {/* Blobs */}
-
-        <div className="absolute top-1/4 right-8 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 left-8 w-32 h-32 bg-secondary/20 rounded-full blur-2xl" />
-
+      <div className="hidden lg:flex lg:w-[50%] relative bg-primary overflow-hidden flex-col items-center justify-center px-12">
         <div className="relative z-10 text-center text-white space-y-8 max-w-sm">
           {/* Logo */}
           <div className="flex items-center justify-center gap-3">
-            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
-              <HeartIcon />
+            <div className="bg-white/20 p-3 rounded-xl">
+              <HeartIcon className="w-7 h-7" />
             </div>
             <span className="text-3xl font-extrabold tracking-tight">BookingHealth</span>
           </div>
@@ -298,21 +185,15 @@ const Register: React.FC = () => {
             ].map((item) => (
               <div
                 key={item.step}
-                className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3"
+                className="flex items-center gap-3 bg-white/10 rounded-xl px-4 py-3"
               >
-                <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-extrabold flex-shrink-0">
+                <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-extrabold shrink-0">
                   {item.step}
                 </span>
                 <span>{item.text}</span>
               </div>
             ))}
           </div>
-
-          {/* Trust badge */}
-          {/* <div className="flex items-center justify-center gap-6 text-white/60 text-xs">
-            <span className="flex items-center gap-1.5">🔒 Bảo mật SSL</span>
-            <span className="flex items-center gap-1.5">✅ Hoàn toàn miễn phí</span>
-          </div> */}
         </div>
       </div>
 
@@ -321,13 +202,20 @@ const Register: React.FC = () => {
         <div className="w-full max-w-lg">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center justify-center gap-2 mb-8">
-            <div className="bg-primary p-2 rounded-xl">
+            <div className="bg-primary p-2 rounded-lg">
               <img src={Logo} alt="BookingHealth" className="w-7 h-7 object-contain" />
             </div>
             <span className="text-2xl font-extrabold text-foreground">BookingHealth</span>
           </div>
 
           <div className="space-y-6">
+            <Link
+              to="/"
+              className=" flex justify-center items-center gap-1.5 rounded-lg border border-primary px-3 py-1.5 text-sm font-medium text-primary shadow-sm"
+            >
+              <ArrowLeftIcon className="w-4 h-4" />
+              Về trang chủ
+            </Link>
             {/* Header */}
             <div>
               <h1 className="text-3xl font-extrabold text-foreground">Tạo tài khoản</h1>
@@ -341,7 +229,7 @@ const Register: React.FC = () => {
               id="google-register-btn"
               type="button"
               onClick={() => loginWithGoogle()}
-              className="w-full flex items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground shadow-sm transition-all duration-200 hover:bg-accent hover:border-primary/30 hover:shadow-md active:scale-[0.98] cursor-pointer"
+              className="btn btn-outline btn-md btn-block"
             >
               <GoogleIcon />
               Tiếp tục với Google
@@ -439,14 +327,24 @@ const Register: React.FC = () => {
                       );
                     })}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {formData.password.length < 4
-                      ? '🔴 Quá yếu'
-                      : formData.password.length < 6
-                        ? '🟡 Yếu'
-                        : formData.password.length < 8
-                          ? '🔵 Trung bình'
-                          : '🟢 Mạnh'}
+                  <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    {formData.password.length < 4 ? (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-red-500" /> Quá yếu
+                      </>
+                    ) : formData.password.length < 6 ? (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-yellow-500" /> Yếu
+                      </>
+                    ) : formData.password.length < 8 ? (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-blue-500" /> Trung bình
+                      </>
+                    ) : (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-green-500" /> Mạnh
+                      </>
+                    )}
                   </p>
                 </div>
               )}
@@ -472,7 +370,7 @@ const Register: React.FC = () => {
                   htmlFor="terms-checkbox"
                   className="flex items-start gap-3 cursor-pointer group"
                 >
-                  <div className="relative mt-0.5 flex-shrink-0">
+                  <div className="relative mt-0.5 shrink-0">
                     <input
                       id="terms-checkbox"
                       type="checkbox"
@@ -481,14 +379,14 @@ const Register: React.FC = () => {
                       className="sr-only"
                     />
                     <div
-                      className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200
+                      className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-200
                         ${
                           agreedToTerms
                             ? 'bg-primary border-primary text-primary-foreground'
                             : 'border-border group-hover:border-primary/50 bg-background'
                         }`}
                     >
-                      {agreedToTerms && <CheckIcon />}
+                      {agreedToTerms && <CheckIcon className="w-3 h-3" />}
                     </div>
                   </div>
                   <span className="text-sm text-muted-foreground leading-relaxed">
@@ -511,7 +409,7 @@ const Register: React.FC = () => {
                 </label>
                 {errors.terms && (
                   <p className="text-xs text-red-500 flex items-center gap-1 pl-8">
-                    <span>⚠</span> {errors.terms}
+                    <AlertTriangleIcon className="w-4 h-4 shrink-0" /> {errors.terms}
                   </p>
                 )}
               </div>
@@ -521,7 +419,7 @@ const Register: React.FC = () => {
                 id="register-submit-btn"
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-[0_8px_20px_rgba(26,113,180,0.35)] transition-all duration-300 hover:shadow-[0_12px_28px_rgba(26,113,180,0.5)] hover:bg-primary-hover active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_8px_20px_rgba(26,113,180,0.35)] cursor-pointer mt-2"
+                className="btn btn-primary btn-md btn-block mt-2"
               >
                 {loading ? (
                   <>
